@@ -1,0 +1,32 @@
+package com.mk.fx.qa.qap.junit.model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import lombok.Data;
+import lombok.ToString;
+
+@Data
+public class QAPTestClass {
+
+    private final String className;
+    private final String displayName;
+    private List<QAPJunitLifeCycleEvent> qapJunitLifeCycleEvent;
+    private final Set<String> classTags;
+    private List<QAPTest> testCases;
+    @ToString.Exclude 
+    private byte[] fixLogs;
+
+    @JsonCreator
+    public QAPTestClass(
+            @JsonProperty("className") String className,
+            @JsonProperty("displayName") String displayName,
+            @JsonProperty("classTags") Set<String> classTags) {
+        this.className = className;
+        this.displayName = displayName;
+        this.classTags = classTags;
+        this.qapJunitLifeCycleEvent = new ArrayList<>();
+    }
+}

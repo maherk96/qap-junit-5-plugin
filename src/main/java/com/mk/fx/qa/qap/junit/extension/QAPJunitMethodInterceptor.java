@@ -1,0 +1,63 @@
+
+package com.mk.fx.qa.qap.junit.extension;
+
+import com.mk.fx.qa.qap.junit.model.QAPTest;
+import com.mk.fx.qa.qap.junit.model.QAPTestParams;
+import com.mk.fx.qa.qap.junit.store.StoreManager;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
+
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
+
+import static com.mk.fx.qa.qap.junit.core.QAPUtils.METHOD_DESCRIPTION_KEY;
+
+
+public class QAPJunitMethodInterceptor implements IMethodInterceptor {
+    private final Map<String, Throwable> failedInits;
+
+    public QAPJunitMethodInterceptor(Map<String, Throwable> failedInits) {
+        this.failedInits = failedInits;
+    }
+
+    @Override
+    public void interceptTestTemplateMethod(
+            InvocationInterceptor.Invocation<Void> invocation,
+            ReflectiveInvocationContext<Method> invocationContext,
+            ExtensionContext extensionContext)
+            throws Throwable {
+        var testParams = invocationContext.getArguments().toArray();
+        var qapTest = StoreManager.getMethodStoreData(extensionContext, METHOD_DESCRIPTION_KEY, QAPTest.class);
+        List<QAPTestParams> qapTestParams = new ArrayList<>();
+        IntStream.range(0, testParams.length)
+                .forEach(args -> {
+                    var arg = testParams[args];
+                    var argClassName = (arg != null) ? arg.getClass().getSimpleName() : "null";
+                    var argStringValue = (arg != null) ? arg.toString() : "null";
+                    var params = new QAPTestParams(args, argClassName, argStringValue);
+                    qapTestParams.add(params);
+                });
+        qapTest.setTestParams(
+                qapTestParams.toString().getBytes(StandardCharsets.UTF_8));
+        invocation.proceed();
+    }
+
+    @Override
+    public void interceptBeforeAllMethod(
+            InvocationInterceptor.Invocation<Void> invocation,
+            ReflectiveInvocationContext<Method> invocationContext,
+            ExtensionContext extensionContext)
+            throws Throwable {
+        try {
+            invocation.proceed();
+        } catch (Throwable t) {
+            failedInits.put(extensionContext.getUniqueId(), t);
+            throw t;
+        }
+    }
+}
