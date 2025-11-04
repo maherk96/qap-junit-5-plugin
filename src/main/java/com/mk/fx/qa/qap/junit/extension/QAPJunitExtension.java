@@ -1,4 +1,3 @@
-
 package com.mk.fx.qa.qap.junit.extension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,32 +8,30 @@ import com.mk.fx.qa.qap.junit.model.QAPJunitLaunch;
 import com.mk.fx.qa.qap.junit.model.QAPPropertiesLoader;
 import com.mk.fx.qa.qap.junit.model.QAPTest;
 import com.mk.fx.qa.qap.junit.store.StoreManager;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.Extension;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
-import org.junit.jupiter.api.extension.TestWatcher;
+import org.junit.jupiter.api.extension.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.mk.fx.qa.qap.junit.core.QAPUtils.METHOD_DESCRIPTION_KEY;
-import static com.mk.fx.qa.qap.junit.core.QAPUtils.TEST_CLASS_DATA_KEY;
-import static com.mk.fx.qa.qap.junit.core.QAPUtils.buildQAPHeaders;
-import static com.mk.fx.qa.qap.junit.core.QAPUtils.isReportingEnabled;
+import static com.mk.fx.qa.qap.junit.core.QAPUtils.*;
 
-
+/**
+ * Bridges JUnit 5 lifecycle with QAP model:
+ *  - builds launch & test events
+ *  - collects params/logs via interceptors
+ *  - serializes and (optionally) publishes results
+ */
 public class QAPJunitExtension
-    implements Extension,
+        implements Extension,
         BeforeAllCallback,
         BeforeEachCallback,
         InvocationInterceptor,
@@ -42,78 +39,99 @@ public class QAPJunitExtension
         AfterAllCallback,
         TestWatcher {
 
-    private final Map<String, Throwable> failedInits = new ConcurrentHashMap<>();
-    private final ILifeCycleEventCreator lifeCycleEventCreator =
-        new QAPJunitLifeCycleEventCreator(failedInits);
-    private final ITestEventCreator eventCreator = new QAPJunitTestEventsCreator();
-    private final IMethodInterceptor methodInterceptor = new QAPJunitMethodInterceptor(failedInits);
-    private final QAPLaunchIdGenerator launchIdGenerator = new QAPLaunchIdGenerator();
+    private static final Logger log = LoggerFactory.getLogger(QAPJunitExtension.class);
+
+    private final Map<String, Throwable> failedInits;
+    private final ILifeCycleEventCreator lifeCycleEventCreator;
+    private final ITestEventCreator eventCreator;
+    private final IMethodInterceptor methodInterceptor;
+    private final QAPLaunchIdGenerator launchIdGenerator;
+    private final ObjectMapper objectMapper;
+    private final DisplayNameResolver displayNameResolver;
 
     /**
-     * Callback for junit afterAll hook
-     *
-     * @param context provides test specific information and state
+     * Default constructor for production use.
+     * Creates shared state between lifecycle and method interceptors.
      */
-    @Override
-    public void afterAll(ExtensionContext context) {
-        var launch = StoreManager.getClassStoreData(context, TEST_CLASS_DATA_KEY, QAPJunitLaunch.class);
-        // lifeCycleEventCreator.createLifeCycleEvent(LifeCycleEvent.AFTER_ALL, context);
-        var qapHeader = launch.getHeader();
-        final var qapAttributes = new QAPPropertiesLoader();
-        final var gitProperties = qapAttributes.loadGitProperties();
-        var git = gitProperties != null ? gitProperties.getProperty("git.branch") : null;
-        buildQAPHeaders(qapHeader, git, qapAttributes);
-        eventCreator.addTestEventsToTestLaunch(context, launch);
-        if (isReportingEnabled(launch, qapAttributes)) {
-            //eventPublisher.publishEvent(launch, qapAttributes);
-            //Temporary
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                String s = mapper.writeValueAsString(launch);
-                System.out.println(s);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public QAPJunitExtension() {
+        ConcurrentHashMap<String, Throwable> sharedFailedInits = new ConcurrentHashMap<>();
+        this.failedInits = sharedFailedInits;
+        this.lifeCycleEventCreator = new QAPJunitLifeCycleEventCreator(sharedFailedInits);
+        this.methodInterceptor = new QAPJunitMethodInterceptor(sharedFailedInits);
+        this.eventCreator = new QAPJunitTestEventsCreator();
+        this.launchIdGenerator = new QAPLaunchIdGenerator();
+        this.objectMapper = new ObjectMapper();
+        this.displayNameResolver = new DisplayNameResolver();
     }
 
     /**
-     * Callback for junit beforeAll hook
-     *
-     * @param context provides test specific information and state
+     * Constructor for testing with dependency injection.
      */
+    QAPJunitExtension(Map<String, Throwable> failedInits,
+                      ILifeCycleEventCreator lifeCycleEventCreator,
+                      ITestEventCreator eventCreator,
+                      IMethodInterceptor methodInterceptor,
+                      QAPLaunchIdGenerator launchIdGenerator,
+                      ObjectMapper objectMapper,
+                      DisplayNameResolver displayNameResolver) {
+        this.failedInits = failedInits;
+        this.lifeCycleEventCreator = lifeCycleEventCreator;
+        this.eventCreator = eventCreator;
+        this.methodInterceptor = methodInterceptor;
+        this.launchIdGenerator = launchIdGenerator;
+        this.objectMapper = objectMapper;
+        this.displayNameResolver = displayNameResolver;
+    }
+
+    // ---- JUnit lifecycle ---------------------------------------------------
+
     @Override
     public void beforeAll(ExtensionContext context) {
-        launchIdGenerator.generateLaunchId();
-        var qapLaunch = eventCreator.startLaunchQAP(context);
-        StoreManager.putClassStoreData(context, TEST_CLASS_DATA_KEY, qapLaunch);
-        // lifeCycleEventCreator.createLifeCycleEvent(LifeCycleEvent.BEFORE_ALL, context);
+        ensureLaunchId();
+        QAPJunitLaunch launch = eventCreator.startLaunchQAP(context);
+        StoreManager.putClassStoreData(context, TEST_CLASS_DATA_KEY, launch);
+        safeCreateLifeCycleEvent(LifeCycleEvent.BEFORE_ALL, context);
     }
 
     @Override
     public void beforeEach(ExtensionContext context) {
-        var methodName = context.getRequiredTestMethod().getName();
-        var rawDisplayName = context.getDisplayName();
-        var displayName = resolveDisplayName(context, methodName, rawDisplayName);
-
-        var createTest = new QAPTest(methodName, displayName);
-        createTest.setStartTime(Instant.now().toEpochMilli());
-        createTest.setTag(context.getTags());
-
-        StoreManager.putMethodStoreData(context, METHOD_DESCRIPTION_KEY, createTest);
+        QAPTest qapTest = newQapTest(context);
+        qapTest.setStartTime(now());
+        qapTest.setTag(context.getTags());
+        StoreManager.putMethodStoreData(context, METHOD_DESCRIPTION_KEY, qapTest);
     }
 
     @Override
-    public void testDisabled(ExtensionContext context, Optional<String> reason) {
-        var qapTest = new QAPTest(context.getRequiredTestMethod().getName(), context.getDisplayName());
-        qapTest.setStartTime(Instant.now().toEpochMilli());
-        qapTest.setTag(context.getTags());
-        qapTest.setEndTime(Instant.now().toEpochMilli());
-        qapTest.setStatus(TestCaseStatus.DISABLED.name());
-        var exc = reason.orElse("Exception not present");
-        qapTest.setException(exc.getBytes(StandardCharsets.UTF_8));
+    public void afterEach(ExtensionContext context) {
+        QAPTest qapTest = StoreManager.getMethodStoreData(context, METHOD_DESCRIPTION_KEY, QAPTest.class);
         StoreManager.addDescriptionToClassStore(context, qapTest);
     }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        QAPJunitLaunch launch = StoreManager.getClassStoreData(context, TEST_CLASS_DATA_KEY, QAPJunitLaunch.class);
+
+        if (launch == null) {
+            log.warn("No launch data found for context: {}. Skipping report generation.",
+                    context.getDisplayName());
+            return;
+        }
+
+        safeCreateLifeCycleEvent(LifeCycleEvent.AFTER_ALL, context);
+
+        QAPPropertiesLoader props = new QAPPropertiesLoader();
+        var gitProps = props.loadGitProperties();
+        String gitBranch = (gitProps != null) ? gitProps.getProperty("git.branch") : null;
+        buildQAPHeaders(launch.getHeader(), gitBranch, props);
+
+        eventCreator.addTestEventsToTestLaunch(context, launch);
+
+        if (isReportingEnabled(launch, props)) {
+            serializeAndLogLaunch(launch);
+        }
+    }
+
+    // ---- TestWatcher -------------------------------------------------------
 
     @Override
     public void testSuccessful(ExtensionContext context) {
@@ -131,61 +149,131 @@ public class QAPJunitExtension
     }
 
     @Override
-    public void afterEach(ExtensionContext extensionContext) {
-        var qapTest =
-                StoreManager.getMethodStoreData(extensionContext, METHOD_DESCRIPTION_KEY, QAPTest.class);
-        StoreManager.addDescriptionToClassStore(extensionContext, qapTest);
+    public void testDisabled(ExtensionContext context, Optional<String> reason) {
+        QAPTest qapTest = newQapTest(context);
+        qapTest.setStartTime(now());
+        qapTest.setTag(context.getTags());
+        qapTest.setEndTime(now());
+        qapTest.setStatus(TestCaseStatus.DISABLED.name());
+        String msg = reason.orElse("Test disabled (no reason provided)");
+        qapTest.setException(toBytes(msg));
+        StoreManager.addDescriptionToClassStore(context, qapTest);
     }
 
+    // ---- InvocationInterceptor ---------------------------------------------
+
     @Override
-    public void interceptBeforeAllMethod(
-            Invocation<Void> invocation,
-            ReflectiveInvocationContext<Method> invocationContext,
-            ExtensionContext extensionContext)
-            throws Throwable {
+    public void interceptBeforeAllMethod(Invocation<Void> invocation,
+                                         ReflectiveInvocationContext<Method> invocationContext,
+                                         ExtensionContext extensionContext) throws Throwable {
         methodInterceptor.interceptBeforeAllMethod(invocation, invocationContext, extensionContext);
     }
 
     @Override
-    public void interceptTestTemplateMethod(
-            Invocation<Void> invocation,
-            ReflectiveInvocationContext<Method> invocationContext,
-            ExtensionContext extensionContext)
-            throws Throwable {
+    public void interceptTestTemplateMethod(Invocation<Void> invocation,
+                                            ReflectiveInvocationContext<Method> invocationContext,
+                                            ExtensionContext extensionContext) throws Throwable {
         methodInterceptor.interceptTestTemplateMethod(invocation, invocationContext, extensionContext);
     }
 
-    private String resolveDisplayName(
-            ExtensionContext context, String methodName, String rawDisplayName) {
-        Optional<Method> method = context.getTestMethod();
-        if (method.isEmpty()) {
-            return isAutoGeneratedDisplayName(rawDisplayName, methodName) ? methodName : rawDisplayName;
-        }
+    // ---- helpers -----------------------------------------------------------
 
-        Method testMethod = method.get();
+    /**
+     * Creates a new QAPTest object with all metadata populated from the test context.
+     */
+    private QAPTest newQapTest(ExtensionContext context) {
+        String methodName = context.getRequiredTestMethod().getName();
+        String rawDisplay = context.getDisplayName();
 
-        DisplayName junitDisplayName = testMethod.getAnnotation(DisplayName.class);
-        if (junitDisplayName != null) {
-            return junitDisplayName.value();
-        }
+        // Run-level display name (parameterized test dynamic names preserved)
+        String runDisplay = displayNameResolver.resolveRunDisplayName(context, methodName, rawDisplay);
+        QAPTest test = new QAPTest(methodName, runDisplay);
 
-        DisplayName classDisplayName = testMethod.getDeclaringClass().getAnnotation(DisplayName.class);
-        if (classDisplayName != null) {
-            return classDisplayName.value();
-        }
+        // Static method-level @DisplayName
+        test.setMethodDisplayName(displayNameResolver.resolveMethodDisplayName(context));
 
-        if (isAutoGeneratedDisplayName(rawDisplayName, methodName)) {
-            return methodName;
-        }
+        // Parent class/nested context display name
+        String classDisplayName = displayNameResolver.resolveClassDisplayName(context);
+        test.setParentDisplayName(classDisplayName);
 
-        return rawDisplayName;
+        // Parent class key (FQCN)
+        test.setParentClassKey(displayNameResolver.resolveParentClassKey(context));
+
+        // Parent chain = ancestors + current class
+        List<String> chain = displayNameResolver.buildParentChain(context);
+        chain.add(classDisplayName);
+        test.setParentChain(chain);
+
+        return test;
     }
 
-    private boolean isAutoGeneratedDisplayName(String displayName, String methodName) {
-        return displayName.equals(methodName + "()")
-                || displayName.startsWith(methodName + "(")
-                || displayName.equals(methodName);
+    /**
+     * Serializes the launch data to JSON and logs it.
+     * Errors during serialization are logged but do not fail the test run.
+     */
+    private void serializeAndLogLaunch(QAPJunitLaunch launch) {
+        try {
+            String json = objectMapper.writeValueAsString(launch);
+            log.info("QAP Launch payload: {}", json);
+            System.out.println(json);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize QAP launch payload", e);
+        }
     }
 
+    private long now() {
+        return Instant.now().toEpochMilli();
+    }
 
+    /**
+     * Ensures a launch ID exists, generating one if necessary.
+     * Thread-safe - the LaunchIdGenerator handles concurrency internally.
+     */
+    private void ensureLaunchId() {
+        String id = launchIdGenerator.getLaunchId();
+        if (id == null || id.isBlank()) {
+             launchIdGenerator.generateLaunchId();
+        }
+    }
+
+    /**
+     * Safely executes lifecycle event creation, logging failures as debug messages.
+     * Lifecycle event failures should not break the test run.
+     */
+    private void safeCreateLifeCycleEvent(LifeCycleEvent event, ExtensionContext ctx) {
+        try {
+            lifeCycleEventCreator.createLifeCycleEvent(event, ctx);
+        } catch (Exception e) {
+            log.debug("Lifecycle event '{}' failed (non-fatal): {}", event, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Converts a string to UTF-8 bytes.
+     */
+    private byte[] toBytes(String text) {
+        if (text == null) {
+            return new byte[0];
+        }
+        return text.getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Converts a throwable's stack trace to UTF-8 bytes.
+     */
+    private byte[] toBytes(Throwable throwable) {
+        if (throwable == null) {
+            return new byte[0];
+        }
+        return toBytes(stackTraceOf(throwable));
+    }
+
+    /**
+     * Extracts the full stack trace from a throwable as a string.
+     */
+    private String stackTraceOf(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+    }
 }

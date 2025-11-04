@@ -5,6 +5,8 @@ import com.mk.fx.qa.qap.junit.model.QAPTest;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.mk.fx.qa.qap.junit.core.QAPUtils.METHOD_DESCRIPTION_KEY;
 
@@ -49,9 +51,9 @@ public class StoreManager {
 
     public static void addDescriptionToClassStore(ExtensionContext context, QAPTest qapTest) {
         ExtensionContext.Store classStore = getClassStore(context);
-        var qapTests =
+        List<QAPTest> qapTests =
                 classStore.getOrDefault(
-                        METHOD_DESCRIPTION_KEY, ArrayList.class, new ArrayList<QAPTest>());
+                        METHOD_DESCRIPTION_KEY, List.class, new CopyOnWriteArrayList<QAPTest>());
         qapTests.add(qapTest);
         classStore.put(METHOD_DESCRIPTION_KEY, qapTests);
     }

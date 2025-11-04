@@ -1,0 +1,95 @@
+{
+  "header": {
+    "launchStartTime": 1760918236646,
+    "launchId": "TestLaunch-6132c533694d",
+    "applicationName": "MyApp",
+    "testEnvironment": "TEST",
+    "user": "your.username",
+    "gitBranch": null,
+    "launchEndTime": 1760918236684,
+    "osVersion": "Mac OS X 26.0.1",
+    "testRunnerVersion": "Junit 5.10.0",
+    "jdkVersion": "JDK 21.0.7",
+    "regression": false
+  },
+  "testClass": {
+    "className": "SecondLevelNested",
+    "displayName": "SecondLevelNested",
+    "classTags": [],
+    "qapJunitLifeCycleEvent": [
+      {
+        "event": null,
+        "exception": null,
+        "logs": null
+      },
+      {
+        "event": null,
+        "exception": null,
+        "logs": null
+      }
+    ],
+    "testCases": [
+      {
+        "methodName": "deeplyNestedTest",
+        "displayName": "Deeply nested test",
+        "startTime": 1760918236648,
+        "endTime": 1760918236648,
+        "status": "PASSED",
+        "logs": null,
+        "fix": null,
+        "exception": null,
+        "tag": [],
+        "methodDisplayName": "Deeply nested test",
+        "parentDisplayName": "SecondLevelNested",
+        "parentClassKey": "NestedTestsExample$FirstNested$SecondLevelNested",
+        "parentChain": [
+          "NestedTestsExample",
+          "FirstNested",
+          "SecondLevelNested"
+        ],
+        "testParams": null
+      },
+      {
+        "methodName": "parameterizedTest",
+        "displayName": "Run 1 with value=A",
+        "startTime": 1760918236662,
+        "endTime": 1760918236677,
+        "status": "PASSED",
+        "logs": null,
+        "fix": null,
+        "exception": null,
+        "tag": [],
+        "methodDisplayName": "Parameterized test in SecondLevelNested",
+        "parentDisplayName": "SecondLevelNested",
+        "parentClassKey": "NestedTestsExample$FirstNested$SecondLevelNested",
+        "parentChain": [
+          "NestedTestsExample",
+          "FirstNested",
+          "SecondLevelNested"
+        ],
+        "testParams": "W1FBUFRlc3RQYXJhbXNbYXJndW1lbnRJbmRleD0wLCBhcmd1bWVudFR5cGU9U3RyaW5nLCBhcmd1bWVudFZhbHVlPUFdXQ=="
+      },
+      {
+        "methodName": "parameterizedTest",
+        "displayName": "Run 2 with value=B",
+        "startTime": 1760918236679,
+        "endTime": 1760918236680,
+        "status": "PASSED",
+        "logs": null,
+        "fix": null,
+        "exception": null,
+        "tag": [],
+        "methodDisplayName": "Parameterized test in SecondLevelNested",
+        "parentDisplayName": "SecondLevelNested",
+        "parentClassKey": "NestedTestsExample$FirstNested$SecondLevelNested",
+        "parentChain": [
+          "NestedTestsExample",
+          "FirstNested",
+          "SecondLevelNested"
+        ],
+        "testParams": "W1FBUFRlc3RQYXJhbXNbYXJndW1lbnRJbmRleD0wLCBhcmd1bWVudFR5cGU9U3RyaW5nLCBhcmd1bWVudFZhbHVlPUJdXQ=="
+      }
+    ],
+    "fixLogs": null
+  }
+}

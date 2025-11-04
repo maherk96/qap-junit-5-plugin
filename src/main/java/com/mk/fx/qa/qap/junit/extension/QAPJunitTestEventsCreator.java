@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.mk.fx.qa.qap.junit.core.QAPUtils.TEST_CLASS_DATA_KEY;
 
@@ -23,7 +24,7 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
     @Override
     public void addTestEventsToTestLaunch(ExtensionContext context, QAPJunitLaunch launch) {
         var events = StoreManager.getClassStoreData(
-                context, QAPUtils.METHOD_DESCRIPTION_KEY, ArrayList.class);
+                context, QAPUtils.METHOD_DESCRIPTION_KEY, List.class);
         launch.getTestClass().setTestCases(events);
     }
 
