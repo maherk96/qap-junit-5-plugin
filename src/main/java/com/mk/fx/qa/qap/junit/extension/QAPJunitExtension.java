@@ -99,6 +99,8 @@ public class QAPJunitExtension
         qapTest.setStartTime(now());
         // Capture method-level tags only (exclude class/inherited tags)
         qapTest.setTag(extractMethodTags(context));
+        // Capture inherited class tags from enclosing classes (excluding current class)
+        qapTest.setInheritedClassTags(extractInheritedClassTags(context));
         StoreManager.putMethodStoreData(context, METHOD_DESCRIPTION_KEY, qapTest);
     }
 
@@ -155,6 +157,8 @@ public class QAPJunitExtension
         qapTest.setStartTime(now());
         // Capture method-level tags only (exclude class/inherited tags)
         qapTest.setTag(extractMethodTags(context));
+        // Capture inherited class tags from enclosing classes (excluding current class)
+        qapTest.setInheritedClassTags(extractInheritedClassTags(context));
         qapTest.setEndTime(now());
         qapTest.setStatus(TestCaseStatus.DISABLED.name());
         String msg = reason.orElse("Test disabled (no reason provided)");
@@ -241,6 +245,27 @@ public class QAPJunitExtension
                     return java.util.Collections.unmodifiableSet(tags);
                 })
                 .orElse(java.util.Collections.emptySet());
+    }
+
+    /**
+     * Walks up the ExtensionContext parent chain and collects @Tag annotations declared on
+     * enclosing classes, excluding the current test's class.
+     */
+    private java.util.Set<String> extractInheritedClassTags(ExtensionContext context) {
+        java.util.Set<String> tags = new java.util.HashSet<>();
+        java.util.Optional<Class<?>> current = context.getTestClass();
+        java.util.Optional<ExtensionContext> parent = context.getParent();
+        while (parent.isPresent()) {
+            ExtensionContext p = parent.get();
+            java.util.Optional<Class<?>> cls = p.getTestClass();
+            if (cls.isPresent() && (current.isEmpty() || !cls.get().equals(current.get()))) {
+                for (org.junit.jupiter.api.Tag t : cls.get().getAnnotationsByType(org.junit.jupiter.api.Tag.class)) {
+                    tags.add(t.value());
+                }
+            }
+            parent = p.getParent();
+        }
+        return java.util.Collections.unmodifiableSet(tags);
     }
 
     /**

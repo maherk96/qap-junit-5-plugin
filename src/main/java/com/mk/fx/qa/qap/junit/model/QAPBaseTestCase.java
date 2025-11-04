@@ -27,6 +27,7 @@ public abstract class QAPBaseTestCase {
     protected byte[] exception;
 
     protected Set<String> tag = new HashSet<>();
+    protected Set<String> inheritedClassTags = new HashSet<>();
 
     // Keep internal field name `tag`, but expose as `methodTags` in JSON
     @JsonProperty("methodTags")
@@ -38,6 +39,18 @@ public abstract class QAPBaseTestCase {
     @JsonIgnore
     public Set<String> getTag() {
         return Collections.unmodifiableSet(tag);
+    }
+
+    @JsonProperty("inheritedClassTags")
+    public Set<String> getInheritedClassTags() {
+        return Collections.unmodifiableSet(inheritedClassTags);
+    }
+
+    public void setInheritedClassTags(Set<String> tags) {
+        this.inheritedClassTags.clear();
+        if (tags != null) {
+            this.inheritedClassTags.addAll(tags);
+        }
     }
 
     public void addTag(String tag) {
