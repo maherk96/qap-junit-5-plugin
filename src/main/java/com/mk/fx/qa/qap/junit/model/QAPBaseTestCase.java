@@ -5,6 +5,8 @@ import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.ToString;
 
@@ -26,6 +28,14 @@ public abstract class QAPBaseTestCase {
 
     protected Set<String> tag = new HashSet<>();
 
+    // Keep internal field name `tag`, but expose as `methodTags` in JSON
+    @JsonProperty("methodTags")
+    public Set<String> getMethodTags() {
+        return Collections.unmodifiableSet(tag);
+    }
+
+    // Avoid emitting legacy `tag` property in JSON
+    @JsonIgnore
     public Set<String> getTag() {
         return Collections.unmodifiableSet(tag);
     }

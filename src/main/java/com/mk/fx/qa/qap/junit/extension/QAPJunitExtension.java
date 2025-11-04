@@ -97,7 +97,8 @@ public class QAPJunitExtension
     public void beforeEach(ExtensionContext context) {
         QAPTest qapTest = newQapTest(context);
         qapTest.setStartTime(now());
-        qapTest.setTag(context.getTags());
+        // Capture method-level tags only (exclude class/inherited tags)
+        qapTest.setTag(extractMethodTags(context));
         StoreManager.putMethodStoreData(context, METHOD_DESCRIPTION_KEY, qapTest);
     }
 
@@ -152,7 +153,8 @@ public class QAPJunitExtension
     public void testDisabled(ExtensionContext context, Optional<String> reason) {
         QAPTest qapTest = newQapTest(context);
         qapTest.setStartTime(now());
-        qapTest.setTag(context.getTags());
+        // Capture method-level tags only (exclude class/inherited tags)
+        qapTest.setTag(extractMethodTags(context));
         qapTest.setEndTime(now());
         qapTest.setStatus(TestCaseStatus.DISABLED.name());
         String msg = reason.orElse("Test disabled (no reason provided)");
@@ -223,6 +225,22 @@ public class QAPJunitExtension
 
     private long now() {
         return Instant.now().toEpochMilli();
+    }
+
+    /**
+     * Extracts only the tags declared directly on the test method.
+     * Does not include class or enclosing context tags.
+     */
+    private java.util.Set<String> extractMethodTags(ExtensionContext context) {
+        return context.getTestMethod()
+                .map(m -> {
+                    java.util.Set<String> tags = new java.util.HashSet<>();
+                    for (org.junit.jupiter.api.Tag t : m.getAnnotationsByType(org.junit.jupiter.api.Tag.class)) {
+                        tags.add(t.value());
+                    }
+                    return java.util.Collections.unmodifiableSet(tags);
+                })
+                .orElse(java.util.Collections.emptySet());
     }
 
     /**

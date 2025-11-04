@@ -50,15 +50,20 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
      */
     @Override
     public QAPJunitLaunch startLaunchQAP(ExtensionContext context) {
+        var clazz = context.getRequiredTestClass();
+        java.util.Set<String> classTags = new java.util.HashSet<>();
+        for (org.junit.jupiter.api.Tag t : clazz.getAnnotationsByType(org.junit.jupiter.api.Tag.class)) {
+            classTags.add(t.value());
+        }
         var qapLaunch = new QAPJunitLaunch(
                 new QAPHeader(
                         Instant.now().toEpochMilli(),
                         System.getProperty(SYSTEM_PROPERTY_LAUNCH_ID)
                 ),
                 new QAPTestClass(
-                        context.getRequiredTestClass().getSimpleName(),
+                        clazz.getSimpleName(),
                         context.getDisplayName(),
-                        context.getTags()
+                        classTags
                 )
         );
 
