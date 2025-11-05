@@ -62,7 +62,7 @@ public class DemoExtensionUsageTest {
         }
 
         @Nested
-        @Tag("Inner")
+        @Tag("InnerTag")
         class InnerGroup {
 
             @Test

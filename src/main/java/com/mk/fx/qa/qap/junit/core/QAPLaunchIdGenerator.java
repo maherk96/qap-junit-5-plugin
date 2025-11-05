@@ -24,6 +24,17 @@ public class QAPLaunchIdGenerator {
         return System.getProperty(SYSTEM_PROPERTY_LAUNCH_ID);
     }
 
+    /**
+     * Generates a launch id only if not already present, with a simple synchronization to
+     * avoid check-then-act races across threads within the same JVM.
+     */
+    public synchronized void generateIfAbsent() {
+        String current = getLaunchId();
+        if (!isFullLaunchId(current)) {
+            generateLaunchId();
+        }
+    }
+
     private boolean isFullLaunchId(String value) {
         return value != null && value.matches(".+[-a-zA-Z0-9]{" + UUID_LENGTH + ",}");
     }
