@@ -27,6 +27,7 @@ public abstract class QAPBaseTestCase {
     protected byte[] exception;
 
     protected Set<String> tag = new HashSet<>();
+    protected Set<String> classTags = new HashSet<>();
     protected Set<String> inheritedClassTags = new HashSet<>();
 
     @JsonProperty("methodTags")
@@ -54,6 +55,18 @@ public abstract class QAPBaseTestCase {
     public void addInheritedClassTags(Set<String> tags) {
         if (tags != null) {
             this.inheritedClassTags.addAll(tags);
+        }
+    }
+
+    @JsonProperty("classTags")
+    public Set<String> getClassTags() {
+        return Collections.unmodifiableSet(classTags);
+    }
+
+    public void setClassTags(Set<String> tags) {
+        this.classTags.clear();
+        if (tags != null) {
+            this.classTags.addAll(tags);
         }
     }
 

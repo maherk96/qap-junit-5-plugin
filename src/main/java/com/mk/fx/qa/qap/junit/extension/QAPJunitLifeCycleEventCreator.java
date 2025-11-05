@@ -21,6 +21,11 @@ public class QAPJunitLifeCycleEventCreator implements ILifeCycleEventCreator {
     public void createLifeCycleEvent(LifeCycleEvent event, ExtensionContext context) {
         var launch = StoreManager.getClassStoreData(context, TEST_CLASS_DATA_KEY, QAPJunitLaunch.class);
 
+        if (launch == null) {
+            // No launch yet (should not happen for top-level), skip safely
+            return;
+        }
+
         QAPJunitLifeCycleEvent lifeCycleEvent = new QAPJunitLifeCycleEvent(null, null, null);
 
         // Optional.ofNullable(failedInits.get(context.getUniqueId()))

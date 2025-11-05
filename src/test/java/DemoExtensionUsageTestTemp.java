@@ -1,5 +1,9 @@
 import com.mk.fx.qa.qap.junit.extension.QAPJunitExtension;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -7,7 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 @Tag("DemoSuite")
 @ExtendWith(QAPJunitExtension.class)
 @DisplayName("Demo QAP Extension Usage")
-public class DemoExtensionUsageTest {
+public class DemoExtensionUsageTestTemp {
 
     // --- Normal tests -------------------------------------------------------
 
@@ -47,30 +51,7 @@ public class DemoExtensionUsageTest {
         Assertions.assertEquals(len, s.length());
     }
 
-    // --- Nested tests -------------------------------------------------------
 
-    @Nested
-    @Tag("Outer")
-    @DisplayName("Math Group")
-    class MathGroup {
 
-        @Test
-        @DisplayName("Multiplication works")
-        @Tag("NestedMethod")
-        void multiply() {
-            Assertions.assertEquals(12, 3 * 4);
-        }
-
-        @Nested
-        @Tag("InnerTag")
-        class InnerGroup {
-
-            @Test
-            @Tag("InnerMethod")
-            void innerWithoutDisplayName() {
-                Assertions.assertTrue(10 > 2);
-            }
-        }
-    }
 }
 

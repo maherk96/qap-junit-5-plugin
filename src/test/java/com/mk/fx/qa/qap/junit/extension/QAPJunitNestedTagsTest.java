@@ -34,7 +34,7 @@ class QAPJunitNestedTagsTest {
     }
 
     @Test
-    void inheritedClassTags_collects_tags_from_enclosing_classes_only() throws Exception {
+    void separates_current_class_tags_from_inherited_enclosing_tags() throws Exception {
         // Mock a nested ExtensionContext chain: top -> mid -> leaf(method)
         ExtensionContext top = mock(ExtensionContext.class);
         ExtensionContext mid = mock(ExtensionContext.class);
@@ -69,7 +69,7 @@ class QAPJunitNestedTagsTest {
         QAPTest test = store.get(METHOD_DESCRIPTION_KEY, QAPTest.class);
         assertNotNull(test);
         assertEquals(Set.of("MethodTag"), test.getMethodTags());
+        assertEquals(Set.of("LeafTag"), test.getClassTags());
         assertEquals(Set.of("TopTag", "MidTag"), test.getInheritedClassTags());
     }
 }
-
