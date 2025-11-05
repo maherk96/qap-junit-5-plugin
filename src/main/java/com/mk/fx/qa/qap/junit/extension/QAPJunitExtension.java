@@ -88,8 +88,10 @@ public class QAPJunitExtension
     @Override
     public void beforeAll(ExtensionContext context) {
         ensureLaunchId();
-        QAPJunitLaunch launch = eventCreator.startLaunchQAP(context);
-        StoreManager.putClassStoreData(context, TEST_CLASS_DATA_KEY, launch);
+        if (isTopLevelClassContext(context)) {
+            QAPJunitLaunch launch = eventCreator.startLaunchQAP(context);
+            StoreManager.putClassStoreData(context, TEST_CLASS_DATA_KEY, launch);
+        }
         safeCreateLifeCycleEvent(LifeCycleEvent.BEFORE_ALL, context);
     }
 
@@ -113,6 +115,12 @@ public class QAPJunitExtension
     @Override
     public void afterAll(ExtensionContext context) {
         QAPJunitLaunch launch = StoreManager.getClassStoreData(context, TEST_CLASS_DATA_KEY, QAPJunitLaunch.class);
+
+        if (!isTopLevelClassContext(context)) {
+            // Still capture lifecycle event entries for nested classes, but avoid emitting JSON here
+            safeCreateLifeCycleEvent(LifeCycleEvent.AFTER_ALL, context);
+            return;
+        }
 
         if (launch == null) {
             log.warn("No launch data found for context: {}. Skipping report generation.",
@@ -318,5 +326,11 @@ public class QAPJunitExtension
         StringWriter sw = new StringWriter();
         throwable.printStackTrace(new PrintWriter(sw));
         return sw.toString();
+    }
+
+    private boolean isTopLevelClassContext(ExtensionContext context) {
+        Class<?> current = context.getRequiredTestClass();
+        Class<?> top = com.mk.fx.qa.qap.junit.store.StoreManager.resolveTopLevelTestClass(context);
+        return current.equals(top);
     }
 }

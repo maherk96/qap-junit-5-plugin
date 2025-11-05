@@ -26,11 +26,31 @@ public class StoreManager {
     }
 
     public static ExtensionContext.Store getClassStore(ExtensionContext context) {
+        Class<?> topLevel = resolveTopLevelTestClass(context);
         return context
                 .getRoot()
                 .getStore(
                         ExtensionContext.Namespace.create(
-                                QAPJunitExtension.class, context.getRequiredTestClass()));
+                                QAPJunitExtension.class, topLevel));
+    }
+
+    /**
+     * Resolves the top-level test class for the current context by walking
+     * up the parent chain and remembering the last seen test class.
+     * This lets us aggregate nested test results under a single class key.
+     */
+    public static Class<?> resolveTopLevelTestClass(ExtensionContext context) {
+        Class<?> top = null;
+        ExtensionContext current = context;
+        while (current != null) {
+            var maybeClass = current.getTestClass();
+            if (maybeClass.isPresent()) {
+                top = maybeClass.get();
+            }
+            var parent = current.getParent();
+            current = parent.orElse(null);
+        }
+        return top != null ? top : context.getRequiredTestClass();
     }
 
     public static <T> T getMethodStoreData(ExtensionContext context, String key, Class<T> type) {
