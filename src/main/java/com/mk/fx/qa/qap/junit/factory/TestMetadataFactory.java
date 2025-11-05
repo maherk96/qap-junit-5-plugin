@@ -1,0 +1,32 @@
+package com.mk.fx.qa.qap.junit.factory;
+
+import com.mk.fx.qa.qap.junit.extension.DisplayNameResolver;
+import com.mk.fx.qa.qap.junit.model.QAPTest;
+import org.junit.jupiter.api.extension.ExtensionContext;
+
+import java.util.List;
+
+public final class TestMetadataFactory {
+
+    private TestMetadataFactory() {}
+
+    public static QAPTest create(ExtensionContext context, DisplayNameResolver resolver) {
+        String methodName = context.getRequiredTestMethod().getName();
+        String rawDisplay = context.getDisplayName();
+
+        String runDisplay = resolver.resolveRunDisplayName(context, methodName, rawDisplay);
+        QAPTest test = new QAPTest(methodName, runDisplay, null, null, null, null);
+
+        test.setMethodDisplayName(resolver.resolveMethodDisplayName(context));
+        String classDisplayName = resolver.resolveClassDisplayName(context);
+        test.setParentDisplayName(classDisplayName);
+        test.setParentClassKey(resolver.resolveParentClassKey(context));
+
+        List<String> chain = resolver.buildParentChain(context);
+        chain.add(classDisplayName);
+        test.setParentChain(chain);
+
+        return test;
+    }
+}
+
