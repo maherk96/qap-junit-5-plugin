@@ -193,7 +193,7 @@ public class QAPJunitExtension
 
         // Run-level display name (parameterized test dynamic names preserved)
         String runDisplay = displayNameResolver.resolveRunDisplayName(context, methodName, rawDisplay);
-        QAPTest test = new QAPTest(methodName, runDisplay);
+        QAPTest test = new QAPTest(methodName, runDisplay, null, null, null, null);
 
         // Static method-level @DisplayName
         test.setMethodDisplayName(displayNameResolver.resolveMethodDisplayName(context));

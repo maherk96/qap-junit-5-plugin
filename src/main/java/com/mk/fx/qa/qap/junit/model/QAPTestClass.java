@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.Data;
-import lombok.ToString;
 
 @Data
 public class QAPTestClass {
@@ -16,8 +15,6 @@ public class QAPTestClass {
     private List<QAPJunitLifeCycleEvent> qapJunitLifeCycleEvent;
     private final Set<String> classTags;
     private List<QAPTest> testCases;
-    @ToString.Exclude 
-    private byte[] fixLogs;
 
     @JsonCreator
     public QAPTestClass(

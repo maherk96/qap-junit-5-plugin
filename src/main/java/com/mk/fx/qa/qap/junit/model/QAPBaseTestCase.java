@@ -29,13 +29,11 @@ public abstract class QAPBaseTestCase {
     protected Set<String> tag = new HashSet<>();
     protected Set<String> inheritedClassTags = new HashSet<>();
 
-    // Keep internal field name `tag`, but expose as `methodTags` in JSON
     @JsonProperty("methodTags")
     public Set<String> getMethodTags() {
         return Collections.unmodifiableSet(tag);
     }
 
-    // Avoid emitting legacy `tag` property in JSON
     @JsonIgnore
     public Set<String> getTag() {
         return Collections.unmodifiableSet(tag);
@@ -48,6 +46,12 @@ public abstract class QAPBaseTestCase {
 
     public void setInheritedClassTags(Set<String> tags) {
         this.inheritedClassTags.clear();
+        if (tags != null) {
+            this.inheritedClassTags.addAll(tags);
+        }
+    }
+
+    public void addInheritedClassTags(Set<String> tags) {
         if (tags != null) {
             this.inheritedClassTags.addAll(tags);
         }

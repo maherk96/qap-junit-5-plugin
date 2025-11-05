@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
@@ -28,9 +29,23 @@ public class QAPTest extends QAPBaseTestCase {
 
     @JsonCreator
     public QAPTest(@JsonProperty("methodName") String methodName,
-                   @JsonProperty("displayName") String displayName) {
+                   @JsonProperty("displayName") String displayName,
+                   @JsonProperty("methodDisplayName") String methodDisplayName,
+                   @JsonProperty("parentDisplayName") String parentDisplayName,
+                   @JsonProperty("parentClassKey") String parentClassKey,
+                   @JsonProperty("parentChain") List<String> parentChain) {
         this.methodName = methodName;
         this.displayName = displayName;
+        // Initialize new fields with safe defaults for null-safety
+        this.methodDisplayName = methodDisplayName != null ? methodDisplayName : "";
+        this.parentDisplayName = parentDisplayName != null ? parentDisplayName : "";
+        this.parentClassKey = parentClassKey != null ? parentClassKey : "";
+        this.parentChain = parentChain != null ? parentChain : new ArrayList<>();
+    }
+
+    // Backwards-compatible convenience constructor used by tests and call sites
+    public QAPTest(String methodName, String displayName) {
+        this(methodName, displayName, null, null, null, null);
     }
 
     public boolean hasTestParams() {
