@@ -22,8 +22,7 @@ class QAPJunitTestEventsCreatorTest {
         QAPJunitTestEventsCreator creator = new QAPJunitTestEventsCreator();
 
         QAPJunitLaunch launch = creator.startLaunchQAP(ctx);
-        assertEquals("WithClassTag", launch.getTestClass().getDisplayName());
-        assertTrue(launch.getTestClass().getClassTags().contains("T1"));
+        assertEquals("WithClassTag", launch.getTestClasses().get(0).getDisplayName());
+        assertTrue(launch.getTestClasses().get(0).getTags().getClazz().contains("T1"));
     }
 }
-

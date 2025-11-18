@@ -16,10 +16,13 @@ public class StdOutPublisher implements LaunchPublisher {
     public void publish(QAPJunitLaunch launch, ObjectMapper mapper, Logger log) {
         try {
             String json = mapper.writeValueAsString(launch);
-            int tests = launch.getTestClass().getTestCases() != null ? launch.getTestClass().getTestCases().size() : 0;
+            int tests = 0;
+            for (var cls : launch.getTestClasses()) {
+                tests += (cls.getTestCases() != null ? cls.getTestCases().size() : 0);
+            }
             int bytes = json.getBytes(StandardCharsets.UTF_8).length;
             String launchId = launch.getHeader().getLaunchId();
-            String cls = launch.getTestClass().getClassName();
+            String cls = launch.getTestClasses().isEmpty() ? "" : launch.getTestClasses().get(0).getClassName();
             log.info("Publishing QAP launch: class='{}' tests={} bytes={} launchId='{}'", cls, tests, bytes, launchId);
             log.debug("QAP Launch payload: {}", json);
             System.out.println(json);

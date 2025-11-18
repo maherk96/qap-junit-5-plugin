@@ -71,10 +71,30 @@ public class StoreManager {
 
     public static void addDescriptionToClassStore(ExtensionContext context, QAPTest qapTest) {
         ExtensionContext.Store classStore = getClassStore(context);
-        List<QAPTest> qapTests =
+        @SuppressWarnings("unchecked")
+        java.util.Map<String, com.mk.fx.qa.qap.junit.model.QAPTestClass> nodes =
                 classStore.getOrDefault(
-                        METHOD_DESCRIPTION_KEY, List.class, new CopyOnWriteArrayList<QAPTest>());
-        qapTests.add(qapTest);
-        classStore.put(METHOD_DESCRIPTION_KEY, qapTests);
+                        com.mk.fx.qa.qap.junit.core.QAPUtils.CLASS_NODES_KEY,
+                        java.util.Map.class,
+                        new java.util.concurrent.ConcurrentHashMap<String, com.mk.fx.qa.qap.junit.model.QAPTestClass>()
+                );
+        String key = context.getRequiredTestClass().getName();
+        com.mk.fx.qa.qap.junit.model.QAPTestClass node = nodes.computeIfAbsent(key, k -> new com.mk.fx.qa.qap.junit.model.QAPTestClass(
+                context.getRequiredTestClass().getSimpleName(),
+                context.getDisplayName(),
+                java.util.Collections.emptySet()
+        ));
+        if (node.getTestCases() == null) {
+            node.setTestCases(new CopyOnWriteArrayList<>());
+        }
+        node.getTestCases().add(qapTest);
+        nodes.put(key, node);
+        classStore.put(com.mk.fx.qa.qap.junit.core.QAPUtils.CLASS_NODES_KEY, nodes);
+
+        // Maintain backward-compatible flat list
+        List<QAPTest> flat = classStore.getOrDefault(
+                METHOD_DESCRIPTION_KEY, List.class, new CopyOnWriteArrayList<QAPTest>());
+        flat.add(qapTest);
+        classStore.put(METHOD_DESCRIPTION_KEY, flat);
     }
 }

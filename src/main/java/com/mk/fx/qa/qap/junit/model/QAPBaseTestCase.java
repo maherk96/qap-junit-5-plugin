@@ -17,13 +17,16 @@ public abstract class QAPBaseTestCase {
     protected long endTime;
     protected String status;
 
-    @ToString.Exclude 
+    @ToString.Exclude
+    @JsonIgnore
     protected byte[] logs;
 
-    @ToString.Exclude 
+    @ToString.Exclude
+    @JsonIgnore
     protected byte[] fix;
 
-    @ToString.Exclude 
+    @ToString.Exclude
+    @JsonIgnore
     protected byte[] exception;
 
     protected Set<String> tag = new HashSet<>();
@@ -91,11 +94,33 @@ public abstract class QAPBaseTestCase {
         return isNotEmpty(logs);
     }
 
+    // Always serialize logs as an array for consistency
+    @JsonProperty("logs")
+    public java.util.List<String> getLogs() {
+        return java.util.Collections.emptyList();
+    }
+
+    @JsonProperty("durationMillis")
+    public long getDurationMillis() {
+        return (endTime > 0L && startTime > 0L && endTime >= startTime) ? (endTime - startTime) : 0L;
+    }
+
     public boolean hasFix() {
         return isNotEmpty(fix);
     }
 
     public boolean hasException() {
         return isNotEmpty(exception);
+    }
+
+    // Serialize fix/exception as arrays when absent to avoid nulls
+    @JsonProperty("fix")
+    public java.util.List<String> getFixArray() {
+        return java.util.Collections.emptyList();
+    }
+
+    @JsonProperty("exception")
+    public java.util.List<String> getExceptionArray() {
+        return java.util.Collections.emptyList();
     }
 }

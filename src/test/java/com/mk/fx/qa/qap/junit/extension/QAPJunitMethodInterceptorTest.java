@@ -59,7 +59,7 @@ class QAPJunitMethodInterceptorTest {
         assertEquals("A", stored.getParameters().get(0).argumentValue());
         assertEquals(1, stored.getParameters().get(1).argumentIndex());
         assertEquals("Integer", stored.getParameters().get(1).argumentType());
-        assertEquals("Dummy#m[0]", stored.getTestCaseId());
+        assertEquals("QAPJunitMethodInterceptorTest$Dummy#m[0]", stored.getTestCaseId());
         verify(invocation).proceed();
     }
 }

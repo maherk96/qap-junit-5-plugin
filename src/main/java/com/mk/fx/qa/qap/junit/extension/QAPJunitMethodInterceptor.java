@@ -44,6 +44,7 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
                     qapTestParams.add(params);
                 });
         qapTest.setParameters(qapTestParams);
+        qapTest.setTestType("PARAMETERIZED");
 
         // Compute a stable index per method invocation using the method-level store
         var methodStore = StoreManager.getMethodStore(extensionContext);
@@ -52,9 +53,9 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
         methodStore.put(QAPUtils.PARAM_INDEX_KEY, index);
 
         // Build testCaseId as TopLevelClass#methodName[index]
-        Class<?> top = StoreManager.resolveTopLevelTestClass(extensionContext);
-        String topSimple = (top != null) ? top.getSimpleName() : extensionContext.getRequiredTestClass().getSimpleName();
-        String id = topSimple + "#" + extensionContext.getRequiredTestMethod().getName() + "[" + index + "]";
+        String fqcn = extensionContext.getRequiredTestClass().getName();
+        String nestedPath = fqcn.substring(fqcn.lastIndexOf('.') + 1);
+        String id = nestedPath + "#" + extensionContext.getRequiredTestMethod().getName() + "[" + index + "]";
         qapTest.setTestCaseId(id);
         invocation.proceed();
     }

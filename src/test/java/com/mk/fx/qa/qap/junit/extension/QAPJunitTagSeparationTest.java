@@ -38,8 +38,8 @@ class QAPJunitTagSeparationTest {
         var launch = creator.startLaunchQAP(ctx);
 
         // Assert
-        assertEquals("AnnotatedTestClass", launch.getTestClass().getClassName());
-        assertEquals(Set.of("ClassTag"), launch.getTestClass().getClassTags());
+        assertEquals("AnnotatedTestClass", launch.getTestClasses().get(0).getClassName());
+        assertEquals(Set.of("ClassTag"), launch.getTestClasses().get(0).getTags().getClazz());
     }
 
     @Test

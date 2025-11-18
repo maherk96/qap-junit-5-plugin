@@ -104,15 +104,15 @@ class QAPJunitExtensionAggregationTest {
         assertFalse(all.isEmpty(), "Top-level afterAll should emit JSON");
 
         // Basic shape assertions
-        assertTrue(all.contains("\"testClass\""), "JSON should include testClass block");
+        assertTrue(all.contains("\"testClasses\""), "JSON should include testClasses array");
         assertTrue(all.contains("TopLevelClass"), "Should reference top-level class name");
         assertTrue(all.contains("\"testCases\""), "Should include aggregated test cases");
 
         // Lifecycle events are collected for both top and nested contexts
         QAPJunitLaunch launch = StoreManager.getClassStoreData(top, QAPUtils.TEST_CLASS_DATA_KEY, QAPJunitLaunch.class);
         assertNotNull(launch);
-        assertNotNull(launch.getTestClass().getQapJunitLifeCycleEvent());
-        assertTrue(launch.getTestClass().getQapJunitLifeCycleEvent().size() >= 2,
+        assertNotNull(launch.getTestClasses().get(0).getQapJunitLifeCycleEvent());
+        assertTrue(launch.getTestClasses().get(0).getQapJunitLifeCycleEvent().size() >= 2,
                 "Should capture lifecycle events across contexts");
     }
 

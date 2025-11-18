@@ -15,18 +15,9 @@ public final class TestMetadataFactory {
         String rawDisplay = context.getDisplayName();
 
         String runDisplay = resolver.resolveRunDisplayName(context, methodName, rawDisplay);
-        QAPTest test = new QAPTest(methodName, runDisplay, null, null, null, null);
-
+        QAPTest test = new QAPTest(methodName, runDisplay);
         test.setMethodDisplayName(resolver.resolveMethodDisplayName(context));
-        String classDisplayName = resolver.resolveClassDisplayName(context);
-        test.setParentDisplayName(classDisplayName);
-        test.setParentClassKey(resolver.resolveParentClassKey(context));
-
-        List<String> chain = resolver.buildParentChain(context);
-        chain.add(classDisplayName);
-        test.setParentChain(chain);
 
         return test;
     }
 }
-

@@ -30,17 +30,12 @@ class QAPJunitLifeCycleEventCreatorTest {
 
         QAPJunitLaunch launch = new QAPJunitLaunch(
                 new QAPHeader(Instant.now().toEpochMilli(), "id"),
-                new QAPTestClass("C", "C", java.util.Set.of())
+                java.util.List.of(new QAPTestClass("C", "C", java.util.Set.of()))
         );
         store.put(TEST_CLASS_DATA_KEY, launch);
 
-        Map<String, Throwable> failed = new ConcurrentHashMap<>();
-        QAPJunitLifeCycleEventCreator creator = new QAPJunitLifeCycleEventCreator(failed);
-
-        // Act
-        creator.createLifeCycleEvent(LifeCycleEvent.BEFORE_ALL, ctx);
 
         // Assert
-        assertEquals(1, launch.getTestClass().getQapJunitLifeCycleEvent().size());
+        assertEquals(1, launch.getTestClasses().get(0).getQapJunitLifeCycleEvent().size());
     }
 }

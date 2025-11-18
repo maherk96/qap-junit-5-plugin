@@ -34,7 +34,7 @@ How It Works
 
 Data Model (JSON)
 - Launch header: launchId, start/end time, app/user/env/os/java/JUnit version, optional gitBranch.
-- Test class: className, displayName, lifecycle events (reserved), tests array.
+- Test class: className, parentDisplayName, lifecycle events (reserved), tests array.
 - Test case fields (important ones):
   - methodName: Java method name.
   - displayName: run-level display (keeps parameterized display like “Run 1: …”).

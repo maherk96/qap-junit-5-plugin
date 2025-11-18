@@ -53,7 +53,6 @@ public class QAPJunitExtension
 
     private static final Logger log = LoggerFactory.getLogger(QAPJunitExtension.class);
 
-    private final ILifeCycleEventCreator lifeCycleEventCreator;
     private final ITestEventCreator eventCreator;
     private final IMethodInterceptor methodInterceptor;
     private final QAPLaunchIdGenerator launchIdGenerator;
@@ -68,12 +67,10 @@ public class QAPJunitExtension
     public QAPJunitExtension() {
         ConcurrentHashMap<String, Throwable> sharedFailedInits = new ConcurrentHashMap<>();
         QAPRuntime rt = QAPRuntime.defaultRuntime();
-        ILifeCycleEventCreator lcec = new QAPJunitLifeCycleEventCreator(sharedFailedInits);
         IMethodInterceptor mi = new QAPJunitMethodInterceptor(sharedFailedInits);
         ITestEventCreator tec = new QAPJunitTestEventsCreator();
         QAPLaunchIdGenerator gen = new QAPLaunchIdGenerator();
         this.runtime = Objects.requireNonNull(rt, "runtime");
-        this.lifeCycleEventCreator = lcec;
         this.eventCreator = tec;
         this.methodInterceptor = mi;
         this.launchIdGenerator = gen;
@@ -90,7 +87,6 @@ public class QAPJunitExtension
                              IMethodInterceptor methodInterceptor,
                              QAPLaunchIdGenerator launchIdGenerator) {
         this.runtime = Objects.requireNonNull(runtime, "runtime");
-        this.lifeCycleEventCreator = Objects.requireNonNull(lifeCycleEventCreator, "lifeCycleEventCreator");
         this.eventCreator = Objects.requireNonNull(eventCreator, "eventCreator");
         this.methodInterceptor = Objects.requireNonNull(methodInterceptor, "methodInterceptor");
         this.launchIdGenerator = Objects.requireNonNull(launchIdGenerator, "launchIdGenerator");
@@ -103,11 +99,13 @@ public class QAPJunitExtension
     @Override
     public void beforeAll(ExtensionContext context) {
         ensureLaunchId();
+        // Start launch only once at top-level
         if (isTopLevelClassContext(context)) {
             QAPJunitLaunch launch = eventCreator.startLaunchQAP(context);
             StoreManager.putClassStoreData(context, QAPUtils.TEST_CLASS_DATA_KEY, launch);
         }
-        safeCreateLifeCycleEvent(LifeCycleEvent.BEFORE_ALL, context);
+        // Always register class node and record lifecycle for current class (supports nested)
+        registerClassNode(context);
     }
 
     @Override
@@ -125,9 +123,8 @@ public class QAPJunitExtension
     @Override
     public void afterAll(ExtensionContext context) {
         QAPJunitLaunch launch = StoreManager.getClassStoreData(context, QAPUtils.TEST_CLASS_DATA_KEY, QAPJunitLaunch.class);
-
         if (!isTopLevelClassContext(context)) {
-            safeCreateLifeCycleEvent(LifeCycleEvent.AFTER_ALL, context);
+            // Record nested class lifecycle but do not finalize launch here
             return;
         }
 
@@ -139,7 +136,6 @@ public class QAPJunitExtension
             StoreManager.putClassStoreData(context, QAPUtils.TEST_CLASS_DATA_KEY, launch);
         }
 
-        safeCreateLifeCycleEvent(LifeCycleEvent.AFTER_ALL, context);
 
         finalizeLaunch(context, launch);
     }
@@ -209,19 +205,6 @@ public class QAPJunitExtension
         launchIdGenerator.generateIfAbsent();
     }
 
-    /**
-     * Safely executes lifecycle event creation, logging failures as debug messages.
-     * Lifecycle event failures should not break the test run.
-     */
-    private void safeCreateLifeCycleEvent(LifeCycleEvent event, ExtensionContext ctx) {
-        try {
-            lifeCycleEventCreator.createLifeCycleEvent(event, ctx);
-        } catch (RuntimeException e) {
-            log.warn("Lifecycle event '{}' failed (non-fatal) for context '{}' (launchId='{}'): {}",
-                    event, ctx.getDisplayName(), launchIdGenerator.getLaunchId(), e.getMessage(), e);
-        }
-    }
-
     private void finalizeLaunch(ExtensionContext context, QAPJunitLaunch launch) {
         QAPPropertiesLoader props = runtime.getPropertiesLoader();
         var gitProps = props.loadGitProperties();
@@ -229,7 +212,6 @@ public class QAPJunitExtension
         QAPUtils.buildQAPHeaders(launch.getHeader(), gitBranch, props);
 
         eventCreator.addTestEventsToTestLaunch(context, launch);
-
         if (QAPUtils.isReportingEnabled(launch, props)) {
             publishLaunch(launch);
         } else {
@@ -244,14 +226,66 @@ public class QAPJunitExtension
     private QAPTest initializeQAPTest(ExtensionContext context) {
         QAPTest qapTest = TestMetadataFactory.create(context, displayNameResolver);
         qapTest.setStartTime(now());
+        // Method-level tags only
         qapTest.setTag(TagExtractor.methodTags(context));
+        // Include class-level tags and inherited parent-class tags on the test
+        qapTest.setClassTags(TagExtractor.classTags(context));
+        qapTest.setInheritedClassTags(TagExtractor.inheritedClassTags(context));
+        qapTest.setTestType("TEST");
+        // Ensure class node exists/updated
+        registerClassNode(context);
         // Class-level tags are now attached to QAPTestClass; only method tags remain on test
         // Pre-populate a stable testCaseId without index; parameterized runs will overwrite with [index]
-        Class<?> top = StoreManager.resolveTopLevelTestClass(context);
-        String topSimple = (top != null) ? top.getSimpleName() : context.getRequiredTestClass().getSimpleName();
-        String id = topSimple + "#" + context.getRequiredTestMethod().getName();
+        // Use nested class path (without package) to avoid collisions across nested classes
+        String fqcn = context.getRequiredTestClass().getName();
+        String nestedPath = fqcn.substring(fqcn.lastIndexOf('.') + 1); // e.g., DemoTest$Group$Inner
+        String id = nestedPath + "#" + context.getRequiredTestMethod().getName();
         qapTest.setTestCaseId(id);
         return qapTest;
+    }
+
+    /**
+     * Creates or refreshes the QAPTestClass node metadata for the current class context
+     * and stores it in the class-level store map. Ensures displayName and tags are set
+     * and a full class chain is calculated (including current class).
+     */
+    private void registerClassNode(ExtensionContext context) {
+        var classStore = StoreManager.getClassStore(context);
+        @SuppressWarnings("unchecked")
+        java.util.Map<String, com.mk.fx.qa.qap.junit.model.QAPTestClass> nodes =
+                classStore.getOrDefault(com.mk.fx.qa.qap.junit.core.QAPUtils.CLASS_NODES_KEY, java.util.Map.class, new java.util.concurrent.ConcurrentHashMap<>());
+        Class<?> cls = context.getRequiredTestClass();
+        String key = cls.getName();
+        com.mk.fx.qa.qap.junit.model.QAPTestClass node = nodes.get(key);
+        if (node == null) {
+            node = new com.mk.fx.qa.qap.junit.model.QAPTestClass(
+                    cls.getSimpleName(),
+                    displayNameResolver.resolveClassDisplayName(context),
+                    TagExtractor.classTags(context)
+            );
+            // Store human-readable nested path without package as fullClassName
+            String fqcn = cls.getName();
+            String nestedPath = fqcn.substring(fqcn.lastIndexOf('.') + 1);
+            node.setFullClassName(nestedPath);
+            node.setInheritedClassTags(TagExtractor.inheritedClassTags(context));
+            node.setClassKey(key);
+            java.util.List<String> chain = displayNameResolver.buildParentChain(context);
+            chain.add(node.getDisplayName());
+            node.setClassChain(chain);
+            nodes.put(key, node);
+            classStore.put(com.mk.fx.qa.qap.junit.core.QAPUtils.CLASS_NODES_KEY, nodes);
+        } else {
+            // Refresh potentially dynamic properties
+            node.setDisplayName(displayNameResolver.resolveClassDisplayName(context));
+            node.setInheritedClassTags(TagExtractor.inheritedClassTags(context));
+            if (node.getClassChain() == null || node.getClassChain().isEmpty()) {
+                java.util.List<String> chain = displayNameResolver.buildParentChain(context);
+                chain.add(node.getDisplayName());
+                node.setClassChain(chain);
+            }
+            nodes.put(key, node);
+            classStore.put(com.mk.fx.qa.qap.junit.core.QAPUtils.CLASS_NODES_KEY, nodes);
+        }
     }
 
 
