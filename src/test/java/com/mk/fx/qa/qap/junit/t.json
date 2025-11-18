@@ -1,0 +1,327 @@
+{
+  "header": {
+    "launchStartTime": 1763430154120,
+    "launchId": "TestLaunch-436762e898b1",
+    "applicationName": "MyApp",
+    "testEnvironment": "TEST",
+    "user": "your.username",
+    "gitBranch": null,
+    "launchEndTime": 1763430154178,
+    "osVersion": "Mac OS X 26.0.1",
+    "testRunnerVersion": "Junit 5.10.2",
+    "jdkVersion": "JDK 21.0.7",
+    "regression": false
+  },
+  "testClasses": [
+    {
+      "className": "DemoExtensionUsageTest",
+      "displayName": "Demo QAP Extension Usage",
+      "fullClassName": "DemoExtensionUsageTest",
+      "qapJunitLifeCycleEvent": [],
+      "testCases": [
+        {
+          "startTime": 1763430154125,
+          "endTime": 1763430154131,
+          "status": "PASSED",
+          "methodName": "normalTestWithDisplayName",
+          "displayName": "Should run a normal test with display name",
+          "testCaseId": "DemoExtensionUsageTest#normalTestWithDisplayName",
+          "methodDisplayName": "Should run a normal test with display name",
+          "parameters": [],
+          "testType": "TEST",
+          "logs": [],
+          "durationMillis": 6,
+          "exception": [],
+          "fix": [],
+          "tags": {
+            "method": [
+              "Normal"
+            ],
+            "class": [
+              "DemoSuite"
+            ]
+          }
+        },
+        {
+          "startTime": 1763430154149,
+          "endTime": 1763430154159,
+          "status": "PASSED",
+          "methodName": "parameterizedAddition",
+          "displayName": "Run 1: 1 + 2 = 3",
+          "testCaseId": "DemoExtensionUsageTest#parameterizedAddition[0]",
+          "methodDisplayName": "Addition works",
+          "parameters": [
+            {
+              "index": 0,
+              "type": "Integer",
+              "value": "1"
+            },
+            {
+              "index": 1,
+              "type": "Integer",
+              "value": "2"
+            },
+            {
+              "index": 2,
+              "type": "Integer",
+              "value": "3"
+            }
+          ],
+          "testType": "PARAMETERIZED",
+          "logs": [],
+          "durationMillis": 10,
+          "exception": [],
+          "fix": [],
+          "tags": {
+            "method": [
+              "ParamTest"
+            ],
+            "class": [
+              "DemoSuite"
+            ]
+          }
+        },
+        {
+          "startTime": 1763430154161,
+          "endTime": 1763430154162,
+          "status": "PASSED",
+          "methodName": "parameterizedAddition",
+          "displayName": "Run 2: 5 + 7 = 12",
+          "testCaseId": "DemoExtensionUsageTest#parameterizedAddition[1]",
+          "methodDisplayName": "Addition works",
+          "parameters": [
+            {
+              "index": 0,
+              "type": "Integer",
+              "value": "5"
+            },
+            {
+              "index": 1,
+              "type": "Integer",
+              "value": "7"
+            },
+            {
+              "index": 2,
+              "type": "Integer",
+              "value": "12"
+            }
+          ],
+          "testType": "PARAMETERIZED",
+          "logs": [],
+          "durationMillis": 1,
+          "exception": [],
+          "fix": [],
+          "tags": {
+            "method": [
+              "ParamTest"
+            ],
+            "class": [
+              "DemoSuite"
+            ]
+          }
+        },
+        {
+          "startTime": 1763430154168,
+          "endTime": 1763430154169,
+          "status": "PASSED",
+          "methodName": "parameterizedWithoutDisplayName",
+          "displayName": "[1] hello, 5",
+          "testCaseId": "DemoExtensionUsageTest#parameterizedWithoutDisplayName[0]",
+          "methodDisplayName": "parameterizedWithoutDisplayName",
+          "parameters": [
+            {
+              "index": 0,
+              "type": "String",
+              "value": "hello"
+            },
+            {
+              "index": 1,
+              "type": "Integer",
+              "value": "5"
+            }
+          ],
+          "testType": "PARAMETERIZED",
+          "logs": [],
+          "durationMillis": 1,
+          "exception": [],
+          "fix": [],
+          "tags": {
+            "method": [
+              "ParamNoDN"
+            ],
+            "class": [
+              "DemoSuite"
+            ]
+          }
+        },
+        {
+          "startTime": 1763430154170,
+          "endTime": 1763430154170,
+          "status": "PASSED",
+          "methodName": "parameterizedWithoutDisplayName",
+          "displayName": "[2] xyz, 3",
+          "testCaseId": "DemoExtensionUsageTest#parameterizedWithoutDisplayName[1]",
+          "methodDisplayName": "parameterizedWithoutDisplayName",
+          "parameters": [
+            {
+              "index": 0,
+              "type": "String",
+              "value": "xyz"
+            },
+            {
+              "index": 1,
+              "type": "Integer",
+              "value": "3"
+            }
+          ],
+          "testType": "PARAMETERIZED",
+          "logs": [],
+          "durationMillis": 0,
+          "exception": [],
+          "fix": [],
+          "tags": {
+            "method": [
+              "ParamNoDN"
+            ],
+            "class": [
+              "DemoSuite"
+            ]
+          }
+        },
+        {
+          "startTime": 1763430154171,
+          "endTime": 1763430154171,
+          "status": "PASSED",
+          "methodName": "normalTestWithoutDisplayName",
+          "displayName": "normalTestWithoutDisplayName",
+          "testCaseId": "DemoExtensionUsageTest#normalTestWithoutDisplayName",
+          "methodDisplayName": "normalTestWithoutDisplayName",
+          "parameters": [],
+          "testType": "TEST",
+          "logs": [],
+          "durationMillis": 0,
+          "exception": [],
+          "fix": [],
+          "tags": {
+            "method": [
+              "NormalNoDN"
+            ],
+            "class": [
+              "DemoSuite"
+            ]
+          }
+        }
+      ],
+      "children": [
+        {
+          "className": "MathGroup",
+          "displayName": "Math Group",
+          "fullClassName": "DemoExtensionUsageTest$MathGroup",
+          "qapJunitLifeCycleEvent": [],
+          "testCases": [
+            {
+              "startTime": 1763430154174,
+              "endTime": 1763430154174,
+              "status": "PASSED",
+              "methodName": "multiply",
+              "displayName": "Multiplication works",
+              "testCaseId": "DemoExtensionUsageTest$MathGroup#multiply",
+              "methodDisplayName": "Multiplication works",
+              "parameters": [],
+              "testType": "TEST",
+              "logs": [],
+              "durationMillis": 0,
+              "exception": [],
+              "fix": [],
+              "tags": {
+                "method": [
+                  "NestedMethod"
+                ],
+                "class": [
+                  "Outer"
+                ],
+                "inherited": [
+                  "DemoSuite"
+                ]
+              }
+            }
+          ],
+          "children": [
+            {
+              "className": "InnerGroup",
+              "displayName": "InnerGroup",
+              "fullClassName": "DemoExtensionUsageTest$MathGroup$InnerGroup",
+              "qapJunitLifeCycleEvent": [],
+              "testCases": [
+                {
+                  "startTime": 1763430154176,
+                  "endTime": 1763430154177,
+                  "status": "PASSED",
+                  "methodName": "innerWithoutDisplayName",
+                  "displayName": "innerWithoutDisplayName",
+                  "testCaseId": "DemoExtensionUsageTest$MathGroup$InnerGroup#innerWithoutDisplayName",
+                  "methodDisplayName": "innerWithoutDisplayName",
+                  "parameters": [],
+                  "testType": "TEST",
+                  "logs": [],
+                  "durationMillis": 1,
+                  "exception": [],
+                  "fix": [],
+                  "tags": {
+                    "method": [
+                      "InnerMethod"
+                    ],
+                    "class": [
+                      "InnerTag"
+                    ],
+                    "inherited": [
+                      "DemoSuite",
+                      "Outer"
+                    ]
+                  }
+                }
+              ],
+              "children": [],
+              "parentClassKey": "DemoExtensionUsageTest$MathGroup$InnerGroup",
+              "parentChain": [
+                "Demo QAP Extension Usage",
+                "Math Group",
+                "InnerGroup"
+              ],
+              "tags": {
+                "class": [
+                  "InnerTag"
+                ],
+                "inherited": [
+                  "DemoSuite",
+                  "Outer"
+                ]
+              }
+            }
+          ],
+          "parentClassKey": "DemoExtensionUsageTest$MathGroup",
+          "parentChain": [
+            "Demo QAP Extension Usage",
+            "Math Group"
+          ],
+          "tags": {
+            "class": [
+              "Outer"
+            ],
+            "inherited": [
+              "DemoSuite"
+            ]
+          }
+        }
+      ],
+      "parentChain": [
+        "Demo QAP Extension Usage"
+      ],
+      "tags": {
+        "class": [
+          "DemoSuite"
+        ]
+      }
+    }
+  ]
+}

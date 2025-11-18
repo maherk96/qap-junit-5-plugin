@@ -8,7 +8,8 @@ Overview
 Key Features
 - One JSON per top-level test class (per JVM). Nested classes aggregate into their parent’s JSON.
 - Rich test metadata: method names, display names, parent chain, tags, timings, status, exceptions.
-- Clear tag semantics: methodTags, classTags (current class), inheritedClassTags (enclosing classes).
+- Clear tag semantics: tags grouped by origin under a single field:
+  "tags": { "class": [...], "method": [...], "inherited": [...] }.
 - Pluggable publishing: stdout + logs by default; logging-only and async variants available.
 - Resilient: handles missing lifecycle edges by recovering at afterAll without failing the run.
 
@@ -33,29 +34,32 @@ How It Works
 
 Data Model (JSON)
 - Launch header: launchId, start/end time, app/user/env/os/java/JUnit version, optional gitBranch.
-- Test class: className, displayName, lifecycle events (reserved), tests array.
+- Test class: className, parentDisplayName, lifecycle events (reserved), tests array.
 - Test case fields (important ones):
   - methodName: Java method name.
   - displayName: run-level display (keeps parameterized display like “Run 1: …”).
-  - methodDisplayName: static @DisplayName on the method (falls back to method name).
-  - parentDisplayName: current class’ @DisplayName or simple name.
+  - testCaseId: stable identifier `TopLevelClass#methodName[runIndex]` for parameterized runs, or `TopLevelClass#methodName` for normal tests.
+- methodDisplayName: static @DisplayName on the method; null if absent.
+- parentDisplayName: current class’ @DisplayName; null if absent.
   - parentClassKey: fully qualified name of the test class (handles nested names).
   - parentChain: top-down display names of ancestors ending with current class display.
-  - methodTags: tags found on the method.
-  - classTags: tags found on the current class.
-  - inheritedClassTags: tags found on enclosing classes (excluding current).
+  - tags: object grouping tags by origin:
+    - class: tags found on the current class.
+    - method: tags found on the method.
+    - inherited: tags found on enclosing classes (excluding current).
+  - parameters: array of { index, type, value } for template/parameterized invocations.
   - startTime/endTime/status/exception.
 
 Display Names
 - Method run display (displayName) prioritizes the dynamic parameterized name (if present), then @DisplayName, then method name.
-- Method static display (methodDisplayName) is always the @DisplayName for the method (or method name if absent).
-- Class display (parentDisplayName) is the class’ @DisplayName (or simple name).
+- Method static display (methodDisplayName) is the @DisplayName if present; otherwise null.
+- Class display (parentDisplayName) is the class’ @DisplayName if present; otherwise null.
 - Parent chain includes ancestors’ display names plus the current class’ display name.
 
 Tags
-- methodTags: `@Tag` on the test method only.
-- classTags: `@Tag` on the current test class only.
-- inheritedClassTags: `@Tag` on enclosing classes (excluding current).
+- tags.method: `@Tag` on the test method only.
+- tags.class: `@Tag` on the current test class only.
+- tags.inherited: `@Tag` on enclosing classes (excluding current).
 
 Nested Classes
 - The extension aggregates all nested tests under their outermost class. The resulting JSON includes correct parentChain, parentDisplayName, and class/inherited tags.
@@ -64,6 +68,8 @@ Nested Classes
 Parameterized & Template Tests
 - Dynamic run names are preserved in `displayName` (e.g., `@ParameterizedTest(name = "Run {index}: {0} + {1} = {2}")`).
 - Method static name is preserved separately in `methodDisplayName`.
+- Parameters are captured as structured JSON, not Base64, e.g.:
+  `"parameters": [ { "index": 0, "type": "Integer", "value": "1" } ]`
 
 Parallel & Multiple JVMs
 - Aggregation is per top-level class per JVM. In parallel forks, each fork produces its own class-level JSON.
@@ -114,7 +120,6 @@ Examples
 - Programmatic registration (custom runtime/publisher): use `@RegisterExtension` as shown above.
 
 Troubleshooting
-- “My nested class tags don’t appear”: current class tags are in `classTags`, ancestor tags in `inheritedClassTags`.
+- “My nested class tags don’t appear”: see `tags.class` for current class and `tags.inherited` for ancestors.
 - “I see multiple JSONs”: one per top-level class per JVM is expected. Merge if you need a single file.
 - “No JSON printed”: ensure `qap.report.test.data=true` and logger level allows INFO/DEBUG as needed.
-

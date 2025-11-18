@@ -9,68 +9,61 @@ import org.junit.jupiter.params.provider.CsvSource;
 @DisplayName("Demo QAP Extension Usage")
 public class DemoExtensionUsageTest {
 
-    // --- Normal tests -------------------------------------------------------
+  // --- Normal tests -------------------------------------------------------
+
+  @Test
+  @DisplayName("Should run a normal test with display name")
+  @Tag("Normal")
+  void normalTestWithDisplayName() {
+    Assertions.assertTrue(true);
+  }
+
+  @Test
+  @Tag("NormalNoDN")
+  void normalTestWithoutDisplayName() {
+    Assertions.assertEquals(2, 1 + 1);
+  }
+
+  // --- Parameterized tests -----------------------------------------------
+
+  @ParameterizedTest(name = "Run {index}: {0} + {1} = {2}")
+  @CsvSource({"1, 2, 3", "5, 7, 12"})
+  @DisplayName("Addition works")
+  @Tag("ParamTest")
+  void parameterizedAddition(int a, int b, int expected) {
+    Assertions.assertEquals(expected, a + b);
+  }
+
+  @ParameterizedTest
+  @CsvSource({"hello, 5", "xyz, 3"})
+  @Tag("ParamNoDN")
+  void parameterizedWithoutDisplayName(String s, int len) {
+    Assertions.assertEquals(len, s.length());
+  }
+
+  // --- Nested tests -------------------------------------------------------
+
+  @Nested
+  @Tag("Outer")
+  @DisplayName("Math Group")
+  class MathGroup {
 
     @Test
-    @DisplayName("Should run a normal test with display name")
-    @Tag("Normal")
-    void normalTestWithDisplayName() {
-        Assertions.assertTrue(true);
+    @DisplayName("Multiplication works")
+    @Tag("NestedMethod")
+    void multiply() {
+      Assertions.assertEquals(12, 3 * 4);
     }
-
-    @Test
-    @Tag("NormalNoDN")
-    void normalTestWithoutDisplayName() {
-        Assertions.assertEquals(2, 1 + 1);
-    }
-
-    // --- Parameterized tests -----------------------------------------------
-
-    @ParameterizedTest(name = "Run {index}: {0} + {1} = {2}")
-    @CsvSource({
-            "1, 2, 3",
-            "5, 7, 12"
-    })
-    @DisplayName("Addition works")
-    @Tag("ParamTest")
-    void parameterizedAddition(int a, int b, int expected) {
-        Assertions.assertEquals(expected, a + b);
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-            "hello, 5",
-            "xyz, 3"
-    })
-    @Tag("ParamNoDN")
-    void parameterizedWithoutDisplayName(String s, int len) {
-        Assertions.assertEquals(len, s.length());
-    }
-
-    // --- Nested tests -------------------------------------------------------
 
     @Nested
-    @Tag("Outer")
-    @DisplayName("Math Group")
-    class MathGroup {
+    @Tag("InnerTag")
+    class InnerGroup {
 
-        @Test
-        @DisplayName("Multiplication works")
-        @Tag("NestedMethod")
-        void multiply() {
-            Assertions.assertEquals(12, 3 * 4);
-        }
-
-        @Nested
-        @Tag("InnerTag")
-        class InnerGroup {
-
-            @Test
-            @Tag("InnerMethod")
-            void innerWithoutDisplayName() {
-                Assertions.assertTrue(10 > 2);
-            }
-        }
+      @Test
+      @Tag("InnerMethod")
+      void innerWithoutDisplayName() {
+        Assertions.assertTrue(10 > 2);
+      }
     }
+  }
 }
-
