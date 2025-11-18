@@ -11,6 +11,7 @@ public final class QAPUtils {
 
     public static final String TEST_CLASS_DATA_KEY = "testClassData";
     public static final String METHOD_DESCRIPTION_KEY = "methodDescription";
+    public static final String PARAM_INDEX_KEY = "paramIndexCounter";
 
     private QAPUtils() {
         // static

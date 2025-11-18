@@ -67,6 +67,13 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
                 )
         );
 
+        // Populate class-level metadata
+        qapLaunch.getTestClass().setClassKey(clazz.getName());
+        java.util.List<String> chain = new java.util.ArrayList<>();
+        chain.add(context.getDisplayName());
+        qapLaunch.getTestClass().setClassChain(chain);
+        qapLaunch.getTestClass().setInheritedClassTags(java.util.Collections.emptySet());
+
         StoreManager.putClassStoreData(context, TEST_CLASS_DATA_KEY, qapLaunch);
         return qapLaunch;
     }

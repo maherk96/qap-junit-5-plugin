@@ -68,8 +68,6 @@ class QAPJunitNestedTagsTest {
 
         QAPTest test = store.get(METHOD_DESCRIPTION_KEY, QAPTest.class);
         assertNotNull(test);
-        assertEquals(Set.of("MethodTag"), test.getMethodTags());
-        assertEquals(Set.of("LeafTag"), test.getClassTags());
-        assertEquals(Set.of("TopTag", "MidTag"), test.getInheritedClassTags());
+        assertEquals(Set.of("MethodTag"), test.getTags().getMethod());
     }
 }

@@ -22,7 +22,7 @@ class QAPJunitMethodInterceptorTest {
     }
 
     @Test
-    void interceptor_sets_testParams_bytes_with_arguments() throws Throwable {
+    void interceptor_sets_parameters_list_with_arguments() throws Throwable {
         // Arrange extension context + store
         ExtensionContext ctx = mock(ExtensionContext.class, RETURNS_DEEP_STUBS);
         ExtensionContext root = mock(ExtensionContext.class);
@@ -32,6 +32,7 @@ class QAPJunitMethodInterceptorTest {
 
         Method m = Dummy.class.getDeclaredMethod("m", String.class, Integer.class);
         when(ctx.getRequiredTestMethod()).thenReturn(m);
+        when(ctx.getRequiredTestClass()).thenReturn((Class) Dummy.class);
 
         // Seed a QAPTest in method store
         QAPTest test = new QAPTest("m", "m");
@@ -51,13 +52,14 @@ class QAPJunitMethodInterceptorTest {
         // Assert
         QAPTest stored = store.get(METHOD_DESCRIPTION_KEY, QAPTest.class);
         assertNotNull(stored);
-        assertTrue(stored.hasTestParams());
-        String params = new String(stored.getTestParams());
-        assertTrue(params.contains("argumentIndex=0"));
-        assertTrue(params.contains("argumentType=String"));
-        assertTrue(params.contains("argumentValue=A"));
-        assertTrue(params.contains("argumentType=Integer"));
+        assertTrue(stored.hasParameters());
+        assertEquals(2, stored.getParameters().size());
+        assertEquals(0, stored.getParameters().get(0).argumentIndex());
+        assertEquals("String", stored.getParameters().get(0).argumentType());
+        assertEquals("A", stored.getParameters().get(0).argumentValue());
+        assertEquals(1, stored.getParameters().get(1).argumentIndex());
+        assertEquals("Integer", stored.getParameters().get(1).argumentType());
+        assertEquals("Dummy#m[0]", stored.getTestCaseId());
         verify(invocation).proceed();
     }
 }
-

@@ -19,13 +19,13 @@ public class QAPTest extends QAPBaseTestCase {
 
     private final String methodName;       // e.g. "parameterizedTest"
     private final String displayName;      // e.g. "Run 1 with value=A"
+    private String testCaseId;             // e.g. "DemoExtensionUsageTest#parameterizedTest[0]"
     private String methodDisplayName;      // e.g. "Parameterized test in SecondLevelNested"
     private String parentDisplayName;      // e.g. "Second Level Nested Context"
     private String parentClassKey;         // e.g. "NestedTestsExample$FirstNested"
     private List<String> parentChain;      // e.g. ["Top-Level Test Class", "First Nested Context", "Second Level Nested Context"]
 
-    @ToString.Exclude
-    private byte[] testParams;
+    private List<QAPTestParams> parameters;
 
     @JsonCreator
     public QAPTest(@JsonProperty("methodName") String methodName,
@@ -48,7 +48,7 @@ public class QAPTest extends QAPBaseTestCase {
         this(methodName, displayName, null, null, null, null);
     }
 
-    public boolean hasTestParams() {
-        return isNotEmpty(testParams);
+    public boolean hasParameters() {
+        return parameters != null && !parameters.isEmpty();
     }
 }

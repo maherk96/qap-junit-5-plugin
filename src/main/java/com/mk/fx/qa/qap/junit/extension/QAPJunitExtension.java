@@ -245,8 +245,12 @@ public class QAPJunitExtension
         QAPTest qapTest = TestMetadataFactory.create(context, displayNameResolver);
         qapTest.setStartTime(now());
         qapTest.setTag(TagExtractor.methodTags(context));
-        qapTest.setClassTags(TagExtractor.classTags(context));
-        qapTest.setInheritedClassTags(TagExtractor.inheritedClassTags(context));
+        // Class-level tags are now attached to QAPTestClass; only method tags remain on test
+        // Pre-populate a stable testCaseId without index; parameterized runs will overwrite with [index]
+        Class<?> top = StoreManager.resolveTopLevelTestClass(context);
+        String topSimple = (top != null) ? top.getSimpleName() : context.getRequiredTestClass().getSimpleName();
+        String id = topSimple + "#" + context.getRequiredTestMethod().getName();
+        qapTest.setTestCaseId(id);
         return qapTest;
     }
 

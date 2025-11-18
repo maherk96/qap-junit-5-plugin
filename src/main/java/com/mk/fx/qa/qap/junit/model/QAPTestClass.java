@@ -1,6 +1,7 @@
 package com.mk.fx.qa.qap.junit.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,9 @@ public class QAPTestClass {
     private final String displayName;
     private List<QAPJunitLifeCycleEvent> qapJunitLifeCycleEvent;
     private final Set<String> classTags;
+    private Set<String> inheritedClassTags;
+    private String classKey;
+    private List<String> classChain;
     private List<QAPTest> testCases;
 
     @JsonCreator
@@ -25,5 +29,15 @@ public class QAPTestClass {
         this.displayName = displayName;
         this.classTags = classTags;
         this.qapJunitLifeCycleEvent = new ArrayList<>();
+    }
+
+    @JsonProperty("tags")
+    public QAPClassTags getTags() {
+        return new QAPClassTags(classTags, inheritedClassTags);
+    }
+
+    @JsonIgnore
+    public Set<String> getInheritedClassTags() {
+        return inheritedClassTags;
     }
 }

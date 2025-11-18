@@ -70,7 +70,7 @@ class QAPJunitTagSeparationTest {
         // Assert
         QAPTest q = store.get(METHOD_DESCRIPTION_KEY, QAPTest.class);
         assertNotNull(q);
-        assertEquals(Set.of("MethodTag"), q.getMethodTags());
+        assertEquals(Set.of("MethodTag"), q.getTags().getMethod());
         assertEquals("Method DN", q.getMethodDisplayName());
     }
 }

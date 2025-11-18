@@ -1,4 +1,13 @@
-
 package com.mk.fx.qa.qap.junit.model;
 
-public record QAPTestParams(int argumentIndex, String argumentType, String argumentValue) {}
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record QAPTestParams(
+        @JsonProperty("index") int argumentIndex,
+        @JsonProperty("type") String argumentType,
+        @JsonProperty("value") String argumentValue) {
+
+    @JsonCreator
+    public QAPTestParams {}
+}

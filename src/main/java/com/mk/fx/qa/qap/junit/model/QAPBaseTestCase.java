@@ -30,7 +30,7 @@ public abstract class QAPBaseTestCase {
     protected Set<String> classTags = new HashSet<>();
     protected Set<String> inheritedClassTags = new HashSet<>();
 
-    @JsonProperty("methodTags")
+    @JsonIgnore
     public Set<String> getMethodTags() {
         return Collections.unmodifiableSet(tag);
     }
@@ -40,7 +40,7 @@ public abstract class QAPBaseTestCase {
         return Collections.unmodifiableSet(tag);
     }
 
-    @JsonProperty("inheritedClassTags")
+    @JsonIgnore
     public Set<String> getInheritedClassTags() {
         return Collections.unmodifiableSet(inheritedClassTags);
     }
@@ -58,9 +58,18 @@ public abstract class QAPBaseTestCase {
         }
     }
 
-    @JsonProperty("classTags")
+    @JsonIgnore
     public Set<String> getClassTags() {
         return Collections.unmodifiableSet(classTags);
+    }
+
+    @JsonProperty("tags")
+    public QAPTags getTags() {
+        return new QAPTags(
+                Collections.unmodifiableSet(tag),
+                Collections.unmodifiableSet(classTags),
+                Collections.unmodifiableSet(inheritedClassTags)
+        );
     }
 
     public void setClassTags(Set<String> tags) {

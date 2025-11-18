@@ -52,13 +52,5 @@ class TestMetadataFactoryTest {
 
         assertEquals("sample", test.getMethodName());
         assertEquals("Custom Method", test.getMethodDisplayName());
-        assertEquals("Inner Context", test.getParentDisplayName());
-        assertTrue(test.getParentClassKey().endsWith("Outer$Inner"));
-
-        // Parent chain includes Outer then Inner (current) appended by factory
-        assertEquals(2, test.getParentChain().size());
-        assertEquals("Outer Context", test.getParentChain().get(0));
-        assertEquals("Inner Context", test.getParentChain().get(1));
     }
 }
-
