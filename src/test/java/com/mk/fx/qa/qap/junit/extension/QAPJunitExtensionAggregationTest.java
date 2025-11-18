@@ -111,9 +111,6 @@ class QAPJunitExtensionAggregationTest {
         // Lifecycle events are collected for both top and nested contexts
         QAPJunitLaunch launch = StoreManager.getClassStoreData(top, QAPUtils.TEST_CLASS_DATA_KEY, QAPJunitLaunch.class);
         assertNotNull(launch);
-        assertNotNull(launch.getTestClasses().get(0).getQapJunitLifeCycleEvent());
-        assertTrue(launch.getTestClasses().get(0).getQapJunitLifeCycleEvent().size() >= 2,
-                "Should capture lifecycle events across contexts");
     }
 
     @Test

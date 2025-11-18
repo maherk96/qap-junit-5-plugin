@@ -16,7 +16,6 @@ public class QAPTestClass {
     private final String className;
     private String displayName;       // used for both root and nested classes
     private String fullClassName;     // e.g., DemoExtensionUsageTest$MathGroup$InnerGroup
-    private List<QAPJunitLifeCycleEvent> qapJunitLifeCycleEvent;
     private final Set<String> classTags;
     private Set<String> inheritedClassTags;
     @JsonProperty("parentClassKey")
@@ -34,7 +33,6 @@ public class QAPTestClass {
         this.className = className;
         this.displayName = displayName;
         this.classTags = classTags;
-        this.qapJunitLifeCycleEvent = new ArrayList<>();
     }
 
     @JsonProperty("tags")
