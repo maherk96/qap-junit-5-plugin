@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 public interface ITestEventCreator {
 
-    void addTestEventsToTestLaunch(ExtensionContext context, QAPJunitLaunch launch);
+  void addTestEventsToTestLaunch(ExtensionContext context, QAPJunitLaunch launch);
 
-    void createTestTemplate(ExtensionContext context, TestCaseStatus status, Throwable t);
+  void createTestTemplate(ExtensionContext context, TestCaseStatus status, Throwable t);
 
-    QAPJunitLaunch startLaunchQAP(ExtensionContext context);
+  QAPJunitLaunch startLaunchQAP(ExtensionContext context);
 }

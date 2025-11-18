@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record QAPTestParams(
-        @JsonProperty("index") int argumentIndex,
-        @JsonProperty("type") String argumentType,
-        @JsonProperty("value") String argumentValue) {
+    @JsonProperty("index") int argumentIndex,
+    @JsonProperty("type") String argumentType,
+    @JsonProperty("value") String argumentValue) {
 
-    @JsonCreator
-    public QAPTestParams {}
+  @JsonCreator
+  public QAPTestParams {}
 }
