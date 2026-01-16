@@ -18,4 +18,22 @@ public interface IMethodInterceptor {
       ReflectiveInvocationContext<Method> invocationContext,
       ExtensionContext extensionContext)
       throws Throwable;
+
+  void interceptBeforeEachMethod(
+      InvocationInterceptor.Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      ExtensionContext extensionContext)
+      throws Throwable;
+
+  void interceptAfterEachMethod(
+      InvocationInterceptor.Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      ExtensionContext extensionContext)
+      throws Throwable;
+
+  void interceptAfterAllMethod(
+      InvocationInterceptor.Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      ExtensionContext extensionContext)
+      throws Throwable;
 }

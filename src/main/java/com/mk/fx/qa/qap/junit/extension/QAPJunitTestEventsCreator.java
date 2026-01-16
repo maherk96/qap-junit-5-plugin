@@ -9,7 +9,6 @@ import com.mk.fx.qa.qap.junit.model.QAPJunitLaunch;
 import com.mk.fx.qa.qap.junit.model.QAPTest;
 import com.mk.fx.qa.qap.junit.model.QAPTestClass;
 import com.mk.fx.qa.qap.junit.store.StoreManager;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -67,9 +66,22 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
     }
 
     if (rootNode != null) {
-      launchRoot.setTestCases(rootNode.getTestCases());
+      // Filter out tests that belong to nested classes (testCaseId contains '$')
+      // Only include tests from the root class itself
+      java.util.List<com.mk.fx.qa.qap.junit.model.QAPTest> rootTests =
+          rootNode.getTestCases() != null
+              ? rootNode.getTestCases().stream()
+                  .filter(
+                      test ->
+                          test.getTestCaseId() != null
+                              && !test.getTestCaseId().contains("$"))
+                  .collect(java.util.stream.Collectors.toList())
+              : new java.util.ArrayList<>();
+      launchRoot.setTestCases(rootTests);
       launchRoot.setClassChain(rootNode.getClassChain());
       launchRoot.setInheritedClassTags(rootNode.getInheritedClassTags());
+      // Preserve fixtures from the store node
+      launchRoot.setFixtures(rootNode.getFixtures());
     } else {
       // If no collected tests for root, at least attach an empty list
       launchRoot.setTestCases(new java.util.ArrayList<>());
@@ -133,9 +145,19 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
     var qapTest =
         StoreManager.getMethodStoreData(context, QAPUtils.METHOD_DESCRIPTION_KEY, QAPTest.class);
     qapTest.setEndTime(Instant.now().toEpochMilli());
+    qapTest.setEndTimeNanos(System.nanoTime());
     qapTest.setStatus(status.name());
     if (t != null) {
-      qapTest.setException(t.getMessage().getBytes(StandardCharsets.UTF_8));
+      qapTest.setFailure(com.mk.fx.qa.qap.junit.util.ExceptionFormatter.toFailure(t));
+    }
+    
+    // Record test execution in lifecycle
+    if (qapTest.getLifecycle() != null) {
+      if (qapTest.getLifecycle().getTest() == null) {
+        qapTest.getLifecycle().setTest(new com.mk.fx.qa.qap.junit.model.QAPTestLifecycle.TestExecution());
+      }
+      qapTest.getLifecycle().getTest().setDurationNanos(qapTest.getDurationNanos());
+      qapTest.getLifecycle().getTest().setStatus(status.name());
     }
   }
 
@@ -160,12 +182,14 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
 
     // Populate class-level metadata
     rootClass.setClassKey(clazz.getName());
-    String nestedPath = clazz.getName().substring(clazz.getName().lastIndexOf('.') + 1);
-    rootClass.setFullClassName(nestedPath);
+    rootClass.setClassFqn(clazz.getName());
+    rootClass.setClassSimpleName(clazz.getSimpleName());
     java.util.List<String> chain = new java.util.ArrayList<>();
     // Standard: empty chain for root
     rootClass.setClassChain(chain);
     rootClass.setInheritedClassTags(java.util.Collections.emptySet());
+    // Initialize fixtures list
+    rootClass.setFixtures(new java.util.ArrayList<>());
 
     StoreManager.putClassStoreData(context, TEST_CLASS_DATA_KEY, qapLaunch);
     return qapLaunch;

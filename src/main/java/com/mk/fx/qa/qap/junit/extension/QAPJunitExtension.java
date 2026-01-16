@@ -10,7 +10,6 @@ import com.mk.fx.qa.qap.junit.model.QAPPropertiesLoader;
 import com.mk.fx.qa.qap.junit.model.QAPTest;
 import com.mk.fx.qa.qap.junit.runtime.QAPRuntime;
 import com.mk.fx.qa.qap.junit.store.StoreManager;
-import com.mk.fx.qa.qap.junit.util.ExceptionFormatter;
 import com.mk.fx.qa.qap.junit.util.TagExtractor;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -103,6 +102,8 @@ public class QAPJunitExtension
   @Override
   public void beforeEach(ExtensionContext context) {
     QAPTest qapTest = initializeQAPTest(context);
+    // Initialize lifecycle tracking for this test
+    qapTest.setLifecycle(new com.mk.fx.qa.qap.junit.model.QAPTestLifecycle());
     StoreManager.putMethodStoreData(context, QAPUtils.METHOD_DESCRIPTION_KEY, qapTest);
   }
 
@@ -156,9 +157,14 @@ public class QAPJunitExtension
   public void testDisabled(ExtensionContext context, Optional<String> reason) {
     QAPTest qapTest = initializeQAPTest(context);
     qapTest.setEndTime(now());
+    qapTest.setEndTimeNanos(nowNanos());
     qapTest.setStatus(TestCaseStatus.DISABLED.name());
+    // For disabled tests, set disabledReason instead of failure
+    // hasFailure should be false because the test wasn't run
     String msg = reason.orElse("Test disabled (no reason provided)");
-    qapTest.setException(ExceptionFormatter.toBytes(msg));
+    qapTest.setDisabledReason(msg);
+    // Explicitly ensure failure is null and hasFailure returns false
+    qapTest.setFailure(null);
     StoreManager.addDescriptionToClassStore(context, qapTest);
   }
 
@@ -171,6 +177,33 @@ public class QAPJunitExtension
       ExtensionContext extensionContext)
       throws Throwable {
     methodInterceptor.interceptBeforeAllMethod(invocation, invocationContext, extensionContext);
+  }
+
+  @Override
+  public void interceptBeforeEachMethod(
+      Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      ExtensionContext extensionContext)
+      throws Throwable {
+    methodInterceptor.interceptBeforeEachMethod(invocation, invocationContext, extensionContext);
+  }
+
+  @Override
+  public void interceptAfterEachMethod(
+      Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      ExtensionContext extensionContext)
+      throws Throwable {
+    methodInterceptor.interceptAfterEachMethod(invocation, invocationContext, extensionContext);
+  }
+
+  @Override
+  public void interceptAfterAllMethod(
+      Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      ExtensionContext extensionContext)
+      throws Throwable {
+    methodInterceptor.interceptAfterAllMethod(invocation, invocationContext, extensionContext);
   }
 
   @Override
@@ -194,6 +227,10 @@ public class QAPJunitExtension
 
   private long now() {
     return runtime.getClock().instant().toEpochMilli();
+  }
+
+  private long nowNanos() {
+    return System.nanoTime();
   }
 
   /**
@@ -225,6 +262,7 @@ public class QAPJunitExtension
   private QAPTest initializeQAPTest(ExtensionContext context) {
     QAPTest qapTest = TestMetadataFactory.create(context, displayNameResolver);
     qapTest.setStartTime(now());
+    qapTest.setStartTimeNanos(nowNanos());
     // Method-level tags only
     qapTest.setTag(TagExtractor.methodTags(context));
     // Include class-level tags and inherited parent-class tags on the test
@@ -266,15 +304,17 @@ public class QAPJunitExtension
               cls.getSimpleName(),
               displayNameResolver.resolveClassDisplayName(context),
               TagExtractor.classTags(context));
-      // Store human-readable nested path without package as fullClassName
+      // Store fully qualified name and simple name
       String fqcn = cls.getName();
-      String nestedPath = fqcn.substring(fqcn.lastIndexOf('.') + 1);
-      node.setFullClassName(nestedPath);
+      node.setClassFqn(fqcn);
+      node.setClassSimpleName(cls.getSimpleName());
       node.setInheritedClassTags(TagExtractor.inheritedClassTags(context));
       node.setClassKey(key);
       java.util.List<String> chain = displayNameResolver.buildParentChain(context);
       chain.add(node.getDisplayName());
       node.setClassChain(chain);
+      // Initialize fixtures list
+      node.setFixtures(new java.util.ArrayList<>());
       nodes.put(key, node);
       classStore.put(com.mk.fx.qa.qap.junit.core.QAPUtils.CLASS_NODES_KEY, nodes);
     } else {

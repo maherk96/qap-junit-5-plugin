@@ -13,9 +13,12 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class QAPTestClass {
 
-  private final String className;
+  private final String className; // simple name (e.g., "DemoExtensionUsageTest")
   private String displayName; // used for both root and nested classes
-  private String fullClassName; // e.g., DemoExtensionUsageTest$MathGroup$InnerGroup
+  @JsonProperty("classFqn")
+  private String classFqn; // fully qualified name (e.g., "com.mk.fx.qa.qap.junit.DemoExtensionUsageTest$MathGroup")
+  @JsonProperty("classSimpleName")
+  private String classSimpleName; // simple name of the class (e.g., "DemoExtensionUsageTest" or "MathGroup")
   private final Set<String> classTags;
   private Set<String> inheritedClassTags;
 
@@ -27,6 +30,7 @@ public class QAPTestClass {
 
   private List<QAPTest> testCases;
   private List<QAPTestClass> children = new ArrayList<>();
+  private List<QAPFixture> fixtures;
 
   @JsonCreator
   public QAPTestClass(

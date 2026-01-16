@@ -56,8 +56,9 @@ class QAPJunitExtensionDisabledTest {
     assertEquals(Set.of("MethodY"), t.getMethodTags());
     assertEquals("DN", t.getMethodDisplayName());
     assertEquals("DISABLED", t.getStatus());
-    assertTrue(t.hasException());
-    assertTrue(new String(t.getException()).contains("maintenance"));
+    assertTrue(t.hasFailure());
+    assertNotNull(t.getFailure());
+    assertTrue(t.getFailure().getMessage().contains("maintenance"));
     assertTrue(t.getEndTime() >= t.getStartTime());
   }
 }

@@ -11,6 +11,8 @@ public final class QAPUtils {
   public static final String METHOD_DESCRIPTION_KEY = "methodDescription";
   public static final String PARAM_INDEX_KEY = "paramIndexCounter";
   public static final String CLASS_NODES_KEY = "classNodes";
+  public static final String FIXTURE_START_TIME_KEY = "fixtureStartTime";
+  public static final String FIXTURE_START_TIME_NANOS_KEY = "fixtureStartTimeNanos";
 
   private QAPUtils() {
     // static

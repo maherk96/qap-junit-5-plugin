@@ -13,6 +13,7 @@ public class QAPHeader {
   private String user;
   private final String launchId;
   private String gitBranch;
+  @JsonProperty("regression")
   private boolean isRegression;
   private long launchEndTime;
   private String osVersion;

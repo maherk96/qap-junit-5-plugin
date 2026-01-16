@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 @DisplayName("Demo QAP Extension Usage")
 public class DemoExtensionUsageTest {
 
+
   // --- Normal tests -------------------------------------------------------
 
   @Test
@@ -58,6 +59,14 @@ public class DemoExtensionUsageTest {
     @Nested
     @Tag("InnerTag")
     class InnerGroup {
+
+      @Test
+      @DisplayName("Intentional failing test")
+      @Tag("Failing")
+      void intentionalFailingTest() {
+        Assertions.fail("This test fails intentionally for demonstration");
+      }
+
 
       @Test
       @Tag("InnerMethod")

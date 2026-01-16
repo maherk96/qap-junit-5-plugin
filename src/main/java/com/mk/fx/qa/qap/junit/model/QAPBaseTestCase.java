@@ -13,15 +13,17 @@ import lombok.ToString;
 @Data
 public abstract class QAPBaseTestCase {
 
-  protected long startTime;
-  protected long endTime;
+  protected long startTime; // epoch milliseconds for wall-clock ordering
+  protected long endTime; // epoch milliseconds for wall-clock ordering
+  @JsonIgnore protected long startTimeNanos; // System.nanoTime() for precise duration measurement
+  @JsonIgnore protected long endTimeNanos; // System.nanoTime() for precise duration measurement
   protected String status;
 
   @ToString.Exclude @JsonIgnore protected byte[] logs;
 
   @ToString.Exclude @JsonIgnore protected byte[] fix;
 
-  @ToString.Exclude @JsonIgnore protected byte[] exception;
+  @JsonIgnore protected QAPFailure failure;
 
   protected Set<String> tag = new HashSet<>();
   protected Set<String> classTags = new HashSet<>();
@@ -98,22 +100,37 @@ public abstract class QAPBaseTestCase {
     return (endTime > 0L && startTime > 0L && endTime >= startTime) ? (endTime - startTime) : 0L;
   }
 
+  @JsonProperty("durationNanos")
+  public long getDurationNanos() {
+    if (endTimeNanos > 0L && startTimeNanos > 0L && endTimeNanos >= startTimeNanos) {
+      return endTimeNanos - startTimeNanos;
+    }
+    // Fallback to millis calculation if nanos not available
+    long millis = getDurationMillis();
+    return millis > 0L ? millis * 1_000_000L : 0L;
+  }
+
   public boolean hasFix() {
     return isNotEmpty(fix);
   }
 
   public boolean hasException() {
-    return isNotEmpty(exception);
+    return failure != null;
   }
 
-  // Serialize fix/exception as arrays when absent to avoid nulls
+  @JsonProperty("hasFailure")
+  public boolean hasFailure() {
+    return failure != null;
+  }
+
+  // Serialize fix as array when absent to avoid nulls
   @JsonProperty("fix")
   public java.util.List<String> getFixArray() {
     return java.util.Collections.emptyList();
   }
 
-  @JsonProperty("exception")
-  public java.util.List<String> getExceptionArray() {
-    return java.util.Collections.emptyList();
+  @JsonProperty("failure")
+  public QAPFailure getFailure() {
+    return failure;
   }
 }
