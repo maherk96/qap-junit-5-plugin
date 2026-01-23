@@ -1,0 +1,46 @@
+plugins {
+    id 'java-library'
+    id 'com.diffplug.spotless' version '6.25.0'
+}
+
+group = 'com.mk.fx.qa'
+version = '1.1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // SLF4J API for internal logging (not actual log capture)
+    implementation 'org.slf4j:slf4j-api:2.0.13'
+    
+    // Jackson for JSON serialization of log entries
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.17.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1'
+    
+    // JUnit 5 for testing
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    
+    // Mockito for testing
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+spotless {
+    java {
+        target 'src/**/*.java'
+        googleJavaFormat('1.17.0')
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}

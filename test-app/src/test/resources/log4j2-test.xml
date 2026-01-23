@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- Console appender for viewing logs -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        
+        <!-- File appender for test logs -->
+        <File name="TestFile" fileName="build/test-logs/test-app.log" append="false">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+    </Appenders>
+    
+    <Loggers>
+        <!-- Root logger -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="TestFile"/>
+        </Root>
+        
+        <!-- QAP framework logging -->
+        <Logger name="com.mk.fx.qa.qap" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="TestFile"/>
+        </Logger>
+        
+        <!-- Test application logging - additivity=true allows QAP to capture logs -->
+        <Logger name="com.example.testapp" level="debug" additivity="true">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="TestFile"/>
+        </Logger>
+    </Loggers>
+</Configuration>
