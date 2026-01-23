@@ -58,7 +58,24 @@ dependencies {
 }
 ```
 
-### 2. Write Your Test
+### 2. (Optional) Configure in qap.properties
+
+Create `src/test/resources/qap.properties` to customize logging:
+
+```properties
+# Minimum log level to capture (default: DEBUG)
+qap.logging.min.level=DEBUG
+
+# Maximum log entries per test (default: 1000)
+qap.logging.max.entries=1000
+
+# Capture only specific packages (default: all)
+qap.logging.logger.patterns=com.myapp.*,org.springframework.*
+```
+
+**That's it!** No XML configuration, no code changes needed!
+
+### 3. Write Your Test
 
 ```java
 import org.slf4j.Logger;
@@ -79,7 +96,7 @@ class MyTest {
 }
 ```
 
-### 3. Run & See Results
+### 4. Run & See Results
 
 ```bash
 ./gradlew test
@@ -112,7 +129,7 @@ class MyTest {
 }
 ```
 
-**That's it! No configuration files, no XML setup, no code changes needed!**
+**That's it! Logs are automatically captured with default settings!**
 
 ---
 
@@ -296,39 +313,52 @@ compileOnly 'ch.qos.logback:logback-core:1.5.6'
 
 ## Configuration
 
-### Property-Based Configuration (Recommended) ⭐
+### ⭐ Property-Based Configuration (Recommended)
 
-**The easiest way to configure logging is via `qap.properties`!** No code changes needed.
+**The easiest and recommended way to configure log capture is via `qap.properties`!** 
+
+Simply add properties to your `src/test/resources/qap.properties` file - **no code changes, no custom extensions, no recompilation needed!**
+
+#### Complete Property List
 
 Add these properties to your `src/test/resources/qap.properties`:
 
 ```properties
+# ========================================
+# QAP Log Capture Configuration
+# ========================================
+
 # Enable/disable log capture (default: true)
 qap.logging.enabled=true
 
-# Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR
-# Default: DEBUG
+# Minimum log level to capture: TRACE, DEBUG, INFO, WARN, ERROR
+# Default: DEBUG (captures DEBUG, INFO, WARN, ERROR)
 qap.logging.min.level=DEBUG
 
-# Maximum log entries per test (default: 1000)
+# Maximum number of log entries per test (prevents OOM)
+# Default: 1000
 qap.logging.max.entries=1000
 
-# Maximum message length in characters (default: 10000)
+# Maximum message length in characters (longer messages are truncated)
+# Default: 10000
 qap.logging.max.message.length=10000
 
 # Capture exception stack traces (default: true)
 qap.logging.capture.stacktraces=true
 
-# Include MDC (default: true)
+# Include MDC (Mapped Diagnostic Context) in logs (default: true)
 qap.logging.include.mdc=true
 
-# Include SLF4J markers (default: true)
+# Include SLF4J markers in logs (default: true)
 qap.logging.include.markers=true
 
-# Logger patterns (comma-separated, supports wildcards)
-# Empty = capture all (default)
-qap.logging.logger.patterns=com.myapp.*,org.springframework.*
+# Logger name patterns to capture (comma-separated, supports wildcards)
+# Empty = capture all loggers (default)
+# Example: com.myapp.*,org.springframework.web.*
+qap.logging.logger.patterns=
 ```
+
+**💡 Pro Tip:** You don't need to specify all properties! Only add the ones you want to change from defaults.
 
 ### Common Configuration Examples
 
@@ -377,17 +407,18 @@ QAPLogCaptureConfig defaultConfig = QAPLogCaptureConfig.builder()
 
 ### Configuration Options Reference
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `enabled` | `true` | Enable/disable log capture |
-| `minLevel` | `INFO` | Minimum log level to capture (TRACE, DEBUG, INFO, WARN, ERROR) |
-| `maxEntriesPerTest` | `1000` | Maximum log entries per test (prevents OOM) |
-| `maxMessageLength` | `10,000` | Maximum characters per log message (truncates longer) |
-| `captureStackTraces` | `true` | Include exception stack traces in captured logs |
-| `includeMdc` | `true` | Capture MDC values |
-| `includeMarkers` | `true` | Capture SLF4J markers |
-| `threadLocal` | `true` | Use ThreadLocal storage (required for parallel tests) |
-| `loggerPatterns` | `[]` (all) | Filter loggers by name pattern (supports wildcards) |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `qap.logging.enabled` | boolean | `true` | Enable/disable log capture |
+| `qap.logging.min.level` | string | `DEBUG` | Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR |
+| `qap.logging.max.entries` | integer | `1000` | Maximum log entries per test (prevents OOM) |
+| `qap.logging.max.message.length` | integer | `10000` | Maximum characters per log message (truncates longer) |
+| `qap.logging.capture.stacktraces` | boolean | `true` | Include exception stack traces in captured logs |
+| `qap.logging.include.mdc` | boolean | `true` | Capture MDC values |
+| `qap.logging.include.markers` | boolean | `true` | Capture SLF4J markers |
+| `qap.logging.logger.patterns` | string | `""` (all) | Comma-separated logger name patterns (supports wildcards: `com.myapp.*`) |
+
+**Note:** ThreadLocal storage is always enabled for thread-safe parallel test execution.
 
 ---
 

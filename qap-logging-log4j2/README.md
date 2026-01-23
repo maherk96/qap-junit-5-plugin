@@ -59,7 +59,7 @@ dependencies {
 }
 ```
 
-### 2. Write Your Test
+### 3. Write Your Test
 
 ```java
 import org.apache.logging.log4j.LogManager;
@@ -80,7 +80,7 @@ class MyTest {
 }
 ```
 
-### 3. Run & See Results
+### 4. Run & See Results
 
 ```bash
 ./gradlew test
@@ -113,7 +113,7 @@ class MyTest {
 }
 ```
 
-**That's it! No configuration files, no XML setup, no code changes needed!**
+**That's it! Logs are automatically captured with default settings!**
 
 ---
 
@@ -302,13 +302,88 @@ compileOnly 'org.apache.logging.log4j:log4j-core:2.23.1'
 
 ## Configuration
 
-### Default Configuration (Recommended)
+### ⭐ Property-Based Configuration (Recommended)
+
+**The easiest and recommended way to configure log capture is via `qap.properties`!** 
+
+Simply add properties to your `src/test/resources/qap.properties` file - **no code changes, no custom extensions, no recompilation needed!**
+
+#### Complete Property List
+
+```properties
+# ========================================
+# QAP Log Capture Configuration
+# ========================================
+
+# Enable/disable log capture (default: true)
+qap.logging.enabled=true
+
+# Minimum log level to capture: TRACE, DEBUG, INFO, WARN, ERROR, FATAL
+# Default: DEBUG (captures DEBUG, INFO, WARN, ERROR, FATAL)
+qap.logging.min.level=DEBUG
+
+# Maximum number of log entries per test (prevents OOM)
+# Default: 1000
+qap.logging.max.entries=1000
+
+# Maximum message length in characters (longer messages are truncated)
+# Default: 10000
+qap.logging.max.message.length=10000
+
+# Capture exception stack traces (default: true)
+qap.logging.capture.stacktraces=true
+
+# Include ThreadContext/MDC in logs (default: true)
+qap.logging.include.mdc=true
+
+# Include Log4j2 markers in logs (default: true)
+qap.logging.include.markers=true
+
+# Logger name patterns to capture (comma-separated, supports wildcards)
+# Empty = capture all loggers (default)
+# Example: com.myapp.*,org.springframework.web.*
+qap.logging.logger.patterns=
+```
+
+**💡 Pro Tip:** You don't need to specify all properties! Only add the ones you want to change from defaults.
+
+### Common Configuration Examples
+
+#### Example 1: Quieter Logging (WARN+ only)
+
+```properties
+qap.logging.min.level=WARN
+```
+
+#### Example 2: Application Logs Only
+
+```properties
+qap.logging.logger.patterns=com.mycompany.*
+```
+
+#### Example 3: High-Volume Tests
+
+```properties
+qap.logging.max.entries=5000
+qap.logging.max.message.length=20000
+```
+
+#### Example 4: Minimal JSON Size
+
+```properties
+qap.logging.min.level=WARN
+qap.logging.include.mdc=false
+qap.logging.include.markers=false
+qap.logging.capture.stacktraces=false
+```
+
+### Default Configuration (If No Properties Set)
 
 ```java
-// These are the defaults - NO configuration needed!
+// These are the defaults when properties are not specified:
 QAPLogCaptureConfig defaultConfig = QAPLogCaptureConfig.builder()
     .enabled(true)                      // Log capture enabled
-    .minLevel(QAPLogLevel.INFO)         // Capture INFO and above
+    .minLevel(QAPLogLevel.DEBUG)        // Capture DEBUG and above
     .maxEntriesPerTest(1000)            // Max 1000 logs per test
     .maxMessageLength(10_000)           // Truncate long messages
     .captureStackTraces(true)           // Include exception details
@@ -318,56 +393,20 @@ QAPLogCaptureConfig defaultConfig = QAPLogCaptureConfig.builder()
     .build();
 ```
 
-### Custom Configuration (Advanced Users)
-
-If you need to customize, modify `QAPJunitExtension`:
-
-```java
-// In your test project:
-public class CustomQAPExtension extends QAPJunitExtension {
-    
-    @Override
-    protected QAPLogCaptureConfig getLogCaptureConfig() {
-        return QAPLogCaptureConfig.builder()
-            // Capture DEBUG and above (more verbose)
-            .minLevel(QAPLogLevel.DEBUG)
-            
-            // Higher limits for chatty tests
-            .maxEntriesPerTest(5000)
-            .maxMessageLength(20_000)
-            
-            // Only capture application logs
-            .addLoggerPattern("com.mycompany.*")
-            .addLoggerPattern("org.springframework.web.*")
-            
-            // Exclude noisy libraries
-            .addLoggerPattern("!com.noisy.library.*")
-            
-            .build();
-    }
-}
-```
-
-Then register your custom extension:
-
-```java
-// In META-INF/services/org.junit.jupiter.api.extension.Extension
-com.mycompany.CustomQAPExtension
-```
-
 ### Configuration Options Reference
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `enabled` | `true` | Enable/disable log capture |
-| `minLevel` | `INFO` | Minimum log level to capture (TRACE, DEBUG, INFO, WARN, ERROR, FATAL) |
-| `maxEntriesPerTest` | `1000` | Maximum log entries per test (prevents OOM) |
-| `maxMessageLength` | `10,000` | Maximum characters per log message (truncates longer) |
-| `captureStackTraces` | `true` | Include exception stack traces in captured logs |
-| `includeMdc` | `true` | Capture MDC (ThreadContext) values |
-| `includeMarkers` | `true` | Capture Log4j2 markers |
-| `threadLocal` | `true` | Use ThreadLocal storage (required for parallel tests) |
-| `loggerPatterns` | `[]` (all) | Filter loggers by name pattern (supports wildcards) |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `qap.logging.enabled` | boolean | `true` | Enable/disable log capture |
+| `qap.logging.min.level` | string | `DEBUG` | Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR, FATAL |
+| `qap.logging.max.entries` | integer | `1000` | Maximum log entries per test (prevents OOM) |
+| `qap.logging.max.message.length` | integer | `10000` | Maximum characters per log message (truncates longer) |
+| `qap.logging.capture.stacktraces` | boolean | `true` | Include exception stack traces in captured logs |
+| `qap.logging.include.mdc` | boolean | `true` | Capture MDC (ThreadContext) values |
+| `qap.logging.include.markers` | boolean | `true` | Capture Log4j2 markers |
+| `qap.logging.logger.patterns` | string | `""` (all) | Comma-separated logger name patterns (supports wildcards: `com.myapp.*`) |
+
+**Note:** ThreadLocal storage is always enabled for thread-safe parallel test execution.
 
 ---
 
