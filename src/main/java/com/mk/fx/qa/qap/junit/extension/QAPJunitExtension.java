@@ -102,8 +102,12 @@ public class QAPJunitExtension
   @Override
   public void beforeEach(ExtensionContext context) {
     QAPTest qapTest = initializeQAPTest(context);
-    // Initialize lifecycle tracking for this test
-    qapTest.setLifecycle(new com.mk.fx.qa.qap.junit.model.QAPTestLifecycle());
+    Objects.requireNonNull(qapTest, "QAPTest initialization failed");
+    
+    // Initialize lifecycle tracking for this test (only if not already present)
+    if (qapTest.getLifecycle() == null) {
+      qapTest.setLifecycle(new com.mk.fx.qa.qap.junit.model.QAPTestLifecycle());
+    }
     StoreManager.putMethodStoreData(context, QAPUtils.METHOD_DESCRIPTION_KEY, qapTest);
   }
 

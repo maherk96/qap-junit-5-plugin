@@ -64,15 +64,38 @@ public class StoreManager {
     getClassStore(context).put(key, value);
   }
 
+  /**
+   * Adds a test case to the class-level store, maintaining both hierarchical and flat structures.
+   * Includes defensive type checking to prevent ClassCastException.
+   *
+   * @param context the extension context
+   * @param qapTest the test case to add
+   */
   public static void addDescriptionToClassStore(ExtensionContext context, QAPTest qapTest) {
     ExtensionContext.Store classStore = getClassStore(context);
+    
+    // Retrieve or create the nodes map with defensive type checking
     @SuppressWarnings("unchecked")
     java.util.Map<String, com.mk.fx.qa.qap.junit.model.QAPTestClass> nodes =
+        (java.util.Map<String, com.mk.fx.qa.qap.junit.model.QAPTestClass>) 
         classStore.getOrDefault(
             com.mk.fx.qa.qap.junit.core.QAPUtils.CLASS_NODES_KEY,
             java.util.Map.class,
             new java.util.concurrent.ConcurrentHashMap<
                 String, com.mk.fx.qa.qap.junit.model.QAPTestClass>());
+    
+    // Defensive check: verify map contains correct types
+    if (nodes != null && !nodes.isEmpty()) {
+      Object firstValue = nodes.values().iterator().next();
+      if (!(firstValue instanceof com.mk.fx.qa.qap.junit.model.QAPTestClass)) {
+        org.slf4j.LoggerFactory.getLogger(StoreManager.class)
+            .error("Store corruption detected: CLASS_NODES_KEY contains wrong type {}, resetting", 
+                   firstValue.getClass().getName());
+        nodes = new java.util.concurrent.ConcurrentHashMap<>();
+        classStore.put(com.mk.fx.qa.qap.junit.core.QAPUtils.CLASS_NODES_KEY, nodes);
+      }
+    }
+    
     String key = context.getRequiredTestClass().getName();
     com.mk.fx.qa.qap.junit.model.QAPTestClass node =
         nodes.computeIfAbsent(
@@ -90,7 +113,8 @@ public class StoreManager {
     classStore.put(com.mk.fx.qa.qap.junit.core.QAPUtils.CLASS_NODES_KEY, nodes);
 
     // Maintain backward-compatible flat list
-    List<QAPTest> flat =
+    @SuppressWarnings("unchecked")
+    List<QAPTest> flat = (List<QAPTest>)
         classStore.getOrDefault(
             METHOD_DESCRIPTION_KEY, List.class, new CopyOnWriteArrayList<QAPTest>());
     flat.add(qapTest);

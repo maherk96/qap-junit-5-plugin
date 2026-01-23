@@ -56,9 +56,14 @@ class QAPJunitExtensionDisabledTest {
     assertEquals(Set.of("MethodY"), t.getMethodTags());
     assertEquals("DN", t.getMethodDisplayName());
     assertEquals("DISABLED", t.getStatus());
-    assertTrue(t.hasFailure());
-    assertNotNull(t.getFailure());
-    assertTrue(t.getFailure().getMessage().contains("maintenance"));
+    
+    // Disabled tests should NOT have failure - only disabledReason
+    // This matches the expected behavior in t.json
+    assertFalse(t.hasFailure(), "Disabled tests should not have failures");
+    assertNull(t.getFailure(), "Disabled tests should have null failure");
+    assertNotNull(t.getDisabledReason(), "Disabled tests should have a disabledReason");
+    assertTrue(t.getDisabledReason().contains("maintenance"), 
+               "DisabledReason should contain 'maintenance'");
     assertTrue(t.getEndTime() >= t.getStartTime());
   }
 }

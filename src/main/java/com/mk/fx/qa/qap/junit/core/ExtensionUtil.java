@@ -13,7 +13,8 @@ public class ExtensionUtil {
    * @return the OS version as a string
    */
   public static String getOsVersion() {
-    return System.getProperty("os.name") + " " + System.getProperty("os.version");
+    return System.getProperty(SystemProperties.OS_NAME) + " " + 
+           System.getProperty(SystemProperties.OS_VERSION);
   }
 
   /**
@@ -22,7 +23,7 @@ public class ExtensionUtil {
    * @return the JDK version as a string
    */
   public static String getJdkVersion() {
-    return "JDK " + System.getProperty("java.version");
+    return "JDK " + System.getProperty(SystemProperties.JAVA_VERSION);
   }
 
   /**
@@ -31,6 +32,6 @@ public class ExtensionUtil {
    * @return true if the 'qap.regression' property is not null, false otherwise.
    */
   public static boolean isRegressionEnabled() {
-    return System.getProperty("qap.regression") != null;
+    return System.getProperty(SystemProperties.QAP_REGRESSION) != null;
   }
 }

@@ -28,7 +28,19 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 
+/**
+ * Interceptor for test lifecycle methods (beforeAll, beforeEach, afterEach, afterAll).
+ * Captures timing, status, and failures for each fixture execution.
+ * 
+ * Thread-safety: The failedInits map must be a ConcurrentHashMap to support
+ * parallel test execution safely.
+ */
 public class QAPJunitMethodInterceptor implements IMethodInterceptor {
+  /**
+   * Thread-safe map tracking failed initialization methods across test execution.
+   * Keys are extension context unique IDs, values are the exceptions thrown.
+   * Must be periodically cleaned to prevent memory leaks in long-running test suites.
+   */
   private final Map<String, Throwable> failedInits;
 
   public QAPJunitMethodInterceptor(Map<String, Throwable> failedInits) {
@@ -290,6 +302,9 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
           durationNanos,
           qapFailure);
       addFixtureToClass(extensionContext, fixture, fixtureMethod);
+      
+      // Clean up failed init tracking for this context to prevent memory leak
+      failedInits.remove(extensionContext.getUniqueId());
     }
   }
 

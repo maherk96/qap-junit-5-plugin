@@ -1,12 +1,12 @@
 {
   "header": {
-    "launchStartTime": 1768527846298,
-    "launchId": "TestLaunch-5ffe039d01f8",
+    "launchStartTime": 1769129303778,
+    "launchId": "TestLaunch-50be0656eaa6",
     "applicationName": "MyApp",
     "testEnvironment": "TEST",
     "user": "your.username",
     "gitBranch": null,
-    "launchEndTime": 1768527846386,
+    "launchEndTime": 1769129303874,
     "osVersion": "Mac OS X 26.2",
     "testRunnerVersion": "Junit 5.10.2",
     "jdkVersion": "JDK 21.0.7",
@@ -18,8 +18,8 @@
       "displayName": "Bank Service Test Suite",
       "testCases": [
         {
-          "startTime": 1768527846320,
-          "endTime": 1768527846341,
+          "startTime": 1769129303803,
+          "endTime": 1769129303827,
           "status": "PASSED",
           "methodName": "shouldDepositAmountIntoAccount",
           "displayName": "Deposit 100.50 into account with balance 0.00 should result in 100.50",
@@ -56,12 +56,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 745583
+                "durationNanos": 685625
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 20877958
+              "durationNanos": 24031458
             },
             "afterEach": [
               {
@@ -69,17 +69,17 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 46542
+                "durationNanos": 64583
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 21670083,
-          "testOnlyDurationNanos": 20877958,
-          "durationNanos": 20877958,
-          "durationMillis": 21,
+          "totalDurationNanos": 24781666,
+          "testOnlyDurationNanos": 24031458,
+          "durationNanos": 24031458,
+          "durationMillis": 24,
           "tags": {
             "method": [
               "Deposit"
@@ -92,8 +92,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846344,
-          "endTime": 1768527846345,
+          "startTime": 1769129303830,
+          "endTime": 1769129303830,
           "status": "PASSED",
           "methodName": "shouldDepositAmountIntoAccount",
           "displayName": "Deposit 50.25 into account with balance 100.00 should result in 150.25",
@@ -130,12 +130,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 19667
+                "durationNanos": 22209
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 692042
+              "durationNanos": 691708
             },
             "afterEach": [
               {
@@ -143,17 +143,17 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 3959
+                "durationNanos": 4042
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 715668,
-          "testOnlyDurationNanos": 692042,
-          "durationNanos": 692042,
-          "durationMillis": 1,
+          "totalDurationNanos": 717959,
+          "testOnlyDurationNanos": 691708,
+          "durationNanos": 691708,
+          "durationMillis": 0,
           "tags": {
             "method": [
               "Deposit"
@@ -166,8 +166,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846346,
-          "endTime": 1768527846346,
+          "startTime": 1769129303832,
+          "endTime": 1769129303832,
           "status": "PASSED",
           "methodName": "shouldDepositAmountIntoAccount",
           "displayName": "Deposit 999.99 into account with balance 1000.00 should result in 1999.99",
@@ -204,12 +204,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 16417
+                "durationNanos": 20000
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 498167
+              "durationNanos": 562375
             },
             "afterEach": [
               {
@@ -217,16 +217,16 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 3208
+                "durationNanos": 3875
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 517792,
-          "testOnlyDurationNanos": 498167,
-          "durationNanos": 498167,
+          "totalDurationNanos": 586250,
+          "testOnlyDurationNanos": 562375,
+          "durationNanos": 562375,
           "durationMillis": 0,
           "tags": {
             "method": [
@@ -240,8 +240,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846347,
-          "endTime": 1768527846348,
+          "startTime": 1769129303833,
+          "endTime": 1769129303835,
           "status": "PASSED",
           "methodName": "shouldFailWhenCreatingDuplicateAccount",
           "displayName": "Should fail when creating duplicate account",
@@ -259,12 +259,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 22084
+                "durationNanos": 23500
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 1164333
+              "durationNanos": 1285500
             },
             "afterEach": [
               {
@@ -272,17 +272,17 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 4917
+                "durationNanos": 9708
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 1191334,
-          "testOnlyDurationNanos": 1164333,
-          "durationNanos": 1164333,
-          "durationMillis": 1,
+          "totalDurationNanos": 1318708,
+          "testOnlyDurationNanos": 1285500,
+          "durationNanos": 1285500,
+          "durationMillis": 2,
           "tags": {
             "method": [
               "AccountCreation"
@@ -295,8 +295,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846349,
-          "endTime": 1768527846349,
+          "startTime": 1769129303835,
+          "endTime": 1769129303836,
           "status": "PASSED",
           "methodName": "shouldReturnFalseForNonExistentAccount",
           "displayName": "shouldReturnFalseForNonExistentAccount",
@@ -314,12 +314,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 14416
+                "durationNanos": 14417
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 516166
+              "durationNanos": 525417
             },
             "afterEach": [
               {
@@ -327,17 +327,17 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 4542
+                "durationNanos": 3917
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 535124,
-          "testOnlyDurationNanos": 516166,
-          "durationNanos": 516166,
-          "durationMillis": 0,
+          "totalDurationNanos": 543751,
+          "testOnlyDurationNanos": 525417,
+          "durationNanos": 525417,
+          "durationMillis": 1,
           "tags": {
             "method": [
               "AccountQuery"
@@ -350,167 +350,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846350,
-          "endTime": 1768527846352,
-          "status": "FAILED",
-          "methodName": "intentionalFailureTest",
-          "displayName": "This test intentionally fails for demonstration",
-          "testCaseId": "BankServiceTest#intentionalFailureTest",
-          "methodDisplayName": "This test intentionally fails for demonstration",
-          "parameters": [],
-          "parameterization": null,
-          "testType": "TEST",
-          "disabledReason": null,
-          "lifecycle": {
-            "beforeAll": [],
-            "beforeEach": [
-              {
-                "methodName": "setUp",
-                "className": "BankServiceTest",
-                "order": 1,
-                "status": "PASSED",
-                "durationNanos": 12625
-              }
-            ],
-            "test": {
-              "status": "FAILED",
-              "durationNanos": 1628625
-            },
-            "afterEach": [
-              {
-                "methodName": "tearDown",
-                "className": "BankServiceTest",
-                "order": 1,
-                "status": "PASSED",
-                "durationNanos": 8833
-              }
-            ],
-            "afterAll": []
-          },
-          "logs": [],
-          "failure": {
-            "type": "org.opentest4j.AssertionFailedError",
-            "message": "expected: <200.00> but was: <100.00>",
-            "stackTrace": [
-              "org.opentest4j.AssertionFailedError: expected: <200.00> but was: <100.00>",
-              "at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)",
-              "at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)",
-              "at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)",
-              "at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)",
-              "at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)",
-              "at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)",
-              "at com.mk.fx.qa.qap.junit.BankServiceTest.intentionalFailureTest(BankServiceTest.java:231)",
-              "at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)",
-              "at java.base/java.lang.reflect.Method.invoke(Method.java:580)",
-              "at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:728)",
-              "at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)",
-              "at org.junit.jupiter.api.extension.InvocationInterceptor.interceptTestMethod(InvocationInterceptor.java:119)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)",
-              "at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)",
-              "at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)",
-              "at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)",
-              "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:218)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:214)",
-              "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:139)",
-              "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-              "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-              "at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)",
-              "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-              "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-              "at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)",
-              "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-              "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-              "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)",
-              "at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)",
-              "at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:107)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)",
-              "at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)",
-              "at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86)",
-              "at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86)",
-              "at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)",
-              "at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)",
-              "at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)",
-              "at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)",
-              "at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)",
-              "at java.base/java.lang.reflect.Method.invoke(Method.java:580)",
-              "at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)",
-              "at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)",
-              "at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)",
-              "at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)",
-              "at jdk.proxy1/jdk.proxy1.$Proxy4.stop(Unknown Source)",
-              "at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)",
-              "at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)",
-              "at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)",
-              "at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)",
-              "at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)",
-              "at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:121)",
-              "at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:71)",
-              "at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)",
-              "at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)"
-            ],
-            "suppressed": [],
-            "location": {
-              "class": "org.junit.jupiter.api.AssertionFailureBuilder",
-              "method": "build",
-              "file": "AssertionFailureBuilder.java",
-              "line": 151
-            }
-          },
-          "totalDurationNanos": 1650083,
-          "testOnlyDurationNanos": 1628625,
-          "durationNanos": 1628625,
-          "durationMillis": 2,
-          "tags": {
-            "method": [
-              "FailureDemo"
-            ],
-            "class": [
-              "Banking"
-            ]
-          },
-          "hasFailure": true,
-          "fix": []
-        },
-        {
-          "startTime": 1768527846354,
-          "endTime": 1768527846354,
+          "startTime": 1769129303836,
+          "endTime": 1769129303836,
           "status": "DISABLED",
           "methodName": "shouldSyncWithExternalBankingSystem",
           "displayName": "shouldSyncWithExternalBankingSystem",
@@ -523,9 +364,9 @@
           "lifecycle": null,
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 49417,
-          "testOnlyDurationNanos": 49417,
-          "durationNanos": 49417,
+          "totalDurationNanos": 70292,
+          "testOnlyDurationNanos": 70292,
+          "durationNanos": 70292,
           "durationMillis": 0,
           "tags": {
             "method": [
@@ -539,167 +380,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846355,
-          "endTime": 1768527846356,
-          "status": "FAILED",
-          "methodName": "anotherFailureTest",
-          "displayName": "anotherFailureTest",
-          "testCaseId": "BankServiceTest#anotherFailureTest",
-          "methodDisplayName": "anotherFailureTest",
-          "parameters": [],
-          "parameterization": null,
-          "testType": "TEST",
-          "disabledReason": null,
-          "lifecycle": {
-            "beforeAll": [],
-            "beforeEach": [
-              {
-                "methodName": "setUp",
-                "className": "BankServiceTest",
-                "order": 1,
-                "status": "PASSED",
-                "durationNanos": 13917
-              }
-            ],
-            "test": {
-              "status": "FAILED",
-              "durationNanos": 380333
-            },
-            "afterEach": [
-              {
-                "methodName": "tearDown",
-                "className": "BankServiceTest",
-                "order": 1,
-                "status": "PASSED",
-                "durationNanos": 3833
-              }
-            ],
-            "afterAll": []
-          },
-          "logs": [],
-          "failure": {
-            "type": "org.opentest4j.AssertionFailedError",
-            "message": "expected: <500.00> but was: <600.00>",
-            "stackTrace": [
-              "org.opentest4j.AssertionFailedError: expected: <500.00> but was: <600.00>",
-              "at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)",
-              "at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)",
-              "at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)",
-              "at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)",
-              "at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)",
-              "at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)",
-              "at com.mk.fx.qa.qap.junit.BankServiceTest.anotherFailureTest(BankServiceTest.java:240)",
-              "at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)",
-              "at java.base/java.lang.reflect.Method.invoke(Method.java:580)",
-              "at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:728)",
-              "at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)",
-              "at org.junit.jupiter.api.extension.InvocationInterceptor.interceptTestMethod(InvocationInterceptor.java:119)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)",
-              "at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)",
-              "at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)",
-              "at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)",
-              "at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)",
-              "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)",
-              "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:218)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:214)",
-              "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:139)",
-              "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-              "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-              "at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)",
-              "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-              "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-              "at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)",
-              "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-              "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-              "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-              "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-              "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)",
-              "at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)",
-              "at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:107)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)",
-              "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)",
-              "at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)",
-              "at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86)",
-              "at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86)",
-              "at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)",
-              "at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)",
-              "at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)",
-              "at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)",
-              "at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)",
-              "at java.base/java.lang.reflect.Method.invoke(Method.java:580)",
-              "at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)",
-              "at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)",
-              "at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)",
-              "at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)",
-              "at jdk.proxy1/jdk.proxy1.$Proxy4.stop(Unknown Source)",
-              "at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)",
-              "at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)",
-              "at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)",
-              "at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)",
-              "at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)",
-              "at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:121)",
-              "at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:71)",
-              "at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)",
-              "at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)"
-            ],
-            "suppressed": [],
-            "location": {
-              "class": "org.junit.jupiter.api.AssertionFailureBuilder",
-              "method": "build",
-              "file": "AssertionFailureBuilder.java",
-              "line": 151
-            }
-          },
-          "totalDurationNanos": 398083,
-          "testOnlyDurationNanos": 380333,
-          "durationNanos": 380333,
-          "durationMillis": 1,
-          "tags": {
-            "method": [
-              "FailureDemo"
-            ],
-            "class": [
-              "Banking"
-            ]
-          },
-          "hasFailure": true,
-          "fix": []
-        },
-        {
-          "startTime": 1768527846356,
-          "endTime": 1768527846357,
+          "startTime": 1769129303838,
+          "endTime": 1769129303838,
           "status": "PASSED",
           "methodName": "shouldCreateAccountWithInitialBalance",
           "displayName": "Should create account with initial balance",
@@ -717,12 +399,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 25209
+                "durationNanos": 19292
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 296250
+              "durationNanos": 472000
             },
             "afterEach": [
               {
@@ -730,17 +412,17 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 3292
+                "durationNanos": 3708
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 324751,
-          "testOnlyDurationNanos": 296250,
-          "durationNanos": 296250,
-          "durationMillis": 1,
+          "totalDurationNanos": 495000,
+          "testOnlyDurationNanos": 472000,
+          "durationNanos": 472000,
+          "durationMillis": 0,
           "tags": {
             "method": [
               "AccountCreation"
@@ -753,8 +435,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846359,
-          "endTime": 1768527846360,
+          "startTime": 1769129303842,
+          "endTime": 1769129303844,
           "status": "PASSED",
           "methodName": "shouldFailWhenDepositingInvalidAmount",
           "displayName": "[1] 0.00",
@@ -781,12 +463,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 13833
+                "durationNanos": 25625
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 756958
+              "durationNanos": 1523000
             },
             "afterEach": [
               {
@@ -794,17 +476,17 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 4583
+                "durationNanos": 6500
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 775374,
-          "testOnlyDurationNanos": 756958,
-          "durationNanos": 756958,
-          "durationMillis": 1,
+          "totalDurationNanos": 1555125,
+          "testOnlyDurationNanos": 1523000,
+          "durationNanos": 1523000,
+          "durationMillis": 2,
           "tags": {
             "method": [
               "Deposit"
@@ -817,8 +499,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846361,
-          "endTime": 1768527846361,
+          "startTime": 1769129303845,
+          "endTime": 1769129303845,
           "status": "PASSED",
           "methodName": "shouldFailWhenDepositingInvalidAmount",
           "displayName": "[2] -10.00",
@@ -845,12 +527,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 15167
+                "durationNanos": 18584
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 356125
+              "durationNanos": 426666
             },
             "afterEach": [
               {
@@ -858,16 +540,16 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 3541
+                "durationNanos": 3625
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 374833,
-          "testOnlyDurationNanos": 356125,
-          "durationNanos": 356125,
+          "totalDurationNanos": 448875,
+          "testOnlyDurationNanos": 426666,
+          "durationNanos": 426666,
           "durationMillis": 0,
           "tags": {
             "method": [
@@ -881,8 +563,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846362,
-          "endTime": 1768527846362,
+          "startTime": 1769129303846,
+          "endTime": 1769129303846,
           "status": "PASSED",
           "methodName": "shouldFailWhenDepositingInvalidAmount",
           "displayName": "[3] -100.50",
@@ -909,12 +591,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 17417
+                "durationNanos": 17041
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 403375
+              "durationNanos": 384875
             },
             "afterEach": [
               {
@@ -922,16 +604,16 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 3625
+                "durationNanos": 3709
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 424417,
-          "testOnlyDurationNanos": 403375,
-          "durationNanos": 403375,
+          "totalDurationNanos": 405625,
+          "testOnlyDurationNanos": 384875,
+          "durationNanos": 384875,
           "durationMillis": 0,
           "tags": {
             "method": [
@@ -945,8 +627,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846363,
-          "endTime": 1768527846363,
+          "startTime": 1769129303847,
+          "endTime": 1769129303848,
           "status": "PASSED",
           "methodName": "shouldReturnTrueForExistingAccount",
           "displayName": "Should return true for existing account",
@@ -964,12 +646,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 14333
+                "durationNanos": 27625
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 450792
+              "durationNanos": 709875
             },
             "afterEach": [
               {
@@ -977,17 +659,17 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 3875
+                "durationNanos": 7458
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 469000,
-          "testOnlyDurationNanos": 450792,
-          "durationNanos": 450792,
-          "durationMillis": 0,
+          "totalDurationNanos": 744958,
+          "testOnlyDurationNanos": 709875,
+          "durationNanos": 709875,
+          "durationMillis": 1,
           "tags": {
             "method": [
               "AccountQuery"
@@ -1000,8 +682,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846364,
-          "endTime": 1768527846364,
+          "startTime": 1769129303848,
+          "endTime": 1769129303849,
           "status": "PASSED",
           "methodName": "shouldCreateAccountWithZeroBalance",
           "displayName": "shouldCreateAccountWithZeroBalance",
@@ -1019,12 +701,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 12500
+                "durationNanos": 19250
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 269917
+              "durationNanos": 428584
             },
             "afterEach": [
               {
@@ -1032,17 +714,17 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 3166
+                "durationNanos": 3500
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 285583,
-          "testOnlyDurationNanos": 269917,
-          "durationNanos": 269917,
-          "durationMillis": 0,
+          "totalDurationNanos": 451334,
+          "testOnlyDurationNanos": 428584,
+          "durationNanos": 428584,
+          "durationMillis": 1,
           "tags": {
             "method": [
               "AccountCreation"
@@ -1055,8 +737,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846364,
-          "endTime": 1768527846365,
+          "startTime": 1769129303849,
+          "endTime": 1769129303850,
           "status": "PASSED",
           "methodName": "shouldFailWhenCreatingAccountWithNegativeBalance",
           "displayName": "Should fail when creating account with negative balance",
@@ -1074,12 +756,12 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 11500
+                "durationNanos": 12333
               }
             ],
             "test": {
               "status": "PASSED",
-              "durationNanos": 362542
+              "durationNanos": 488875
             },
             "afterEach": [
               {
@@ -1087,16 +769,16 @@
                 "className": "BankServiceTest",
                 "order": 1,
                 "status": "PASSED",
-                "durationNanos": 3708
+                "durationNanos": 4166
               }
             ],
             "afterAll": []
           },
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 377750,
-          "testOnlyDurationNanos": 362542,
-          "durationNanos": 362542,
+          "totalDurationNanos": 505374,
+          "testOnlyDurationNanos": 488875,
+          "durationNanos": 488875,
           "durationMillis": 1,
           "tags": {
             "method": [
@@ -1110,8 +792,8 @@
           "fix": []
         },
         {
-          "startTime": 1768527846365,
-          "endTime": 1768527846365,
+          "startTime": 1769129303850,
+          "endTime": 1769129303850,
           "status": "DISABLED",
           "methodName": "shouldCalculateInterestOnAccountBalance",
           "displayName": "Should calculate interest on account balance",
@@ -1124,9 +806,9 @@
           "lifecycle": null,
           "logs": [],
           "failure": null,
-          "totalDurationNanos": 33250,
-          "testOnlyDurationNanos": 33250,
-          "durationNanos": 33250,
+          "totalDurationNanos": 35792,
+          "testOnlyDurationNanos": 35792,
+          "durationNanos": 35792,
           "durationMillis": 0,
           "tags": {
             "method": [
@@ -1146,8 +828,8 @@
           "displayName": "Withdrawal Operations",
           "testCases": [
             {
-              "startTime": 1768527846375,
-              "endTime": 1768527846375,
+              "startTime": 1769129303863,
+              "endTime": 1769129303864,
               "status": "PASSED",
               "methodName": "shouldFailWhenWithdrawingFromNonExistentAccount",
               "displayName": "Should fail when withdrawing from non-existent account",
@@ -1165,12 +847,12 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 12417
+                    "durationNanos": 11666
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 518625
+                  "durationNanos": 578458
                 },
                 "afterEach": [
                   {
@@ -1178,17 +860,17 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 4334
+                    "durationNanos": 4875
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 535376,
-              "testOnlyDurationNanos": 518625,
-              "durationNanos": 518625,
-              "durationMillis": 0,
+              "totalDurationNanos": 594999,
+              "testOnlyDurationNanos": 578458,
+              "durationNanos": 578458,
+              "durationMillis": 1,
               "tags": {
                 "class": [
                   "Withdrawal"
@@ -1201,8 +883,8 @@
               "fix": []
             },
             {
-              "startTime": 1768527846377,
-              "endTime": 1768527846378,
+              "startTime": 1769129303866,
+              "endTime": 1769129303867,
               "status": "PASSED",
               "methodName": "shouldWithdrawVariousAmounts",
               "displayName": "Withdraw 100.00 from 1000.00 should leave 900.00",
@@ -1239,12 +921,12 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 15584
+                    "durationNanos": 13042
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 888375
+                  "durationNanos": 606291
                 },
                 "afterEach": [
                   {
@@ -1252,16 +934,16 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 4834
+                    "durationNanos": 4125
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 908793,
-              "testOnlyDurationNanos": 888375,
-              "durationNanos": 888375,
+              "totalDurationNanos": 623458,
+              "testOnlyDurationNanos": 606291,
+              "durationNanos": 606291,
               "durationMillis": 1,
               "tags": {
                 "class": [
@@ -1275,8 +957,8 @@
               "fix": []
             },
             {
-              "startTime": 1768527846379,
-              "endTime": 1768527846379,
+              "startTime": 1769129303867,
+              "endTime": 1769129303868,
               "status": "PASSED",
               "methodName": "shouldWithdrawVariousAmounts",
               "displayName": "Withdraw 250.50 from 500.00 should leave 249.50",
@@ -1313,12 +995,12 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 9542
+                    "durationNanos": 12625
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 337334
+                  "durationNanos": 472625
                 },
                 "afterEach": [
                   {
@@ -1326,17 +1008,17 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 3250
+                    "durationNanos": 3417
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 350126,
-              "testOnlyDurationNanos": 337334,
-              "durationNanos": 337334,
-              "durationMillis": 0,
+              "totalDurationNanos": 488667,
+              "testOnlyDurationNanos": 472625,
+              "durationNanos": 472625,
+              "durationMillis": 1,
               "tags": {
                 "class": [
                   "Withdrawal"
@@ -1349,8 +1031,8 @@
               "fix": []
             },
             {
-              "startTime": 1768527846380,
-              "endTime": 1768527846380,
+              "startTime": 1769129303868,
+              "endTime": 1769129303869,
               "status": "PASSED",
               "methodName": "shouldWithdrawVariousAmounts",
               "displayName": "Withdraw 100.00 from 100.00 should leave 0.00",
@@ -1387,12 +1069,12 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 15292
+                    "durationNanos": 12334
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 343083
+                  "durationNanos": 389875
                 },
                 "afterEach": [
                   {
@@ -1400,17 +1082,17 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 3125
+                    "durationNanos": 3417
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 361500,
-              "testOnlyDurationNanos": 343083,
-              "durationNanos": 343083,
-              "durationMillis": 0,
+              "totalDurationNanos": 405626,
+              "testOnlyDurationNanos": 389875,
+              "durationNanos": 389875,
+              "durationMillis": 1,
               "tags": {
                 "class": [
                   "Withdrawal"
@@ -1423,8 +1105,8 @@
               "fix": []
             },
             {
-              "startTime": 1768527846381,
-              "endTime": 1768527846381,
+              "startTime": 1769129303869,
+              "endTime": 1769129303870,
               "status": "PASSED",
               "methodName": "shouldFailWhenWithdrawingMoreThanBalance",
               "displayName": "shouldFailWhenWithdrawingMoreThanBalance",
@@ -1442,12 +1124,12 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 10250
+                    "durationNanos": 10208
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 675000
+                  "durationNanos": 499542
                 },
                 "afterEach": [
                   {
@@ -1455,17 +1137,17 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 10333
+                    "durationNanos": 4416
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 695583,
-              "testOnlyDurationNanos": 675000,
-              "durationNanos": 675000,
-              "durationMillis": 0,
+              "totalDurationNanos": 514166,
+              "testOnlyDurationNanos": 499542,
+              "durationNanos": 499542,
+              "durationMillis": 1,
               "tags": {
                 "class": [
                   "Withdrawal"
@@ -1478,8 +1160,8 @@
               "fix": []
             },
             {
-              "startTime": 1768527846382,
-              "endTime": 1768527846382,
+              "startTime": 1769129303870,
+              "endTime": 1769129303871,
               "status": "PASSED",
               "methodName": "shouldWithdrawValidAmount",
               "displayName": "Should withdraw valid amount from account",
@@ -1497,12 +1179,12 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 10167
+                    "durationNanos": 11792
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 281916
+                  "durationNanos": 244584
                 },
                 "afterEach": [
                   {
@@ -1510,17 +1192,17 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 3458
+                    "durationNanos": 3000
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 295541,
-              "testOnlyDurationNanos": 281916,
-              "durationNanos": 281916,
-              "durationMillis": 0,
+              "totalDurationNanos": 259376,
+              "testOnlyDurationNanos": 244584,
+              "durationNanos": 244584,
+              "durationMillis": 1,
               "tags": {
                 "class": [
                   "Withdrawal"
@@ -1539,185 +1221,8 @@
               "displayName": "Edge Cases",
               "testCases": [
                 {
-                  "startTime": 1768527846383,
-                  "endTime": 1768527846384,
-                  "status": "FAILED",
-                  "methodName": "shouldHandleWithdrawalOfExactBalance",
-                  "displayName": "Should handle withdrawal of exact balance",
-                  "testCaseId": "BankServiceTest$WithdrawalTests$WithdrawalEdgeCases#shouldHandleWithdrawalOfExactBalance",
-                  "methodDisplayName": "Should handle withdrawal of exact balance",
-                  "parameters": [],
-                  "parameterization": null,
-                  "testType": "TEST",
-                  "disabledReason": null,
-                  "lifecycle": {
-                    "beforeAll": [],
-                    "beforeEach": [
-                      {
-                        "methodName": "setUp",
-                        "className": "BankServiceTest",
-                        "order": 1,
-                        "status": "PASSED",
-                        "durationNanos": 9875
-                      }
-                    ],
-                    "test": {
-                      "status": "FAILED",
-                      "durationNanos": 355792
-                    },
-                    "afterEach": [
-                      {
-                        "methodName": "tearDown",
-                        "className": "BankServiceTest",
-                        "order": 1,
-                        "status": "PASSED",
-                        "durationNanos": 3875
-                      }
-                    ],
-                    "afterAll": []
-                  },
-                  "logs": [],
-                  "failure": {
-                    "type": "org.opentest4j.AssertionFailedError",
-                    "message": "expected: <0> but was: <0.00>",
-                    "stackTrace": [
-                      "org.opentest4j.AssertionFailedError: expected: <0> but was: <0.00>",
-                      "at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)",
-                      "at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)",
-                      "at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)",
-                      "at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)",
-                      "at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)",
-                      "at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)",
-                      "at com.mk.fx.qa.qap.junit.BankServiceTest$WithdrawalTests$WithdrawalEdgeCases.shouldHandleWithdrawalOfExactBalance(BankServiceTest.java:140)",
-                      "at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)",
-                      "at java.base/java.lang.reflect.Method.invoke(Method.java:580)",
-                      "at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:728)",
-                      "at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)",
-                      "at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)",
-                      "at org.junit.jupiter.api.extension.InvocationInterceptor.interceptTestMethod(InvocationInterceptor.java:119)",
-                      "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)",
-                      "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)",
-                      "at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)",
-                      "at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)",
-                      "at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)",
-                      "at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)",
-                      "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)",
-                      "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)",
-                      "at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)",
-                      "at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)",
-                      "at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)",
-                      "at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)",
-                      "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)",
-                      "at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)",
-                      "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:218)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:214)",
-                      "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:139)",
-                      "at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-                      "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-                      "at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)",
-                      "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-                      "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-                      "at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)",
-                      "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-                      "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-                      "at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)",
-                      "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-                      "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-                      "at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)",
-                      "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)",
-                      "at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)",
-                      "at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)",
-                      "at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)",
-                      "at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)",
-                      "at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)",
-                      "at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)",
-                      "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:107)",
-                      "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)",
-                      "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)",
-                      "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)",
-                      "at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)",
-                      "at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)",
-                      "at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86)",
-                      "at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86)",
-                      "at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)",
-                      "at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)",
-                      "at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)",
-                      "at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)",
-                      "at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)",
-                      "at java.base/java.lang.reflect.Method.invoke(Method.java:580)",
-                      "at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)",
-                      "at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)",
-                      "at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)",
-                      "at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)",
-                      "at jdk.proxy1/jdk.proxy1.$Proxy4.stop(Unknown Source)",
-                      "at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)",
-                      "at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)",
-                      "at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)",
-                      "at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)",
-                      "at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)",
-                      "at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:121)",
-                      "at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:71)",
-                      "at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)",
-                      "at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)"
-                    ],
-                    "suppressed": [],
-                    "location": {
-                      "class": "org.junit.jupiter.api.AssertionFailureBuilder",
-                      "method": "build",
-                      "file": "AssertionFailureBuilder.java",
-                      "line": 151
-                    }
-                  },
-                  "totalDurationNanos": 369542,
-                  "testOnlyDurationNanos": 355792,
-                  "durationNanos": 355792,
-                  "durationMillis": 1,
-                  "tags": {
-                    "inherited": [
-                      "Withdrawal",
-                      "Banking"
-                    ]
-                  },
-                  "hasFailure": true,
-                  "fix": []
-                },
-                {
-                  "startTime": 1768527846385,
-                  "endTime": 1768527846385,
+                  "startTime": 1769129303872,
+                  "endTime": 1769129303872,
                   "status": "DISABLED",
                   "methodName": "shouldFailWhenWithdrawingNegativeAmount",
                   "displayName": "shouldFailWhenWithdrawingNegativeAmount",
@@ -1730,9 +1235,9 @@
                   "lifecycle": null,
                   "logs": [],
                   "failure": null,
-                  "totalDurationNanos": 38250,
-                  "testOnlyDurationNanos": 38250,
-                  "durationNanos": 38250,
+                  "totalDurationNanos": 40958,
+                  "testOnlyDurationNanos": 40958,
+                  "durationNanos": 40958,
                   "durationMillis": 0,
                   "tags": {
                     "inherited": [
@@ -1744,8 +1249,8 @@
                   "fix": []
                 },
                 {
-                  "startTime": 1768527846385,
-                  "endTime": 1768527846386,
+                  "startTime": 1769129303873,
+                  "endTime": 1769129303873,
                   "status": "PASSED",
                   "methodName": "shouldFailWhenWithdrawingZero",
                   "displayName": "shouldFailWhenWithdrawingZero",
@@ -1763,12 +1268,12 @@
                         "className": "BankServiceTest",
                         "order": 1,
                         "status": "PASSED",
-                        "durationNanos": 9750
+                        "durationNanos": 12125
                       }
                     ],
                     "test": {
                       "status": "PASSED",
-                      "durationNanos": 416583
+                      "durationNanos": 503000
                     },
                     "afterEach": [
                       {
@@ -1776,17 +1281,17 @@
                         "className": "BankServiceTest",
                         "order": 1,
                         "status": "PASSED",
-                        "durationNanos": 3750
+                        "durationNanos": 10125
                       }
                     ],
                     "afterAll": []
                   },
                   "logs": [],
                   "failure": null,
-                  "totalDurationNanos": 430083,
-                  "testOnlyDurationNanos": 416583,
-                  "durationNanos": 416583,
-                  "durationMillis": 1,
+                  "totalDurationNanos": 525250,
+                  "testOnlyDurationNanos": 503000,
+                  "durationNanos": 503000,
+                  "durationMillis": 0,
                   "tags": {
                     "inherited": [
                       "Withdrawal",
@@ -1837,8 +1342,8 @@
           "displayName": "Transfer Operations",
           "testCases": [
             {
-              "startTime": 1768527846368,
-              "endTime": 1768527846368,
+              "startTime": 1769129303853,
+              "endTime": 1769129303855,
               "status": "PASSED",
               "methodName": "shouldTransferVariousAmounts",
               "displayName": "Transfer 100.00 from account with 1000.00 to account with 500.00",
@@ -1875,19 +1380,19 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 17792
+                    "durationNanos": 48750
                   },
                   {
                     "methodName": "setUpAccounts",
                     "className": "TransferTests",
                     "order": 2,
                     "status": "PASSED",
-                    "durationNanos": 65667
+                    "durationNanos": 117666
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 705208
+                  "durationNanos": 1539708
                 },
                 "afterEach": [
                   {
@@ -1895,17 +1400,17 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 4083
+                    "durationNanos": 6583
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 792750,
-              "testOnlyDurationNanos": 705208,
-              "durationNanos": 705208,
-              "durationMillis": 0,
+              "totalDurationNanos": 1712707,
+              "testOnlyDurationNanos": 1539708,
+              "durationNanos": 1539708,
+              "durationMillis": 2,
               "tags": {
                 "class": [
                   "Transfer"
@@ -1918,8 +1423,8 @@
               "fix": []
             },
             {
-              "startTime": 1768527846369,
-              "endTime": 1768527846370,
+              "startTime": 1769129303856,
+              "endTime": 1769129303856,
               "status": "PASSED",
               "methodName": "shouldTransferVariousAmounts",
               "displayName": "Transfer 500.00 from account with 2000.00 to account with 0.00",
@@ -1956,19 +1461,19 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 14958
+                    "durationNanos": 21542
                   },
                   {
                     "methodName": "setUpAccounts",
                     "className": "TransferTests",
                     "order": 2,
                     "status": "PASSED",
-                    "durationNanos": 18125
+                    "durationNanos": 19875
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 459958
+                  "durationNanos": 623833
                 },
                 "afterEach": [
                   {
@@ -1976,17 +1481,17 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 3458
+                    "durationNanos": 3584
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 496499,
-              "testOnlyDurationNanos": 459958,
-              "durationNanos": 459958,
-              "durationMillis": 1,
+              "totalDurationNanos": 668834,
+              "testOnlyDurationNanos": 623833,
+              "durationNanos": 623833,
+              "durationMillis": 0,
               "tags": {
                 "class": [
                   "Transfer"
@@ -1999,8 +1504,8 @@
               "fix": []
             },
             {
-              "startTime": 1768527846370,
-              "endTime": 1768527846371,
+              "startTime": 1769129303857,
+              "endTime": 1769129303858,
               "status": "PASSED",
               "methodName": "shouldTransferVariousAmounts",
               "displayName": "Transfer 50.00 from account with 100.00 to account with 100.00",
@@ -2037,19 +1542,19 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 16709
+                    "durationNanos": 15083
                   },
                   {
                     "methodName": "setUpAccounts",
                     "className": "TransferTests",
                     "order": 2,
                     "status": "PASSED",
-                    "durationNanos": 17958
+                    "durationNanos": 17125
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 512833
+                  "durationNanos": 514084
                 },
                 "afterEach": [
                   {
@@ -2057,16 +1562,16 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 3542
+                    "durationNanos": 3583
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 551042,
-              "testOnlyDurationNanos": 512833,
-              "durationNanos": 512833,
+              "totalDurationNanos": 549875,
+              "testOnlyDurationNanos": 514084,
+              "durationNanos": 514084,
               "durationMillis": 1,
               "tags": {
                 "class": [
@@ -2080,8 +1585,8 @@
               "fix": []
             },
             {
-              "startTime": 1768527846372,
-              "endTime": 1768527846372,
+              "startTime": 1769129303859,
+              "endTime": 1769129303859,
               "status": "PASSED",
               "methodName": "shouldTransferAmountBetweenAccounts",
               "displayName": "Should transfer amount between accounts",
@@ -2099,19 +1604,19 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 13791
+                    "durationNanos": 12958
                   },
                   {
                     "methodName": "setUpAccounts",
                     "className": "TransferTests",
                     "order": 2,
                     "status": "PASSED",
-                    "durationNanos": 16333
+                    "durationNanos": 19167
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 388750
+                  "durationNanos": 407167
                 },
                 "afterEach": [
                   {
@@ -2119,16 +1624,16 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 3250
+                    "durationNanos": 3500
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 422124,
-              "testOnlyDurationNanos": 388750,
-              "durationNanos": 388750,
+              "totalDurationNanos": 442792,
+              "testOnlyDurationNanos": 407167,
+              "durationNanos": 407167,
               "durationMillis": 0,
               "tags": {
                 "class": [
@@ -2142,8 +1647,8 @@
               "fix": []
             },
             {
-              "startTime": 1768527846372,
-              "endTime": 1768527846373,
+              "startTime": 1769129303860,
+              "endTime": 1769129303861,
               "status": "PASSED",
               "methodName": "shouldFailWhenTransferringInsufficientFunds",
               "displayName": "shouldFailWhenTransferringInsufficientFunds",
@@ -2161,19 +1666,19 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 10958
+                    "durationNanos": 15375
                   },
                   {
                     "methodName": "setUpAccounts",
                     "className": "TransferTests",
                     "order": 2,
                     "status": "PASSED",
-                    "durationNanos": 16500
+                    "durationNanos": 30000
                   }
                 ],
                 "test": {
                   "status": "PASSED",
-                  "durationNanos": 580833
+                  "durationNanos": 961208
                 },
                 "afterEach": [
                   {
@@ -2181,16 +1686,16 @@
                     "className": "BankServiceTest",
                     "order": 1,
                     "status": "PASSED",
-                    "durationNanos": 4375
+                    "durationNanos": 6334
                   }
                 ],
                 "afterAll": []
               },
               "logs": [],
               "failure": null,
-              "totalDurationNanos": 612666,
-              "testOnlyDurationNanos": 580833,
-              "durationNanos": 580833,
+              "totalDurationNanos": 1012917,
+              "testOnlyDurationNanos": 961208,
+              "durationNanos": 961208,
               "durationMillis": 1,
               "tags": {
                 "class": [

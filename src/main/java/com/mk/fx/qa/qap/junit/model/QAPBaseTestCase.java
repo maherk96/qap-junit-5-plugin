@@ -100,12 +100,23 @@ public abstract class QAPBaseTestCase {
     return (endTime > 0L && startTime > 0L && endTime >= startTime) ? (endTime - startTime) : 0L;
   }
 
+  /**
+   * Returns the test duration in nanoseconds.
+   * If nanosecond timestamps are not available (startTimeNanos/endTimeNanos),
+   * falls back to converting millisecond duration.
+   * 
+   * Note: The millisecond fallback provides lower precision (only accurate to milliseconds)
+   * but maintains backward compatibility with existing code paths.
+   *
+   * @return duration in nanoseconds, or 0 if timing data is unavailable
+   */
   @JsonProperty("durationNanos")
   public long getDurationNanos() {
     if (endTimeNanos > 0L && startTimeNanos > 0L && endTimeNanos >= startTimeNanos) {
       return endTimeNanos - startTimeNanos;
     }
-    // Fallback to millis calculation if nanos not available
+    // Fallback: convert millisecond duration to nanoseconds
+    // Note: This is less precise but maintains backward compatibility
     long millis = getDurationMillis();
     return millis > 0L ? millis * 1_000_000L : 0L;
   }

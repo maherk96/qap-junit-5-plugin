@@ -26,7 +26,8 @@ public class QAPPropertiesLoader {
     Properties qapAttributes = loadQAPAttributes();
     this.appName = qapAttributes.getProperty("qap.app.name");
     this.fixMessageLogging = qapAttributes.getProperty("qap.report.fix.messaging");
-    this.user = qapAttributes.getProperty("qap.user", System.getProperty("user.name"));
+    this.user = qapAttributes.getProperty("qap.user", 
+        System.getProperty(com.mk.fx.qa.qap.junit.core.SystemProperties.USER_NAME));
     this.testEnvironment = qapAttributes.getProperty("qap.test.environment");
     this.runEnvironment = qapAttributes.getProperty("qap.run.environment", "UAT");
     this.isReportingEnabled =
@@ -34,15 +35,26 @@ public class QAPPropertiesLoader {
     this.apiKey = qapAttributes.getProperty("qap.api.key");
   }
 
+  /**
+   * Loads QAP configuration properties from classpath.
+   * If qap.properties is not found, returns empty Properties with a warning.
+   * This allows tests to run with default values.
+   *
+   * @return Properties object (may be empty if file not found or parsing failed)
+   */
   public Properties loadQAPAttributes() {
     Properties properties = new Properties();
     try (InputStream in = getClass().getClassLoader().getResourceAsStream("qap.properties")) {
       if (in == null) {
-        throw new IOException("Unable to find qap.properties");
+        log.warn("qap.properties not found on classpath, using default configuration values");
+        return properties; // Return empty properties to use defaults
       }
       properties.load(in);
+      log.debug("Successfully loaded {} properties from qap.properties", properties.size());
     } catch (IOException e) {
-      log.error("Unable to load properties: {}", e.getMessage());
+      log.error("Failed to parse qap.properties: {}", e.getMessage(), e);
+      // Return empty properties rather than propagating exception
+      // This allows tests to continue with default values
     }
     return properties;
   }

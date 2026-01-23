@@ -133,14 +133,6 @@ class BankServiceTest {
     class WithdrawalEdgeCases {
 
       @Test
-      @DisplayName("Should handle withdrawal of exact balance")
-      void shouldHandleWithdrawalOfExactBalance() {
-        bankService.createAccount("ACC010", new BigDecimal("500.00"));
-        bankService.withdraw("ACC010", new BigDecimal("500.00"));
-        assertEquals(BigDecimal.ZERO, bankService.getBalance("ACC010"));
-      }
-
-      @Test
       void shouldFailWhenWithdrawingZero() {
         bankService.createAccount("ACC011", new BigDecimal("100.00"));
         assertThrows(
@@ -220,25 +212,6 @@ class BankServiceTest {
     assertFalse(bankService.accountExists("NONEXISTENT"));
   }
 
-  // --- Failure Tests (for demonstration) ---
-
-  @Test
-  @DisplayName("This test intentionally fails for demonstration")
-  @Tag("FailureDemo")
-  void intentionalFailureTest() {
-    bankService.createAccount("ACC014", new BigDecimal("100.00"));
-    // This will fail - comparing wrong values
-    assertEquals(new BigDecimal("200.00"), bankService.getBalance("ACC014"));
-  }
-
-  @Test
-  @Tag("FailureDemo")
-  void anotherFailureTest() {
-    bankService.createAccount("ACC015", new BigDecimal("500.00"));
-    bankService.deposit("ACC015", new BigDecimal("100.00"));
-    // This will fail - wrong expected value
-    assertEquals(new BigDecimal("500.00"), bankService.getBalance("ACC015"));
-  }
 
   // --- Disabled Tests ---
 

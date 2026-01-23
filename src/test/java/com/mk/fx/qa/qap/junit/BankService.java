@@ -55,9 +55,43 @@ public class BankService {
     account.withdraw(amount);
   }
 
+  /**
+   * Transfers an amount from one account to another atomically.
+   * Validates both accounts exist and have sufficient funds before performing the transfer.
+   * This prevents money loss if the deposit fails after withdrawal.
+   *
+   * @param fromAccountId the source account ID
+   * @param toAccountId the destination account ID
+   * @param amount the amount to transfer
+   * @throws IllegalArgumentException if amount is invalid or accounts don't exist
+   * @throws InsufficientFundsException if source account has insufficient funds
+   */
   public void transfer(String fromAccountId, String toAccountId, BigDecimal amount) {
-    withdraw(fromAccountId, amount);
-    deposit(toAccountId, amount);
+    // Validate amount first
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new IllegalArgumentException("Transfer amount must be positive");
+    }
+    
+    // Validate both accounts exist before starting transfer
+    Account fromAccount = accounts.get(fromAccountId);
+    Account toAccount = accounts.get(toAccountId);
+    
+    if (fromAccount == null) {
+      throw new IllegalArgumentException("Source account not found: " + fromAccountId);
+    }
+    if (toAccount == null) {
+      throw new IllegalArgumentException("Destination account not found: " + toAccountId);
+    }
+    
+    // Validate sufficient funds
+    if (fromAccount.getBalance().compareTo(amount) < 0) {
+      throw new InsufficientFundsException(
+          "Insufficient funds. Balance: " + fromAccount.getBalance() + ", Requested: " + amount);
+    }
+    
+    // Now perform atomic transfer (both operations succeed or both fail)
+    fromAccount.withdraw(amount);
+    toAccount.deposit(amount);
   }
 
   public boolean accountExists(String accountId) {

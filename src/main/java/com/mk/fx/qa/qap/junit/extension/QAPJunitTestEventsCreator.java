@@ -14,7 +14,8 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class QAPJunitTestEventsCreator implements ITestEventCreator {
 
-  private static final String SYSTEM_PROPERTY_LAUNCH_ID = "launchID";
+  private static final String SYSTEM_PROPERTY_LAUNCH_ID = 
+      com.mk.fx.qa.qap.junit.core.SystemProperties.LAUNCH_ID;
 
   @Override
   public void addTestEventsToTestLaunch(ExtensionContext context, QAPJunitLaunch launch) {

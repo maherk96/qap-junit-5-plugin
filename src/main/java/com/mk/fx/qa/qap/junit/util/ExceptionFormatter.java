@@ -85,7 +85,8 @@ public final class ExceptionFormatter {
     QAPFailure causedBy = null;
     Throwable cause = throwable.getCause();
     if (cause != null && cause != throwable) {
-      causedBy = toFailure(cause, new ArrayList<>(seen));
+      // Pass the same seen list to maintain circular reference detection
+      causedBy = toFailure(cause, seen);
     }
 
     // Handle suppressed exceptions
@@ -93,7 +94,8 @@ public final class ExceptionFormatter {
     Throwable[] suppressedExceptions = throwable.getSuppressed();
     if (suppressedExceptions != null && suppressedExceptions.length > 0) {
       for (Throwable suppressedException : suppressedExceptions) {
-        QAPFailure suppressedFailure = toFailure(suppressedException, new ArrayList<>(seen));
+        // Pass the same seen list to maintain circular reference detection
+        QAPFailure suppressedFailure = toFailure(suppressedException, seen);
         if (suppressedFailure != null) {
           suppressed.add(suppressedFailure);
         }
