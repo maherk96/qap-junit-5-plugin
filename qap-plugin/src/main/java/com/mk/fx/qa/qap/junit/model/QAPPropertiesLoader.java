@@ -22,8 +22,12 @@ public class QAPPropertiesLoader {
 
   private String isRegression;
 
+  // Logging configuration properties
+  private final Properties qapProperties;
+
   public QAPPropertiesLoader() {
     Properties qapAttributes = loadQAPAttributes();
+    this.qapProperties = qapAttributes; // Store for later access
     this.appName = qapAttributes.getProperty("qap.app.name");
     this.fixMessageLogging = qapAttributes.getProperty("qap.report.fix.messaging");
     this.user =
@@ -34,6 +38,48 @@ public class QAPPropertiesLoader {
     this.isReportingEnabled =
         Boolean.parseBoolean(qapAttributes.getProperty("qap.report.test.data", "true"));
     this.apiKey = qapAttributes.getProperty("qap.api.key");
+  }
+
+  /**
+   * Gets a property value with a default.
+   *
+   * @param key property key
+   * @param defaultValue default value if not found
+   * @return property value or default
+   */
+  public String getProperty(String key, String defaultValue) {
+    return qapProperties.getProperty(key, defaultValue);
+  }
+
+  /**
+   * Gets a boolean property value with a default.
+   *
+   * @param key property key
+   * @param defaultValue default value if not found
+   * @return property value or default
+   */
+  public boolean getBooleanProperty(String key, boolean defaultValue) {
+    String value = qapProperties.getProperty(key);
+    return value != null ? Boolean.parseBoolean(value) : defaultValue;
+  }
+
+  /**
+   * Gets an integer property value with a default.
+   *
+   * @param key property key
+   * @param defaultValue default value if not found or parsing fails
+   * @return property value or default
+   */
+  public int getIntProperty(String key, int defaultValue) {
+    String value = qapProperties.getProperty(key);
+    if (value != null) {
+      try {
+        return Integer.parseInt(value.trim());
+      } catch (NumberFormatException e) {
+        log.warn("Invalid integer value for {}: '{}', using default: {}", key, value, defaultValue);
+      }
+    }
+    return defaultValue;
   }
 
   /**

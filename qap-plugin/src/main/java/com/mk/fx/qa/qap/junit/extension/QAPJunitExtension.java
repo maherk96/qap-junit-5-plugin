@@ -72,7 +72,7 @@ public class QAPJunitExtension
     this.launchIdGenerator = gen;
     this.objectMapper = runtime.getObjectMapper();
     this.displayNameResolver = runtime.getDisplayNameResolver();
-    log.info("🚀 QAPJunitExtension initialized successfully!");
+    log.debug("QAPJunitExtension initialized");
   }
 
   /** Test constructor: injects runtime and all collaborators from a single source. */
@@ -94,11 +94,11 @@ public class QAPJunitExtension
 
   @Override
   public void beforeAll(ExtensionContext context) {
-    log.info("🔵 beforeAll called for: {}", context.getDisplayName());
+    log.debug("beforeAll called for: {}", context.getDisplayName());
     ensureLaunchId();
     // Start launch only once at top-level
     if (isTopLevelClassContext(context)) {
-      log.info("🔵 Starting QAP launch for top-level context: {}", context.getDisplayName());
+      log.debug("Starting QAP launch for top-level context: {}", context.getDisplayName());
       QAPJunitLaunch launch = eventCreator.startLaunchQAP(context);
       StoreManager.putClassStoreData(context, QAPUtils.TEST_CLASS_DATA_KEY, launch);
 
@@ -405,14 +405,76 @@ public class QAPJunitExtension
 
     try {
       String testId = context.getUniqueId();
-      com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig config =
-          com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig.defaultConfig();
+      // Build configuration from properties
+      com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig config = buildLogCaptureConfig();
 
       logCapturer.startCapture(testId, config);
       log.debug("Started log capture for test: {}", testId);
     } catch (Exception e) {
       log.warn("Failed to start log capture for {}: {}", context.getDisplayName(), e.getMessage());
     }
+  }
+
+  /**
+   * Builds log capture configuration from qap.properties. Users can customize logging behavior by
+   * setting properties like: - qap.logging.enabled=true - qap.logging.min.level=DEBUG -
+   * qap.logging.max.entries=5000 - qap.logging.max.message.length=20000 -
+   * qap.logging.capture.stacktraces=true - qap.logging.include.mdc=true -
+   * qap.logging.include.markers=true -
+   * qap.logging.logger.patterns=com.myapp.*,org.springframework.*
+   *
+   * @return configured QAPLogCaptureConfig
+   */
+  private com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig buildLogCaptureConfig() {
+    QAPPropertiesLoader props = runtime.getPropertiesLoader();
+
+    com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig.Builder builder =
+        com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig.builder();
+
+    // Enabled (default: true)
+    builder.enabled(props.getBooleanProperty("qap.logging.enabled", true));
+
+    // Min level (default: DEBUG for comprehensive capture)
+    String minLevelStr = props.getProperty("qap.logging.min.level", "DEBUG");
+    try {
+      com.mk.fx.qa.qap.logging.core.QAPLogLevel minLevel =
+          com.mk.fx.qa.qap.logging.core.QAPLogLevel.valueOf(minLevelStr.toUpperCase());
+      builder.minLevel(minLevel);
+    } catch (IllegalArgumentException e) {
+      log.warn(
+          "Invalid qap.logging.min.level '{}', using DEBUG. Valid values: TRACE, DEBUG, INFO, WARN, ERROR, FATAL",
+          minLevelStr);
+      builder.minLevel(com.mk.fx.qa.qap.logging.core.QAPLogLevel.DEBUG);
+    }
+
+    // Max entries per test (default: 1000)
+    builder.maxEntriesPerTest(props.getIntProperty("qap.logging.max.entries", 1000));
+
+    // Max message length (default: 10000)
+    builder.maxMessageLength(props.getIntProperty("qap.logging.max.message.length", 10000));
+
+    // Capture stack traces (default: true)
+    builder.captureStackTraces(props.getBooleanProperty("qap.logging.capture.stacktraces", true));
+
+    // Include MDC (default: true)
+    builder.includeMdc(props.getBooleanProperty("qap.logging.include.mdc", true));
+
+    // Include markers (default: true)
+    builder.includeMarkers(props.getBooleanProperty("qap.logging.include.markers", true));
+
+    // Logger patterns (default: empty = capture all)
+    String patternsStr = props.getProperty("qap.logging.logger.patterns", "");
+    if (!patternsStr.trim().isEmpty()) {
+      String[] patterns = patternsStr.split(",");
+      for (String pattern : patterns) {
+        String trimmed = pattern.trim();
+        if (!trimmed.isEmpty()) {
+          builder.addLoggerPattern(trimmed);
+        }
+      }
+    }
+
+    return builder.build();
   }
 
   /**

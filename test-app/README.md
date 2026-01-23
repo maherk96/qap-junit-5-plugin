@@ -17,7 +17,8 @@ This module demonstrates the complete integration of the QAP JUnit 5 Extension w
 2. **`log4j2-test.xml`** - Log4j2 logging configuration
    - Console appender for viewing logs
    - File appender (build/test-logs/test-app.log)
-   - Configured loggers for QAP framework and test code
+   - QAP framework logger set to WARN (hides internal framework logs)
+   - Test code logger set to DEBUG (captures all test logs)
 
 3. **`META-INF/services/org.junit.jupiter.api.extension.Extension`** - JUnit extension auto-discovery
    - Automatically registers `QAPJunitExtension`
@@ -262,16 +263,23 @@ qap.run.environment=PROD
 ### Adjust Logging Levels
 Edit `log4j2-test.xml`:
 ```xml
-<!-- More verbose QAP framework logging -->
-<Logger name="com.mk.fx.qa.qap" level="trace" additivity="false">
+<!-- Hide QAP framework logs (recommended for users) -->
+<Logger name="com.mk.fx.qa.qap" level="warn" additivity="false">
     <AppenderRef ref="Console"/>
 </Logger>
 
-<!-- Less verbose test logging -->
-<Logger name="com.example.testapp" level="info" additivity="false">
+<!-- Show QAP framework debug logs (for troubleshooting) -->
+<Logger name="com.mk.fx.qa.qap" level="debug" additivity="false">
+    <AppenderRef ref="Console"/>
+</Logger>
+
+<!-- Adjust test logging verbosity -->
+<Logger name="com.example.testapp" level="info" additivity="true">
     <AppenderRef ref="Console"/>
 </Logger>
 ```
+
+**Important:** Keep `additivity="true"` for your test loggers to enable automatic log capture!
 
 ### Use Different Publishers
 The QAP extension uses `StdOutPublisher` by default. You can configure different publishers in the code or via configuration (future enhancement).

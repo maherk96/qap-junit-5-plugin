@@ -1,8 +1,8 @@
-# QAP Logging Log4j2 Module
+# QAP Logging Logback Module
 
-![Status](https://img.shields.io/badge/status-production--ready-green) ![Version](https://img.shields.io/badge/version-1.1.0--SNAPSHOT-blue) ![Log4j2](https://img.shields.io/badge/log4j2-2.20%2B-orange)
+![Status](https://img.shields.io/badge/status-production--ready-green) ![Version](https://img.shields.io/badge/version-1.1.0--SNAPSHOT-blue) ![Logback](https://img.shields.io/badge/logback-1.4%2B-orange)
 
-**Automatic log capture for JUnit 5 tests using Apache Log4j2 - Zero configuration required!**
+**Automatic log capture for JUnit 5 tests using Logback - Zero configuration required!**
 
 ---
 
@@ -13,7 +13,7 @@
 - [How It Works](#how-it-works)
 - [Installation](#installation)
 - [Configuration](#configuration)
-- [Log4j2 XML Configuration](#log4j2-xml-configuration)
+- [Logback XML Configuration](#logback-xml-configuration)
 - [Usage Examples](#usage-examples)
 - [Advanced Features](#advanced-features)
 - [Performance](#performance)
@@ -27,7 +27,7 @@
 
 ## Overview
 
-The `qap-logging-log4j2` module provides **automatic, thread-safe log capture** for JUnit 5 tests using Apache Log4j2. It seamlessly integrates with the QAP JUnit 5 Plugin to capture all test logs and include them in your JSON test reports.
+The `qap-logging-logback` module provides **automatic, thread-safe log capture** for JUnit 5 tests using Logback. It seamlessly integrates with the QAP JUnit 5 Plugin to capture all test logs and include them in your JSON test reports.
 
 ### ✨ Key Features
 
@@ -36,11 +36,11 @@ The `qap-logging-log4j2` module provides **automatic, thread-safe log capture** 
 | 🚀 **Zero Configuration** | Just add the dependency - works automatically via ServiceLoader |
 | 🔒 **Thread-Safe** | Full support for parallel test execution using ThreadLocal storage |
 | 🎯 **Smart Filtering** | Capture only what you need - filter by level, logger name, patterns |
-| 📊 **Rich Context** | Captures MDC/ThreadContext, markers, exceptions with stack traces |
+| 📊 **Rich Context** | Captures MDC, markers, exceptions with stack traces |
 | 💾 **Memory Efficient** | Bounded buffers (default 1000 entries/test) prevent OOM |
 | 🔌 **Dynamic Appender** | Programmatically attached to root logger - no XML configuration needed |
-| ⚡ **High Priority** | Priority 100 (vs Logback's 0) - preferred when multiple frameworks present |
-| 🧪 **Production Tested** | Comprehensive test suite with 31+ tests covering all scenarios |
+| 🧩 **SLF4J Native** | Works seamlessly with SLF4J - the standard Java logging facade |
+| 🧪 **Production Tested** | Comprehensive test suite with 30+ tests covering all scenarios |
 
 ---
 
@@ -50,24 +50,23 @@ The `qap-logging-log4j2` module provides **automatic, thread-safe log capture** 
 
 ```gradle
 dependencies {
-    // Your existing Log4j2 dependencies
-    testImplementation 'org.apache.logging.log4j:log4j-api:2.23.1'
-    testImplementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    // Your existing Logback dependencies
+    testImplementation 'ch.qos.logback:logback-classic:1.5.6'
     
-    // Add QAP Log4j2 integration - THAT'S IT!
-    testImplementation 'com.mk.fx.qa:qap-logging-log4j2:1.1.0'
+    // Add QAP Logback integration - THAT'S IT!
+    testImplementation 'com.mk.fx.qa:qap-logging-logback:1.1.0'
 }
 ```
 
 ### 2. Write Your Test
 
 ```java
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.Test;
 
 class MyTest {
-    private static final Logger log = LogManager.getLogger(MyTest.class);
+    private static final Logger log = LoggerFactory.getLogger(MyTest.class);
     
     @Test
     void myTest() {
@@ -135,17 +134,19 @@ class MyTest {
                                      │   │
                                      ▼   ▼
                     ┌─────────────────────────────────┐
-                    │  Log4j2 Logging Framework       │
+                    │  SLF4J API                      │
+                    │         ↓                        │
+                    │  Logback Framework              │
                     │                                 │
                     │  Root Logger                    │
                     │    ├─ ConsoleAppender           │
-                    │    └─ QAPLog4j2Appender ◄───────┼── Dynamically attached!
+                    │    └─ QAPLogbackAppender ◄──────┼── Dynamically attached!
                     └─────────────────────────────────┘
                                      │
                                      │ All logs flow here
                                      ▼
                     ┌─────────────────────────────────┐
-                    │  QAPLog4j2Appender              │
+                    │  QAPLogbackAppender             │
                     │                                 │
                     │  ThreadLocal Storage:           │
                     │    Thread-1: [test-A → logs]   │
@@ -181,33 +182,33 @@ class MyTest {
 QAPLogCapturerRegistry registry = new QAPLogCapturerRegistry();
 registry.discover(); // Uses Java ServiceLoader
 
-// Discovers: Log4j2CapturerFactory (via META-INF/services)
-// Creates: Log4j2Capturer instance
-// Priority: 100 (highest) ✅
+// Discovers: LogbackCapturerFactory (via META-INF/services)
+// Creates: LogbackCapturer instance
+// Priority: 0 (Log4j2 has priority 100, so Log4j2 preferred if both present)
 ```
 
 **ServiceLoader looks for:**
 - File: `META-INF/services/com.mk.fx.qa.qap.logging.core.QAPLogCapturerFactory`
-- Content: `com.mk.fx.qa.qap.logging.log4j2.Log4j2CapturerFactory`
+- Content: `com.mk.fx.qa.qap.logging.logback.LogbackCapturerFactory`
 
 #### Phase 2: Appender Attachment (First Test)
 
 ```java
 // Before first test in the class:
-log4j2Capturer.ensureInitialized();
+logbackCapturer.ensureInitialized();
 
 // This does:
-1. Gets Log4j2's LoggerContext
-2. Creates QAPLog4j2Appender instance
-3. Starts the appender
+1. Gets Logback's LoggerContext from SLF4J
+2. Creates QAPLogbackAppender instance
+3. Sets context and starts the appender
 4. Attaches to root logger programmatically
    
    rootLogger.addAppender(appender); // ← Magic happens here!
 ```
 
 **Why no XML configuration needed?**
-- Appender is attached **programmatically at runtime**, not via `log4j2.xml`
-- Works with any existing Log4j2 configuration
+- Appender is attached **programmatically at runtime**, not via `logback.xml`
+- Works with any existing Logback configuration
 - Doesn't interfere with your Console/File appenders
 
 #### Phase 3: Per-Test Capture (Each Test)
@@ -243,16 +244,15 @@ void afterEach(ExtensionContext context) {
 
 ```gradle
 dependencies {
-    // Required: Log4j2 runtime dependencies
-    testImplementation 'org.apache.logging.log4j:log4j-api:2.23.1'
-    testImplementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    // Required: Logback runtime dependency
+    testImplementation 'ch.qos.logback:logback-classic:1.5.6'
     
-    // Recommended: SLF4J bridge (if using SLF4J in tests)
-    testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'
+    // SLF4J API (usually transitively included by logback-classic)
+    testImplementation 'org.slf4j:slf4j-api:2.0.13'
     
     // QAP modules
     testImplementation 'com.mk.fx.qa:qap-plugin:1.1.0'
-    testImplementation 'com.mk.fx.qa:qap-logging-log4j2:1.1.0'
+    testImplementation 'com.mk.fx.qa:qap-logging-logback:1.1.0'
 }
 ```
 
@@ -260,99 +260,119 @@ dependencies {
 
 ```xml
 <dependencies>
-    <!-- Log4j2 -->
+    <!-- Logback -->
     <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-api</artifactId>
-        <version>2.23.1</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>2.23.1</version>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.5.6</version>
         <scope>test</scope>
     </dependency>
     
-    <!-- QAP Log4j2 integration -->
+    <!-- QAP Logback integration -->
     <dependency>
         <groupId>com.mk.fx.qa</groupId>
-        <artifactId>qap-logging-log4j2</artifactId>
+        <artifactId>qap-logging-logback</artifactId>
         <version>1.1.0</version>
         <scope>test</scope>
     </dependency>
 </dependencies>
 ```
 
-### Why `compileOnly` for Log4j2?
+### Why `compileOnly` for Logback?
 
 ```gradle
-// In qap-logging-log4j2/build.gradle:
-compileOnly 'org.apache.logging.log4j:log4j-api:2.23.1'
-compileOnly 'org.apache.logging.log4j:log4j-core:2.23.1'
+// In qap-logging-logback/build.gradle:
+compileOnly 'ch.qos.logback:logback-classic:1.5.6'
+compileOnly 'ch.qos.logback:logback-core:1.5.6'
 ```
 
-**Reason:** We don't force Log4j2 on users who don't want it!
+**Reason:** We don't force Logback on users who don't want it!
 
-- ✅ If you have Log4j2 → Module loads automatically
-- ✅ If you don't have Log4j2 → Module is skipped (no errors)
+- ✅ If you have Logback → Module loads automatically
+- ✅ If you don't have Logback → Module is skipped (no errors)
 - ✅ Multi-module projects can use different logging frameworks
 
 ---
 
 ## Configuration
 
-### Default Configuration (Recommended)
+### Property-Based Configuration (Recommended) ⭐
+
+**The easiest way to configure logging is via `qap.properties`!** No code changes needed.
+
+Add these properties to your `src/test/resources/qap.properties`:
+
+```properties
+# Enable/disable log capture (default: true)
+qap.logging.enabled=true
+
+# Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR
+# Default: DEBUG
+qap.logging.min.level=DEBUG
+
+# Maximum log entries per test (default: 1000)
+qap.logging.max.entries=1000
+
+# Maximum message length in characters (default: 10000)
+qap.logging.max.message.length=10000
+
+# Capture exception stack traces (default: true)
+qap.logging.capture.stacktraces=true
+
+# Include MDC (default: true)
+qap.logging.include.mdc=true
+
+# Include SLF4J markers (default: true)
+qap.logging.include.markers=true
+
+# Logger patterns (comma-separated, supports wildcards)
+# Empty = capture all (default)
+qap.logging.logger.patterns=com.myapp.*,org.springframework.*
+```
+
+### Common Configuration Examples
+
+#### Example 1: Quieter Logging (WARN+ only)
+
+```properties
+qap.logging.min.level=WARN
+```
+
+#### Example 2: Application Logs Only
+
+```properties
+qap.logging.logger.patterns=com.mycompany.*
+```
+
+#### Example 3: High-Volume Tests
+
+```properties
+qap.logging.max.entries=5000
+qap.logging.max.message.length=20000
+```
+
+#### Example 4: Minimal JSON Size
+
+```properties
+qap.logging.include.mdc=false
+qap.logging.include.markers=false
+qap.logging.capture.stacktraces=false
+```
+
+### Default Configuration (If No Properties Set)
 
 ```java
-// These are the defaults - NO configuration needed!
+// These are the defaults when properties are not specified:
 QAPLogCaptureConfig defaultConfig = QAPLogCaptureConfig.builder()
     .enabled(true)                      // Log capture enabled
-    .minLevel(QAPLogLevel.INFO)         // Capture INFO and above
+    .minLevel(QAPLogLevel.DEBUG)        // Capture DEBUG and above
     .maxEntriesPerTest(1000)            // Max 1000 logs per test
     .maxMessageLength(10_000)           // Truncate long messages
     .captureStackTraces(true)           // Include exception details
-    .includeMdc(true)                   // Capture ThreadContext/MDC
+    .includeMdc(true)                   // Capture MDC
     .includeMarkers(true)               // Capture markers
     .threadLocal(true)                  // Thread-safe for parallel tests
     .build();
-```
-
-### Custom Configuration (Advanced Users)
-
-If you need to customize, modify `QAPJunitExtension`:
-
-```java
-// In your test project:
-public class CustomQAPExtension extends QAPJunitExtension {
-    
-    @Override
-    protected QAPLogCaptureConfig getLogCaptureConfig() {
-        return QAPLogCaptureConfig.builder()
-            // Capture DEBUG and above (more verbose)
-            .minLevel(QAPLogLevel.DEBUG)
-            
-            // Higher limits for chatty tests
-            .maxEntriesPerTest(5000)
-            .maxMessageLength(20_000)
-            
-            // Only capture application logs
-            .addLoggerPattern("com.mycompany.*")
-            .addLoggerPattern("org.springframework.web.*")
-            
-            // Exclude noisy libraries
-            .addLoggerPattern("!com.noisy.library.*")
-            
-            .build();
-    }
-}
-```
-
-Then register your custom extension:
-
-```java
-// In META-INF/services/org.junit.jupiter.api.extension.Extension
-com.mycompany.CustomQAPExtension
 ```
 
 ### Configuration Options Reference
@@ -360,90 +380,88 @@ com.mycompany.CustomQAPExtension
 | Option | Default | Description |
 |--------|---------|-------------|
 | `enabled` | `true` | Enable/disable log capture |
-| `minLevel` | `INFO` | Minimum log level to capture (TRACE, DEBUG, INFO, WARN, ERROR, FATAL) |
+| `minLevel` | `INFO` | Minimum log level to capture (TRACE, DEBUG, INFO, WARN, ERROR) |
 | `maxEntriesPerTest` | `1000` | Maximum log entries per test (prevents OOM) |
 | `maxMessageLength` | `10,000` | Maximum characters per log message (truncates longer) |
 | `captureStackTraces` | `true` | Include exception stack traces in captured logs |
-| `includeMdc` | `true` | Capture MDC (ThreadContext) values |
-| `includeMarkers` | `true` | Capture Log4j2 markers |
+| `includeMdc` | `true` | Capture MDC values |
+| `includeMarkers` | `true` | Capture SLF4J markers |
 | `threadLocal` | `true` | Use ThreadLocal storage (required for parallel tests) |
 | `loggerPatterns` | `[]` (all) | Filter loggers by name pattern (supports wildcards) |
 
 ---
 
-## Log4j2 XML Configuration
+## Logback XML Configuration
 
 ### Minimal Configuration (Recommended)
 
-**You don't need QAP-specific configuration in `log4j2.xml`!** The appender is attached programmatically.
+**You don't need QAP-specific configuration in `logback.xml`!** The appender is attached programmatically.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
-    <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </Console>
-    </Appenders>
-    
-    <Loggers>
-        <!-- Root logger - all logs flow here -->
-        <Root level="debug">
-            <AppenderRef ref="Console"/>
-            <!-- QAPLog4j2Appender is attached here automatically! -->
-        </Root>
-    </Loggers>
-</Configuration>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT" />
+        <!-- QAPLogbackAppender is attached here automatically! -->
+    </root>
+</configuration>
 ```
 
 ### Recommended Configuration with QAP Framework Log Suppression
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
-    <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </Console>
-        
-        <File name="TestFile" fileName="build/test-logs/test.log" append="false">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </File>
-    </Appenders>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
     
-    <Loggers>
-        <!-- Root logger - captures all logs (including for QAP) -->
-        <Root level="debug">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="TestFile"/>
-        </Root>
-        
-        <!-- Hide QAP framework logs from console (optional) -->
-        <Logger name="com.mk.fx.qa.qap" level="warn" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="TestFile"/>
-        </Logger>
-    </Loggers>
-</Configuration>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>build/test-logs/test.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+    
+    <!-- Hide QAP framework logs from console (optional) -->
+    <logger name="com.mk.fx.qa.qap" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </logger>
+</configuration>
 ```
 
 ### 🚨 Critical: Understanding `additivity`
 
 ```xml
 <!-- ❌ BAD - Logs won't reach QAP appender! -->
-<Logger name="com.example.myapp" level="debug" additivity="false">
-    <AppenderRef ref="Console"/>
-</Logger>
+<logger name="com.example.myapp" level="debug" additivity="false">
+    <appender-ref ref="STDOUT"/>
+</logger>
 
 <!-- ✅ GOOD - Logs propagate to root logger where QAP captures them -->
-<Logger name="com.example.myapp" level="debug" additivity="true">
-    <!-- No AppenderRef needed - root logger handles output -->
-</Logger>
+<logger name="com.example.myapp" level="debug" additivity="true">
+    <!-- No appender-ref needed - root logger handles output -->
+</logger>
 
 <!-- ✅ ALSO GOOD - Just rely on root logger (no specific logger needed) -->
-<Root level="debug">
-    <AppenderRef ref="Console"/>
-</Root>
+<root level="debug">
+    <appender-ref ref="STDOUT"/>
+</root>
 ```
 
 **Why this matters:**
@@ -458,7 +476,7 @@ Logger "com.example"
     ↓ (additivity=true, propagates upward)
 Root Logger
     ├─ ConsoleAppender ✅
-    └─ QAPLog4j2Appender ✅ (CAPTURED!)
+    └─ QAPLogbackAppender ✅ (CAPTURED!)
 
 
 Log Flow with additivity="false":
@@ -467,7 +485,7 @@ com.example.MyTest.log.info("Hello")
 Logger "com.example.MyTest" (additivity=false, stops here!)
     ├─ ConsoleAppender ✅
     └─ Does NOT propagate to root
-         ❌ QAPLog4j2Appender NEVER SEES IT!
+         ❌ QAPLogbackAppender NEVER SEES IT!
 ```
 
 ### Common Configurations
@@ -475,81 +493,84 @@ Logger "com.example.MyTest" (additivity=false, stops here!)
 #### 1. Simple Setup (Everything to Console + QAP)
 
 ```xml
-<Configuration>
-    <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"/>
-        </Console>
-    </Appenders>
-    
-    <Loggers>
-        <Root level="info">
-            <AppenderRef ref="Console"/>
-        </Root>
-    </Loggers>
-</Configuration>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
 ```
 
 #### 2. Different Levels for Different Packages
 
 ```xml
-<Configuration>
-    <Loggers>
-        <Root level="info">
-            <AppenderRef ref="Console"/>
-        </Root>
-        
-        <!-- More verbose for your app -->
-        <Logger name="com.mycompany" level="debug" additivity="true"/>
-        
-        <!-- Quieter for noisy libraries -->
-        <Logger name="org.springframework" level="warn" additivity="true"/>
-        <Logger name="org.hibernate" level="warn" additivity="true"/>
-    </Loggers>
-</Configuration>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+    
+    <!-- More verbose for your app -->
+    <logger name="com.mycompany" level="debug" additivity="true"/>
+    
+    <!-- Quieter for noisy libraries -->
+    <logger name="org.springframework" level="warn" additivity="true"/>
+    <logger name="org.hibernate" level="warn" additivity="true"/>
+</configuration>
 ```
 
 #### 3. Separate File for Different Components
 
 ```xml
-<Configuration>
-    <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"/>
-        </Console>
-        
-        <File name="DatabaseLog" fileName="build/logs/database.log">
-            <PatternLayout pattern="%d %-5level [%t] %logger - %msg%n"/>
-        </File>
-    </Appenders>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
     
-    <Loggers>
-        <Root level="info">
-            <AppenderRef ref="Console"/>
-        </Root>
-        
-        <!-- Database logs go to separate file + QAP -->
-        <Logger name="com.myapp.database" level="debug" additivity="true">
-            <AppenderRef ref="DatabaseLog"/>
-        </Logger>
-    </Loggers>
-</Configuration>
+    <appender name="DB_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>build/logs/database.log</file>
+        <encoder>
+            <pattern>%d %-5level [%thread] %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+    
+    <!-- Database logs go to separate file + QAP -->
+    <logger name="com.myapp.database" level="debug" additivity="true">
+        <appender-ref ref="DB_FILE"/>
+    </logger>
+</configuration>
 ```
 
 ---
 
 ## Usage Examples
 
-### Basic Logging
+### Basic Logging with SLF4J
 
 ```java
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
-    private static final Logger log = LogManager.getLogger(UserServiceTest.class);
+    private static final Logger log = LoggerFactory.getLogger(UserServiceTest.class);
     
     @Test
     void testUserRegistration() {
@@ -632,23 +653,22 @@ void testPaymentFailure() {
   "stackTrace": [
     "com.example.PaymentProcessor.charge(PaymentProcessor.java:45)",
     "com.example.PaymentTest.testPaymentFailure(PaymentTest.java:23)",
-    "java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)",
     "..."
   ]
 }
 ```
 
-### MDC (ThreadContext) Usage
+### MDC (Mapped Diagnostic Context) Usage
 
 ```java
-import org.apache.logging.log4j.ThreadContext;
+import org.slf4j.MDC;
 
 @Test
 void testWithRequestContext() {
     // Set context for this test
-    ThreadContext.put("requestId", "REQ-" + UUID.randomUUID());
-    ThreadContext.put("userId", "user-12345");
-    ThreadContext.put("sessionId", "sess-abc-123");
+    MDC.put("requestId", "REQ-" + UUID.randomUUID());
+    MDC.put("userId", "user-12345");
+    MDC.put("sessionId", "sess-abc-123");
     
     try {
         log.info("Processing user request");
@@ -657,7 +677,7 @@ void testWithRequestContext() {
         
         log.info("Order created successfully");
     } finally {
-        ThreadContext.clearAll(); // Clean up
+        MDC.clear(); // Clean up
     }
 }
 ```
@@ -681,13 +701,13 @@ void testWithRequestContext() {
 ### Markers for Structured Logging
 
 ```java
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 @Test
 void testSecurityAudit() {
-    Marker auditMarker = MarkerManager.getMarker("AUDIT");
-    Marker securityMarker = MarkerManager.getMarker("SECURITY");
+    Marker auditMarker = MarkerFactory.getMarker("AUDIT");
+    Marker securityMarker = MarkerFactory.getMarker("SECURITY");
     
     log.info(auditMarker, "User login attempt");
     
@@ -718,7 +738,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class ValidationTest {
-    private static final Logger log = LogManager.getLogger(ValidationTest.class);
+    private static final Logger log = LoggerFactory.getLogger(ValidationTest.class);
     
     @ParameterizedTest
     @ValueSource(strings = {"", "   ", "a", "ab"})
@@ -734,26 +754,7 @@ class ValidationTest {
 }
 ```
 
-Each parameterized test execution gets **separate log capture**:
-
-```json
-[
-  {
-    "methodName": "testInvalidUsernames",
-    "parameters": [""],
-    "logEntries": [
-      {"message": "Testing invalid username: ''", ...}
-    ]
-  },
-  {
-    "methodName": "testInvalidUsernames",
-    "parameters": ["   "],
-    "logEntries": [
-      {"message": "Testing invalid username: '   '", ...}
-    ]
-  }
-]
-```
+Each parameterized test execution gets **separate log capture**!
 
 ### Nested Tests
 
@@ -761,7 +762,7 @@ Each parameterized test execution gets **separate log capture**:
 @Nested
 @DisplayName("User Authentication Tests")
 class UserAuthTests {
-    private static final Logger log = LogManager.getLogger(UserAuthTests.class);
+    private static final Logger log = LoggerFactory.getLogger(UserAuthTests.class);
     
     @BeforeEach
     void setup() {
@@ -787,7 +788,7 @@ class UserAuthTests {
 ```java
 @Execution(ExecutionMode.CONCURRENT) // Parallel execution
 class ParallelTests {
-    private static final Logger log = LogManager.getLogger(ParallelTests.class);
+    private static final Logger log = LoggerFactory.getLogger(ParallelTests.class);
     
     @Test
     void test1() {
@@ -803,17 +804,7 @@ class ParallelTests {
 }
 ```
 
-**Thread Safety Guaranteed:**
-
-```
-Thread-1 executing test1():
-  ThreadLocal buffer: { "test1-id" → [log entries for test1] }
-
-Thread-2 executing test2():
-  ThreadLocal buffer: { "test2-id" → [log entries for test2] }
-
-No race conditions, no cross-contamination!
-```
+**Thread Safety Guaranteed!** No race conditions, no cross-contamination.
 
 ---
 
@@ -846,15 +837,6 @@ QAPLogCaptureConfig config = QAPLogCaptureConfig.builder()
     .build();
 ```
 
-When limit is reached:
-
-```
-Log entry 500: "Processing batch..."
-Log entry 501: ❌ DROPPED (warning logged once)
-Log entry 502: ❌ DROPPED (silently)
-...
-```
-
 ### 3. Selective Context Capture
 
 ```java
@@ -871,30 +853,29 @@ QAPLogCaptureConfig config = QAPLogCaptureConfig.builder()
     .build();
 ```
 
-### 4. Marker Hierarchy
+### 4. Marker References
 
-Log4j2 supports marker hierarchies, and QAP captures them all:
+SLF4J/Logback supports marker references, and QAP captures them all:
 
 ```java
-Marker databaseMarker = MarkerManager.getMarker("DATABASE");
-Marker sqlMarker = MarkerManager.getMarker("SQL").addParents(databaseMarker);
-Marker slowQueryMarker = MarkerManager.getMarker("SLOW_QUERY").addParents(sqlMarker);
+Marker parentMarker = MarkerFactory.getMarker("DATABASE");
+Marker childMarker = MarkerFactory.getMarker("SQL");
+childMarker.add(parentMarker);
 
-log.warn(slowQueryMarker, "Query took 5 seconds");
+log.warn(childMarker, "Slow query detected");
 
-// Captured markers: ["SLOW_QUERY", "SQL", "DATABASE"]
+// Captured markers: ["SQL", "DATABASE"]
 ```
 
 ### 5. Level Mapping
 
-| Log4j2 Level | QAPLogLevel | Captured by Default? |
-|--------------|-------------|----------------------|
-| TRACE        | TRACE       | ❌ No (below INFO) |
-| DEBUG        | DEBUG       | ❌ No (below INFO) |
-| INFO         | INFO        | ✅ Yes |
-| WARN         | WARN        | ✅ Yes |
-| ERROR        | ERROR       | ✅ Yes |
-| FATAL        | FATAL       | ✅ Yes |
+| Logback Level | QAPLogLevel | Captured by Default? |
+|---------------|-------------|----------------------|
+| TRACE         | TRACE       | ❌ No (below INFO) |
+| DEBUG         | DEBUG       | ❌ No (below INFO) |
+| INFO          | INFO        | ✅ Yes |
+| WARN          | WARN        | ✅ Yes |
+| ERROR         | ERROR       | ✅ Yes |
 
 Change default with `.minLevel(QAPLogLevel.DEBUG)`.
 
@@ -908,17 +889,17 @@ Measured on MacBook Pro M2, 16GB RAM, JDK 21:
 
 | Operation | Time | Notes |
 |-----------|------|-------|
-| ServiceLoader discovery | ~8-12ms | One-time at startup |
+| ServiceLoader discovery | ~5-10ms | One-time at startup |
 | Appender attachment | ~2-3ms | One-time at first test |
 | `startCapture()` | <0.5ms | Per test |
 | `stopCapture()` | <1ms | Per test (including buffer retrieval) |
-| Per-log-event capture | ~3-7µs | Per log statement |
-| 100 logs serialization | ~5ms | At end of test |
-| 1000 logs serialization | ~45ms | At end of test |
+| Per-log-event capture | ~2-5µs | Per log statement |
+| 100 logs serialization | ~4ms | At end of test |
+| 1000 logs serialization | ~40ms | At end of test |
 
 **Real-world impact:**
-- Test with 50 log statements: +0.15ms overhead (~0.3%)
-- Test suite with 1000 tests: +10ms total overhead
+- Test with 50 log statements: +0.1ms overhead (~0.2%)
+- Test suite with 1000 tests: +8ms total overhead
 
 ### Memory Usage
 
@@ -933,15 +914,7 @@ Measured on MacBook Pro M2, 16GB RAM, JDK 21:
 **Memory safety:**
 - Bounded buffers prevent OOM
 - ThreadLocal cleanup after each test
-- No memory leaks (verified with heap dumps)
-
-### Scalability
-
-Tested with:
-- ✅ 10,000 tests in single run
-- ✅ 100 parallel threads
-- ✅ 1000 log entries per test
-- ✅ No performance degradation
+- No memory leaks
 
 ---
 
@@ -954,11 +927,11 @@ Tested with:
 **Diagnostic Steps:**
 
 ```bash
-# 1. Check if Log4j2 is on classpath
-./gradlew dependencies | grep log4j
+# 1. Check if Logback is on classpath
+./gradlew dependencies | grep logback
 
 # Should see:
-# testRuntimeClasspath - org.apache.logging.log4j:log4j-core:2.23.1
+# testRuntimeClasspath - ch.qos.logback:logback-classic:1.5.6
 ```
 
 ```java
@@ -968,45 +941,44 @@ void debugCapturer() {
     QAPLogCapturerRegistry registry = new QAPLogCapturerRegistry();
     registry.discover();
     System.out.println("Capturers found: " + registry.getAvailableCount());
-    // Should print: Capturers found: 1
     
-    Optional<QAPLogCapturer> capturer = registry.getAvailableCapturer();
+    Optional<QAPLogCapturer> capturer = registry.getCapturer("Logback");
     System.out.println("Active capturer: " + capturer.get().getFrameworkName());
-    // Should print: Active capturer: Log4j2
+    // Should print: Active capturer: Logback
 }
 ```
 
 **Common Causes & Fixes:**
 
-#### Cause A: `additivity="false"` in log4j2.xml
+#### Cause A: `additivity="false"` in logback.xml
 
 ```xml
 <!-- ❌ PROBLEM -->
-<Logger name="com.myapp" level="debug" additivity="false">
-    <AppenderRef ref="Console"/>
-</Logger>
+<logger name="com.myapp" level="debug" additivity="false">
+    <appender-ref ref="STDOUT"/>
+</logger>
 ```
 
 **Fix:**
 
 ```xml
 <!-- ✅ SOLUTION 1: Set additivity="true" -->
-<Logger name="com.myapp" level="debug" additivity="true">
-</Logger>
+<logger name="com.myapp" level="debug" additivity="true">
+</logger>
 
 <!-- ✅ SOLUTION 2: Remove specific logger entirely (use root) -->
-<Root level="debug">
-    <AppenderRef ref="Console"/>
-</Root>
+<root level="debug">
+    <appender-ref ref="STDOUT"/>
+</root>
 ```
 
 #### Cause B: Log level too high
 
 ```xml
 <!-- ❌ PROBLEM: Root at WARN, your logs are INFO -->
-<Root level="warn">
-    <AppenderRef ref="Console"/>
-</Root>
+<root level="warn">
+    <appender-ref ref="STDOUT"/>
+</root>
 ```
 
 ```java
@@ -1017,78 +989,62 @@ log.info("This won't be captured!"); // Below WARN
 
 ```xml
 <!-- ✅ SOLUTION -->
-<Root level="info">
-    <AppenderRef ref="Console"/>
-</Root>
-```
-
-OR lower the capture threshold:
-
-```java
-config.minLevel(QAPLogLevel.DEBUG)
+<root level="info">
+    <appender-ref ref="STDOUT"/>
+</root>
 ```
 
 #### Cause C: Wrong SLF4J binding
 
 ```gradle
-// ❌ PROBLEM: Using Logback binding instead of Log4j2
-testImplementation 'org.slf4j:slf4j-simple:2.0.13'
+// ❌ PROBLEM: Using Log4j2 binding instead of Logback
+testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'
 ```
 
 **Fix:**
 
 ```gradle
-// ✅ SOLUTION: Use Log4j2 SLF4J binding
-testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'
+// ✅ SOLUTION: Use Logback (logback-classic includes SLF4J binding)
+testImplementation 'ch.qos.logback:logback-classic:1.5.6'
 ```
 
 ### Issue 2: Duplicate Logs in Console
 
-**Symptom:** Each log appears twice in console output.
+**Symptom:** Each log appears twice.
 
-```
-02:30:45.123 [Test worker] INFO  MyTest - Processing
-02:30:45.123 [Test worker] INFO  MyTest - Processing  ← Duplicate!
-```
-
-**Cause:** Logger has both `additivity="true"` AND `AppenderRef` elements.
+**Cause:** Logger has both `additivity="true"` AND `appender-ref` elements.
 
 ```xml
 <!-- ❌ PROBLEM -->
-<Logger name="com.myapp" level="debug" additivity="true">
-    <AppenderRef ref="Console"/>  ← Logger writes to Console
-</Logger>
+<logger name="com.myapp" level="debug" additivity="true">
+    <appender-ref ref="STDOUT"/>  ← Logger writes to STDOUT
+</logger>
 
-<Root level="debug">
-    <AppenderRef ref="Console"/>  ← Root ALSO writes to Console
-</Root>
-<!-- Log goes to Console twice! -->
+<root level="debug">
+    <appender-ref ref="STDOUT"/>  ← Root ALSO writes to STDOUT
+</root>
 ```
 
 **Fix:**
 
 ```xml
-<!-- ✅ SOLUTION: Remove AppenderRef from specific logger -->
-<Logger name="com.myapp" level="debug" additivity="true">
-    <!-- No AppenderRef - logs propagate to root -->
-</Logger>
+<!-- ✅ SOLUTION: Remove appender-ref from specific logger -->
+<logger name="com.myapp" level="debug" additivity="true">
+    <!-- No appender-ref - logs propagate to root -->
+</logger>
 
-<Root level="debug">
-    <AppenderRef ref="Console"/>  ← Only root writes to Console
-</Root>
+<root level="debug">
+    <appender-ref ref="STDOUT"/>
+</root>
 ```
 
-### Issue 3: Too Many Logs Captured (Performance Impact)
-
-**Symptom:** Tests slow, JSON reports huge (100+ MB).
-
-**Cause:** Very verbose logging (1000+ logs per test).
+### Issue 3: Too Many Logs Captured
 
 **Solutions:**
 
 ```java
 // Option 1: Raise minimum level
-config.minLevel(QAPLogLevel.WARN); // Only WARN, ERROR, FATAL
+config.minLevel(QAPLogLevel.WARN);
 
 // Option 2: Filter by logger name
 config.addLoggerPattern("com.myapp.important.*");
@@ -1096,80 +1052,50 @@ config.addLoggerPattern("com.myapp.important.*");
 // Option 3: Lower limits
 config.maxEntriesPerTest(200);
 config.maxMessageLength(1000);
-
-// Option 4: Disable for specific tests
-config.enabled(false);
 ```
 
-### Issue 4: OutOfMemoryError
+### Issue 4: Both Log4j2 and Logback on Classpath
 
-**Symptom:** `java.lang.OutOfMemoryError: Java heap space` during test execution.
-
-**Cause:** Too many tests × too many logs = memory exhaustion.
-
-```
-10,000 tests × 1000 logs/test × 100 bytes/log = ~1 GB memory!
-```
-
-**Solutions:**
-
-```java
-// Solution 1: Reduce per-test limit
-config.maxEntriesPerTest(100); // Instead of 1000
-
-// Solution 2: Truncate messages
-config.maxMessageLength(500); // Instead of 10,000
-
-// Solution 3: Increase heap
-// In gradle.properties:
-org.gradle.jvmargs=-Xmx4g
-```
-
-### Issue 5: ServiceLoader Not Finding Capturer
-
-**Symptom:** No capturer discovered, but jar is on classpath.
-
-**Diagnostic:**
-
-```bash
-# Check if META-INF/services file exists in jar
-jar tf qap-logging-log4j2-1.1.0.jar | grep META-INF/services
-
-# Should output:
-# META-INF/services/com.mk.fx.qa.qap.logging.core.QAPLogCapturerFactory
-```
-
-**Fix:**
-
-Ensure the file exists and has correct content:
-
-```
-File: src/main/resources/META-INF/services/com.mk.fx.qa.qap.logging.core.QAPLogCapturerFactory
-Content: com.mk.fx.qa.qap.logging.log4j2.Log4j2CapturerFactory
-```
-
-### Issue 6: Logs Captured for Wrong Test
-
-**Symptom:** Test A's logs appear in Test B's report.
-
-**Cause:** Not using ThreadLocal, or tests not cleaning up.
+**Symptom:** Not sure which is being used.
 
 **Check:**
 
 ```java
-// Ensure config uses ThreadLocal (default)
-config.threadLocal(true); // Should be true!
+@Test
+void checkActiveFramework() {
+    QAPLogCapturerRegistry registry = new QAPLogCapturerRegistry();
+    registry.discover();
+    
+    Optional<QAPLogCapturer> capturer = registry.getAvailableCapturer();
+    System.out.println("Active: " + capturer.get().getFrameworkName());
+    System.out.println("Priority: " + capturer.get().getPriority());
+    // Log4j2 has priority 100, Logback has priority 0
+    // So Log4j2 will be chosen if both are available
+}
 ```
 
-**This should never happen** with default config, but if it does, file a bug report!
+**Force Logback:**
+
+```gradle
+dependencies {
+    // Exclude Log4j2 from classpath
+    testImplementation('com.mk.fx.qa:qap-plugin:1.1.0') {
+        exclude group: 'org.apache.logging.log4j'
+    }
+    
+    // Only use Logback
+    testImplementation 'ch.qos.logback:logback-classic:1.5.6'
+    testImplementation 'com.mk.fx.qa:qap-logging-logback:1.1.0'
+}
+```
 
 ---
 
 ## FAQ
 
-### Q: Do I need to modify my log4j2.xml?
+### Q: Do I need to modify my logback.xml?
 
-**A:** No! The QAPLog4j2Appender is attached **programmatically at runtime**. Your existing configuration works as-is.
+**A:** No! The QAPLogbackAppender is attached **programmatically at runtime**. Your existing configuration works as-is.
 
 ### Q: Will this interfere with my existing Console/File appenders?
 
@@ -1177,75 +1103,53 @@ config.threadLocal(true); // Should be true!
 
 ### Q: How do I hide QAP framework logs from my console?
 
-**A:** Add this to your log4j2.xml:
+**A:** Add this to your logback.xml:
 
 ```xml
-<Logger name="com.mk.fx.qa.qap" level="warn" additivity="false">
-    <AppenderRef ref="Console"/>
-</Logger>
+<logger name="com.mk.fx.qa.qap" level="WARN" additivity="false">
+    <appender-ref ref="STDOUT"/>
+</logger>
 ```
 
 ### Q: Can I use this with SLF4J?
 
-**A:** Yes! Use the Log4j2 SLF4J bridge:
-
-```gradle
-testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'
-```
-
-Then log with SLF4J:
+**A:** Yes! Logback is the **native implementation** of SLF4J. Just use SLF4J as normal:
 
 ```java
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 Logger log = LoggerFactory.getLogger(MyTest.class);
-log.info("This works!"); // Captured via Log4j2
+log.info("This works!"); // Automatically captured
 ```
 
 ### Q: What happens if I have both Log4j2 and Logback?
 
-**A:** Log4j2 is preferred (priority 100 vs 0). QAP will use Log4j2 automatically.
+**A:** Log4j2 is preferred (priority 100 vs 0). If you want Logback, exclude Log4j2 from your dependencies.
 
 ### Q: Can I disable log capture for specific tests?
 
-**A:** Yes, but requires custom extension. Most use cases: just set higher log level in log4j2.xml:
+**A:** Yes, but requires custom extension. Most use cases: just set higher log level in logback.xml:
 
 ```xml
-<Logger name="com.myapp.noisy" level="error" additivity="true"/>
+<logger name="com.myapp.noisy" level="error" additivity="true"/>
 ```
 
 ### Q: Are logs captured for @BeforeEach, @AfterEach methods?
 
-**A:** Yes! All lifecycle methods (BeforeAll, BeforeEach, Test, AfterEach, AfterAll) logs are captured and categorized in the JSON report under the `lifecycle` section.
+**A:** Yes! All lifecycle methods' logs are captured and categorized in the JSON report under the `lifecycle` section.
 
 ### Q: What's the performance impact?
 
-**A:** Minimal: ~3-7µs per log statement, ~0.5ms per test. For a test with 50 logs: ~0.15ms overhead.
+**A:** Minimal: ~2-5µs per log statement, ~0.5ms per test. For a test with 50 logs: ~0.1ms overhead.
 
-### Q: Can I capture logs from third-party libraries?
+### Q: What Logback versions are supported?
 
-**A:** Yes! Any library using Log4j2 or SLF4J (with Log4j2 bridge) will be captured automatically. Filter by logger name if needed.
-
-### Q: What Log4j2 versions are supported?
-
-**A:** 2.20.0+ recommended. Tested with 2.23.1. Avoid 2.17.x and below (security issues).
+**A:** 1.3.0+ recommended. Tested with 1.5.6.
 
 ### Q: Is this thread-safe for parallel test execution?
 
 **A:** Yes! Uses ThreadLocal storage. Tested with 100+ parallel threads.
-
-### Q: How do I debug if logs aren't being captured?
-
-**A:** Enable QAP framework logging:
-
-```xml
-<Logger name="com.mk.fx.qa.qap.logging.log4j2" level="debug" additivity="true"/>
-```
-
-Look for messages like:
-- `"Started Log4j2 capture for test: ..."`
-- `"Stopped Log4j2 capture for test: ... (X entries)"`
 
 ---
 
@@ -1254,16 +1158,16 @@ Look for messages like:
 ### Module Structure
 
 ```
-qap-logging-log4j2/
+qap-logging-logback/
 ├── src/main/java/
-│   └── com/mk/fx/qa/qap/logging/log4j2/
-│       ├── Log4j2Capturer.java           # Main QAPLogCapturer implementation
-│       ├── Log4j2CapturerFactory.java    # ServiceLoader factory
-│       └── QAPLog4j2Appender.java        # Custom Log4j2 appender
+│   └── com/mk/fx/qa/qap/logging/logback/
+│       ├── LogbackCapturer.java           # Main QAPLogCapturer implementation
+│       ├── LogbackCapturerFactory.java    # ServiceLoader factory
+│       └── QAPLogbackAppender.java        # Custom Logback appender
 ├── src/main/resources/
 │   └── META-INF/services/
 │       └── com.mk.fx.qa.qap.logging.core.QAPLogCapturerFactory
-├── src/test/java/                        # Comprehensive test suite
+├── src/test/java/                         # Comprehensive test suite
 └── build.gradle
 ```
 
@@ -1289,66 +1193,25 @@ qap-logging-log4j2/
                             │ implements
                             │
 ┌─────────────────────────────────────────────────────────────┐
-│  qap-logging-log4j2 (implementation)                        │
+│  qap-logging-logback (implementation)                       │
 │                                                              │
-│  Log4j2Capturer implements QAPLogCapturer                   │
-│  ├─ appender: QAPLog4j2Appender                             │
+│  LogbackCapturer implements QAPLogCapturer                  │
+│  ├─ appender: QAPLogbackAppender                            │
 │  ├─ startCapture() → appender.startCapture()                │
 │  ├─ stopCapture() → appender.stopCapture()                  │
-│  ├─ getPriority() → 100                                     │
+│  ├─ getPriority() → 0                                       │
 │  └─ ensureInitialized() → attaches appender to root         │
 │                                                              │
-│  Log4j2CapturerFactory implements QAPLogCapturerFactory     │
-│  └─ create() → new Log4j2Capturer()                         │
+│  LogbackCapturerFactory implements QAPLogCapturerFactory    │
+│  └─ create() → new LogbackCapturer()                        │
 │                                                              │
-│  QAPLog4j2Appender extends AbstractAppender (Log4j2)        │
+│  QAPLogbackAppender extends AppenderBase<ILoggingEvent>     │
 │  ├─ threadLocalBuffers: ThreadLocal<Map<testId, logs>>     │
 │  ├─ activeCaptures: Map<testId, config>                    │
-│  ├─ append(LogEvent) → converts & buffers log              │
+│  ├─ append(ILoggingEvent) → converts & buffers log         │
 │  ├─ startCapture() → creates buffer for test               │
 │  └─ stopCapture() → retrieves & clears buffer              │
 └─────────────────────────────────────────────────────────────┘
-```
-
-### Sequence Diagram
-
-```
-QAPJunitExtension    Log4j2Capturer    QAPLog4j2Appender    Log4j2 Root Logger
-      │                    │                    │                   │
-      │ beforeAll()        │                    │                   │
-      ├────discover()──────►                    │                   │
-      │                    │                    │                   │
-      │                    │ ensureInitialized()│                   │
-      │                    ├────create()────────►                   │
-      │                    │                    │──attach()────────►│
-      │                    │◄───success─────────┤                   │
-      │◄───Log4j2Capturer──┤                    │                   │
-      │                    │                    │                   │
-      │ beforeEach()       │                    │                   │
-      ├─startCapture(id)───►                    │                   │
-      │                    ├─startCapture(id)───►                   │
-      │                    │                    ├─create buffer     │
-      │                    │◄───success─────────┤                   │
-      │◄───success─────────┤                    │                   │
-      │                    │                    │                   │
-      │ [Test Execution]   │                    │                   │
-      │ log.info("Hello")  │                    │                   │
-      │────────────────────┼────────────────────┼───LogEvent───────►│
-      │                    │                    │◄──append()────────┤
-      │                    │                    ├─convert to        │
-      │                    │                    ├─QAPLogEntry       │
-      │                    │                    ├─add to buffer     │
-      │                    │                    │                   │
-      │ afterEach()        │                    │                   │
-      ├─stopCapture(id)────►                    │                   │
-      │                    ├─stopCapture(id)────►                   │
-      │                    │                    ├─retrieve buffer   │
-      │                    │                    ├─clear buffer      │
-      │                    │◄───List<logs>──────┤                   │
-      │◄───List<logs>──────┤                    │                   │
-      │                    │                    │                   │
-      │ attach to report   │                    │                   │
-      │                    │                    │                   │
 ```
 
 ### Thread Safety Model
@@ -1374,15 +1237,11 @@ QAPJunitExtension    Log4j2Capturer    QAPLog4j2Appender    Log4j2 Root Logger
 │       ▼                         ▼                           │
 │  ["A1"]                    ["B1"]                           │
 │       │                         │                           │
-│  log.info("A2")            log.info("B2")                   │
-│       ▼                         ▼                           │
-│  ["A1", "A2"]              ["B1", "B2"]                     │
-│       │                         │                           │
 │       ▼                         ▼                           │
 │  stopCapture("test-A")     stopCapture("test-B")            │
 │       │                         │                           │
 │       ▼                         ▼                           │
-│  Returns ["A1", "A2"]      Returns ["B1", "B2"]            │
+│  Returns ["A1"]            Returns ["B1"]                   │
 │                                                              │
 │  ✅ No cross-thread interference!                           │
 └─────────────────────────────────────────────────────────────┘
@@ -1395,93 +1254,43 @@ QAPJunitExtension    Log4j2Capturer    QAPLog4j2Appender    Log4j2 Root Logger
 ### Test Suite
 
 ```bash
-./gradlew :qap-logging-log4j2:test
+./gradlew :qap-logging-logback:test
 ```
 
-**Coverage:** 31+ tests across 3 test classes
+**Coverage:** 30+ tests across 3 test classes
 
 | Test Class | Tests | Coverage |
 |------------|-------|----------|
-| `Log4j2CapturerTest` | 17 | Core functionality, filtering, context |
-| `Log4j2CapturerFactoryTest` | 4 | ServiceLoader factory |
+| `LogbackCapturerTest` | 17 | Core functionality, filtering, context |
+| `LogbackCapturerFactoryTest` | 4 | ServiceLoader factory |
 | `ServiceLoaderIntegrationTest` | 10+ | End-to-end integration |
 
 ### Test Categories
 
-1. **Basic Capture**
-   - INFO, WARN, ERROR logs
-   - Message formatting
-   - Timestamp accuracy
-
-2. **Level Filtering**
-   - Min level threshold
-   - Level hierarchy (TRACE < DEBUG < INFO < ...)
-
-3. **Logger Filtering**
-   - Pattern matching (`com.example.*`)
-   - Multiple patterns
-   - Pattern combinations
-
-4. **Context Capture**
-   - MDC/ThreadContext
-   - Markers (simple & hierarchical)
-   - Thread names
-
-5. **Exception Handling**
-   - Stack trace capture
-   - Nested exceptions
-   - Error messages
-
-6. **Memory Management**
-   - Max entries per test
-   - Message truncation
-   - Buffer cleanup
-
-7. **Thread Safety**
-   - Parallel test execution
-   - ThreadLocal isolation
-   - No race conditions
-
-8. **ServiceLoader**
-   - Discovery mechanism
-   - Priority selection
-   - Factory creation
-
-### Run Specific Tests
-
-```bash
-# All tests
-./gradlew :qap-logging-log4j2:test
-
-# Specific class
-./gradlew :qap-logging-log4j2:test --tests Log4j2CapturerTest
-
-# Specific test
-./gradlew :qap-logging-log4j2:test --tests Log4j2CapturerTest.testBasicLogCapture
-
-# With verbose output
-./gradlew :qap-logging-log4j2:test --info
-```
+1. **Basic Capture** - INFO, WARN, ERROR logs
+2. **Level Filtering** - Min level threshold
+3. **Logger Filtering** - Pattern matching
+4. **Context Capture** - MDC, markers, thread names
+5. **Exception Handling** - Stack trace capture
+6. **Memory Management** - Max entries, truncation
+7. **Thread Safety** - Parallel execution
+8. **ServiceLoader** - Discovery mechanism
 
 ---
 
 ## Compatibility
 
-### Log4j2 Versions
+### Logback Versions
 
 | Version | Status | Notes |
 |---------|--------|-------|
-| 2.23.x  | ✅ Tested | Recommended |
-| 2.22.x  | ✅ Compatible | Tested |
-| 2.21.x  | ✅ Compatible | Should work |
-| 2.20.x  | ✅ Compatible | Minimum recommended |
-| 2.19.x  | ⚠️ Not tested | May work |
-| 2.18.x  | ⚠️ Not tested | May work |
-| 2.17.x  | ❌ Avoid | Security vulnerabilities (CVE-2021-45105) |
-| 2.16.x  | ❌ Avoid | Security vulnerabilities (CVE-2021-45046) |
-| 2.15.x  | ❌ Avoid | Security vulnerabilities (CVE-2021-44228 - Log4Shell) |
+| 1.5.x   | ✅ Tested | Recommended |
+| 1.4.x   | ✅ Compatible | Tested |
+| 1.3.x   | ✅ Compatible | Should work |
+| 1.2.x   | ⚠️ Not tested | May work (older SLF4J) |
+| 1.1.x   | ❌ Avoid | Deprecated |
 
-**Recommendation:** Use Log4j2 **2.20.0 or higher**.
+**Recommendation:** Use Logback **1.3.0 or higher**.
 
 ### JDK Versions
 
@@ -1499,82 +1308,14 @@ QAPJunitExtension    Log4j2Capturer    QAPLog4j2Appender    Log4j2 Root Logger
 | 5.10.x  | ✅ Tested |
 | 5.9.x   | ✅ Compatible |
 | 5.8.x   | ✅ Compatible |
-| 5.7.x   | ⚠️ Not tested |
-
----
-
-## Dependencies
-
-### Runtime Dependencies (Provided by User)
-
-```gradle
-// User MUST provide these (compileOnly in module)
-implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
-implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
-```
-
-### Module Dependencies (Bundled)
-
-```gradle
-// Automatically included when you add qap-logging-log4j2
-implementation project(':qap-logging-core')  // Core interfaces
-implementation 'org.slf4j:slf4j-api:2.0.13'  // Internal logging
-```
-
-### Why `compileOnly`?
-
-```gradle
-// In qap-logging-log4j2/build.gradle:
-compileOnly 'org.apache.logging.log4j:log4j-api:2.23.1'
-compileOnly 'org.apache.logging.log4j:log4j-core:2.23.1'
-```
-
-**Benefits:**
-1. ✅ No version conflicts - users control Log4j2 version
-2. ✅ No forced dependencies - optional module
-3. ✅ Smaller artifacts - Log4j2 jars not bundled
-4. ✅ Flexibility - works with any Log4j2 version
-
-**How it works:**
-- At compile time: Log4j2 classes available (compileOnly)
-- At runtime: `isAvailable()` checks if Log4j2 on classpath
-- If present: Module loads
-- If absent: Module skipped (no errors)
 
 ---
 
 ## Related Modules
 
 - **[qap-logging-core](../qap-logging-core/README.md)** - Core interfaces and models
+- **[qap-logging-log4j2](../qap-logging-log4j2/README.md)** - Log4j2 implementation
 - **[qap-plugin](../qap-plugin/README.md)** - Main JUnit 5 extension
-- **qap-logging-logback** - Logback implementation (coming soon)
-
----
-
-## Contributing
-
-### Adding New Features
-
-1. Write tests first (TDD approach)
-2. Implement feature
-3. Update this README
-4. Run full test suite: `./gradlew test`
-5. Run Spotless: `./gradlew spotlessApply`
-
-### Reporting Issues
-
-Include:
-- Log4j2 version
-- JDK version
-- Sample `log4j2.xml` configuration
-- Minimal reproducible test case
-- Expected vs actual behavior
-
----
-
-## License
-
-Same as parent project.
 
 ---
 
@@ -1583,11 +1324,10 @@ Same as parent project.
 - **Documentation:** This README, plus [qap-logging-core README](../qap-logging-core/README.md)
 - **Examples:** See [test-app module](../test-app/)
 - **Issues:** GitHub Issues
-- **Questions:** GitHub Discussions
 
 ---
 
 **Version:** 1.1.0-SNAPSHOT  
-**Module:** qap-logging-log4j2  
+**Module:** qap-logging-logback  
 **Status:** ✅ Production Ready  
 **Last Updated:** 2026-01-23

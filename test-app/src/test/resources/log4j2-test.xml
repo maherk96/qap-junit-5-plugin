@@ -13,22 +13,18 @@
     </Appenders>
     
     <Loggers>
-        <!-- Root logger -->
-        <Root level="info">
+        <!-- Root logger - set to debug to capture all log levels -->
+        <Root level="debug">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="TestFile"/>
         </Root>
         
-        <!-- QAP framework logging -->
-        <Logger name="com.mk.fx.qa.qap" level="debug" additivity="false">
+        <!-- QAP framework logging - set to WARN to hide internal framework logs from users -->
+        <Logger name="com.mk.fx.qa.qap" level="warn" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="TestFile"/>
         </Logger>
         
-        <!-- Test application logging - additivity=true allows QAP to capture logs -->
-        <Logger name="com.example.testapp" level="debug" additivity="true">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="TestFile"/>
-        </Logger>
+        <!-- No specific logger needed! All logs automatically flow to root logger and QAP captures them -->
     </Loggers>
 </Configuration>
