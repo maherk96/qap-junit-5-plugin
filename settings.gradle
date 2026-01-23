@@ -1,1 +1,14 @@
 rootProject.name = 'qap-junit-5-plugin'
+
+// Main plugin module - JUnit 5 extension
+include 'qap-plugin'
+
+// Core logging module - framework-agnostic
+include 'qap-logging-core'
+
+// Framework-specific implementations
+include 'qap-logging-logback'
+include 'qap-logging-log4j2'
+
+// Test application - integration tests
+include 'test-app'

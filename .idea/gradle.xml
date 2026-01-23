@@ -8,6 +8,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/qap-logging-core" />
+            <option value="$PROJECT_DIR$/qap-logging-log4j2" />
+            <option value="$PROJECT_DIR$/qap-logging-logback" />
+            <option value="$PROJECT_DIR$/qap-plugin" />
+            <option value="$PROJECT_DIR$/test-app" />
           </set>
         </option>
       </GradleProjectSettings>

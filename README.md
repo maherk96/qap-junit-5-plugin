@@ -18,6 +18,15 @@ Install & Enable
 - Enable the extension at the class level:
   `@ExtendWith(com.mk.fx.qa.qap.junit.extension.QAPJunitExtension.class)`
 
+Automatic Log Capture (Optional)
+- Add the logging module to capture test logs automatically:
+  `testImplementation project(':qap-logging-log4j2')`  (for Log4j2)
+  or `testImplementation project(':qap-logging-logback')` (for Logback, future)
+- Logs are automatically captured during test execution and attached to test reports
+- No configuration needed - works out of the box!
+- Logs include: level, message, timestamp, thread, MDC/ThreadContext, markers, stack traces
+- See `qap-logging-log4j2/README.md` for more details
+
 Quick Start
 - Annotate a test class and run tests. A JSON payload for the class appears in logs/stdout.
 - Example: `src/test/java/DemoExtensionUsageTest.java:1`
