@@ -1,0 +1,44 @@
+> Task :test-app:clean
+> Task :qap-logging-core:compileJava UP-TO-DATE
+> Task :qap-logging-core:processResources UP-TO-DATE
+> Task :qap-logging-core:classes UP-TO-DATE
+> Task :qap-logging-core:jar UP-TO-DATE
+> Task :qap-logging-log4j2:compileJava UP-TO-DATE
+> Task :qap-logging-log4j2:processResources UP-TO-DATE
+> Task :qap-logging-log4j2:classes UP-TO-DATE
+> Task :qap-logging-log4j2:jar UP-TO-DATE
+> Task :qap-plugin:compileJava UP-TO-DATE
+> Task :qap-plugin:processResources NO-SOURCE
+> Task :qap-plugin:classes UP-TO-DATE
+> Task :qap-plugin:jar UP-TO-DATE
+> Task :test-app:compileJava NO-SOURCE
+> Task :test-app:processResources NO-SOURCE
+> Task :test-app:classes UP-TO-DATE
+> Task :test-app:compileTestJava
+> Task :test-app:processTestResources
+> Task :test-app:testClasses
+
+> Task :test-app:test
+
+Payment Processor Tests STANDARD_OUT
+    02:12:41.002 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - === Starting Payment Processor Test Suite ===
+    02:12:41.004 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - Initializing payment gateway connection
+
+Payment Processor Tests > Should process valid credit card payment STANDARD_OUT
+    02:12:41.008 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - Creating new payment processor instance
+    02:12:41.009 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - Testing credit card payment processing
+    02:12:41.014 [Test worker] DEBUG com.example.testapp.PaymentProcessorTest - Processing payment - Card: ****9012, Amount: $99.99
+    02:12:41.016 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - Payment approved - Transaction ID: TXN-1000, Amount: $99.99
+
+Payment Processor Tests > Should process valid credit card payment PASSED
+
+[Incubating] Problems report is available at: file:///Users/maherkarim/Dev/qap-junit-5-plugin/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1s
+12 actionable tasks: 4 executed, 8 up-to-date

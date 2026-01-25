@@ -1,0 +1,51 @@
+plugins {
+    id 'java-library'
+    id 'com.diffplug.spotless' version '6.25.0'
+}
+
+group = 'com.mk.fx.qa'
+version = '1.1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Core logging module
+    implementation project(':qap-logging-core')
+    
+    // Logback dependencies (compileOnly = user must provide)
+    compileOnly 'ch.qos.logback:logback-classic:1.5.6'
+    compileOnly 'ch.qos.logback:logback-core:1.5.6'
+    
+    // SLF4J API for internal logging
+    implementation 'org.slf4j:slf4j-api:2.0.13'
+    
+    // Test dependencies
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    
+    // Logback for testing (actual implementation)
+    testImplementation 'ch.qos.logback:logback-classic:1.5.6'
+    testImplementation 'ch.qos.logback:logback-core:1.5.6'
+    
+    // Mockito for testing
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+spotless {
+    java {
+        target 'src/**/*.java'
+        googleJavaFormat('1.17.0')
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
