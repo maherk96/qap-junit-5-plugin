@@ -1,0 +1,29 @@
+{
+  "beforeAll": [],
+  "beforeEach": [
+    {
+      "methodName": "setup",
+      "className": "PaymentProcessorTest",
+      "order": 1,
+      "status": "PASSED",
+      "durationNanos": 1902625,
+      "logEntries": [
+        {
+          "timestamp": 1769225710.633000000,
+          "level": "INFO",
+          "logger": "com.example.testapp.PaymentProcessorTest",
+          "thread": "Test worker",
+          "message": "Creating new payment processor instance",
+          "mdc": {},
+          "markers": []
+        }
+      ]
+    }
+  ],
+  "test": {
+    "status": "PASSED",
+    "durationNanos": 11362792
+  },
+  "afterEach": [],
+  "afterAll": []
+}

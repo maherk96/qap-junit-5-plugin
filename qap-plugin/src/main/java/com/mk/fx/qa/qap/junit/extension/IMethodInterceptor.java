@@ -13,6 +13,12 @@ public interface IMethodInterceptor {
       ExtensionContext extensionContext)
       throws Throwable;
 
+  void interceptTestMethod(
+      InvocationInterceptor.Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      ExtensionContext extensionContext)
+      throws Throwable;
+
   void interceptBeforeAllMethod(
       InvocationInterceptor.Invocation<Void> invocation,
       ReflectiveInvocationContext<Method> invocationContext,

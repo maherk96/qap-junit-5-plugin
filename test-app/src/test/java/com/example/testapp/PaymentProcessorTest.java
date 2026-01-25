@@ -2,9 +2,8 @@ package com.example.testapp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.math.BigDecimal;
-
 import com.mk.fx.qa.qap.junit.extension.QAPJunitExtension;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,6 +25,12 @@ class PaymentProcessorTest {
   static void setupClass() {
     logger.info("=== Starting Payment Processor Test Suite ===");
     logger.info("Initializing payment gateway connection");
+  }
+
+  @AfterAll
+  static void teardownClass() {
+    logger.info("=== Payment Processor Test Suite Complete ===");
+    logger.info("Closing payment gateway connection");
   }
 
   @BeforeEach
@@ -108,7 +113,7 @@ class PaymentProcessorTest {
             () -> paymentProcessor.processPayment(cardNumber, tooSmall));
 
     logger.error("Payment rejected: {}", exception.getMessage());
-    assertTrue(exception.getMessage().contains("minimum"));
+    assertTrue(exception.getMessage().contains("should fail"));
   }
 
   @Test

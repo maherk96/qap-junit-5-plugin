@@ -3,6 +3,7 @@ package com.mk.fx.qa.qap.junit.util;
 import com.mk.fx.qa.qap.junit.model.QAPFailure;
 import com.mk.fx.qa.qap.junit.model.QAPFailureLocation;
 import com.mk.fx.qa.qap.junit.model.QAPRootCause;
+import com.mk.fx.qa.qap.junit.model.StackTraceConfig;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -11,7 +12,20 @@ import java.util.List;
 
 public final class ExceptionFormatter {
 
+  private static StackTraceConfig stackTraceConfig = StackTraceConfig.defaultConfig();
+
   private ExceptionFormatter() {}
+
+  /**
+   * Sets the stack trace configuration for capping and formatting.
+   *
+   * @param config the stack trace configuration
+   */
+  public static void setStackTraceConfig(StackTraceConfig config) {
+    if (config != null) {
+      stackTraceConfig = config;
+    }
+  }
 
   public static byte[] toBytes(String text) {
     if (text == null) {
@@ -73,7 +87,7 @@ public final class ExceptionFormatter {
 
     String type = throwable.getClass().getName();
     String message = throwable.getMessage();
-    String stackTrace = stackTraceOf(throwable);
+    String stackTrace = capStackTrace(throwable); // ✅ Use capped stack trace
 
     // Extract location from stack trace
     QAPFailureLocation location = extractLocation(throwable);
@@ -106,7 +120,122 @@ public final class ExceptionFormatter {
   }
 
   /**
-   * Extracts location information from the first stack trace element.
+   * Caps the stack trace based on configuration settings.
+   *
+   * @param throwable the exception to extract stack trace from
+   * @return capped stack trace string
+   */
+  private static String capStackTrace(Throwable throwable) {
+    String fullStackTrace = stackTraceOf(throwable);
+    if (fullStackTrace == null || fullStackTrace.isEmpty()) {
+      return fullStackTrace;
+    }
+
+    String[] lines = fullStackTrace.split("\r?\n");
+    int totalLines = lines.length;
+
+    // If unlimited or within limits, return as-is
+    if (stackTraceConfig.getMaxLines() < 0 || totalLines <= stackTraceConfig.getMaxLines()) {
+      return fullStackTrace;
+    }
+
+    // Apply capping strategy
+    List<String> cappedLines = new ArrayList<>();
+
+    if (stackTraceConfig.isKeepUntilFrameworkExit()) {
+      // Strategy: Keep lines until we exit user-code frames
+      cappedLines.addAll(capUntilFrameworkExit(lines));
+    } else {
+      // Strategy: Keep first N + last M lines
+      int headLines = Math.min(stackTraceConfig.getHeadLines(), totalLines);
+      int tailLines = Math.min(stackTraceConfig.getTailLines(), totalLines - headLines);
+
+      // Add head lines
+      for (int i = 0; i < headLines; i++) {
+        cappedLines.add(lines[i]);
+      }
+
+      // Add separator if we're truncating
+      if (headLines + tailLines < totalLines) {
+        int omittedLines = totalLines - headLines - tailLines;
+        cappedLines.add(String.format("\t... %d more lines omitted ...", omittedLines));
+      }
+
+      // Add tail lines
+      int tailStartIndex = totalLines - tailLines;
+      for (int i = tailStartIndex; i < totalLines; i++) {
+        cappedLines.add(lines[i]);
+      }
+    }
+
+    return String.join("\n", cappedLines);
+  }
+
+  /**
+   * Caps stack trace by keeping lines until we exit user-code frames.
+   *
+   * @param lines all stack trace lines
+   * @return list of lines to keep
+   */
+  private static List<String> capUntilFrameworkExit(String[] lines) {
+    List<String> result = new ArrayList<>();
+    boolean inUserCode = false;
+
+    for (int i = 0; i < lines.length && result.size() < stackTraceConfig.getMaxLines(); i++) {
+      String line = lines[i];
+      result.add(line);
+
+      // Check if this is a user-code frame
+      boolean isUserFrame = !isFrameworkLine(line);
+
+      if (isUserFrame) {
+        inUserCode = true;
+      } else if (inUserCode) {
+        // We were in user code and now hit framework code - stop here
+        if (i < lines.length - 1) {
+          int omittedLines = lines.length - i - 1;
+          result.add(String.format("\t... %d more lines omitted ...", omittedLines));
+        }
+        break;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Checks if a stack trace line represents framework code (not user code).
+   *
+   * @param line stack trace line
+   * @return true if this is a framework line
+   */
+  private static boolean isFrameworkLine(String line) {
+    // Skip the first line (exception type and message)
+    if (!line.trim().startsWith("at ")) {
+      return false;
+    }
+
+    // Extract class name from "at com.example.Class.method(File.java:123)"
+    String trimmed = line.trim();
+    if (trimmed.startsWith("at ")) {
+      String rest = trimmed.substring(3);
+      int parenIndex = rest.indexOf('(');
+      if (parenIndex > 0) {
+        String classAndMethod = rest.substring(0, parenIndex);
+        int lastDotIndex = classAndMethod.lastIndexOf('.');
+        if (lastDotIndex > 0) {
+          String className = classAndMethod.substring(0, lastDotIndex);
+          return isFrameworkClass(className);
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Extracts location information from the first user-code stack trace element. Skips JUnit and
+   * internal framework frames to find the actual test method that failed.
    *
    * @param throwable the exception to extract location from
    * @return QAPFailureLocation or null if no stack trace available
@@ -117,14 +246,48 @@ public final class ExceptionFormatter {
       return null;
     }
 
-    StackTraceElement firstElement = stackTrace[0];
-    String className = firstElement.getClassName();
-    String methodName = firstElement.getMethodName();
-    String fileName = firstElement.getFileName();
-    int lineNumber = firstElement.getLineNumber();
+    // Find the first user-code frame (skip JUnit, java.base, org.gradle, etc.)
+    StackTraceElement userFrame = null;
+    for (StackTraceElement element : stackTrace) {
+      String className = element.getClassName();
+      // Skip framework and infrastructure classes
+      if (!isFrameworkClass(className)) {
+        userFrame = element;
+        break;
+      }
+    }
+
+    // Fall back to first element if no user frame found
+    if (userFrame == null) {
+      userFrame = stackTrace[0];
+    }
+
+    String className = userFrame.getClassName();
+    String methodName = userFrame.getMethodName();
+    String fileName = userFrame.getFileName();
+    int lineNumber = userFrame.getLineNumber();
 
     return new QAPFailureLocation(
         className, methodName, fileName, lineNumber > 0 ? lineNumber : null);
+  }
+
+  /**
+   * Determines if a class name belongs to framework/infrastructure code that should be skipped when
+   * finding the user-code location.
+   *
+   * @param className fully qualified class name
+   * @return true if this is a framework class to skip
+   */
+  private static boolean isFrameworkClass(String className) {
+    return className.startsWith("org.junit.")
+        || className.startsWith("org.opentest4j.")
+        || className.startsWith("java.base/")
+        || className.startsWith("jdk.internal.")
+        || className.startsWith("java.lang.reflect.")
+        || className.startsWith("org.gradle.")
+        || className.startsWith("worker.org.gradle.")
+        || className.startsWith("jdk.proxy")
+        || className.startsWith("com.mk.fx.qa.qap.junit.extension."); // Skip our own extension code
   }
 
   /**

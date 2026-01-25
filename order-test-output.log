@@ -1,0 +1,47 @@
+> Task :qap-logging-core:compileJava
+> Task :qap-logging-core:processResources
+> Task :qap-logging-core:classes
+> Task :qap-logging-core:jar
+
+> Task :qap-logging-log4j2:compileJava
+warning: unknown enum constant Include.NON_NULL
+  reason: class file for com.fasterxml.jackson.annotation.JsonInclude$Include not found
+1 warning
+
+> Task :qap-logging-log4j2:processResources
+> Task :qap-logging-log4j2:classes
+> Task :qap-logging-log4j2:jar
+> Task :qap-plugin:compileJava
+> Task :qap-plugin:processResources NO-SOURCE
+> Task :qap-plugin:classes
+> Task :qap-plugin:jar
+> Task :test-app:compileJava NO-SOURCE
+> Task :test-app:processResources NO-SOURCE
+> Task :test-app:classes UP-TO-DATE
+> Task :test-app:compileTestJava
+> Task :test-app:processTestResources
+> Task :test-app:testClasses
+> Task :test-app:test FAILED
+
+[Incubating] Problems report is available at: file:///Users/maherkarim/Dev/qap-junit-5-plugin/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test-app:test'.
+> No tests found for given includes: [com.example.testapp.OrderProcessingTest.testCreateAndProcessOrder](--tests filter)
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1s
+11 actionable tasks: 11 executed

@@ -1,0 +1,60 @@
+> Task :qap-logging-core:compileJava
+> Task :qap-logging-core:processResources
+> Task :qap-logging-core:classes
+> Task :qap-logging-core:jar
+
+> Task :qap-logging-log4j2:compileJava
+warning: unknown enum constant Include.NON_NULL
+  reason: class file for com.fasterxml.jackson.annotation.JsonInclude$Include not found
+1 warning
+
+> Task :qap-logging-log4j2:processResources
+> Task :qap-logging-log4j2:classes
+> Task :qap-logging-log4j2:jar
+> Task :qap-plugin:compileJava
+> Task :qap-plugin:processResources NO-SOURCE
+> Task :qap-plugin:classes
+> Task :qap-plugin:jar
+> Task :test-app:compileJava NO-SOURCE
+> Task :test-app:processResources NO-SOURCE
+> Task :test-app:classes UP-TO-DATE
+> Task :test-app:compileTestJava
+> Task :test-app:processTestResources
+> Task :test-app:testClasses
+
+> Task :test-app:test
+
+Order Processing Tests STANDARD_OUT
+    03:36:34.350 [Test worker] INFO  com.example.testapp.OrderProcessingTest - ╔══════════════════════════════════════════════════════════╗
+    03:36:34.353 [Test worker] INFO  com.example.testapp.OrderProcessingTest - ║   Starting Order Processing End-to-End Test Suite      ║
+    03:36:34.353 [Test worker] INFO  com.example.testapp.OrderProcessingTest - ╚══════════════════════════════════════════════════════════╝
+    03:36:34.353 [Test worker] DEBUG com.example.testapp.OrderProcessingTest - Initializing order processing system
+
+Order Processing Tests > ✓ Should create and process simple order STANDARD_OUT
+    03:36:34.357 [Test worker] INFO  com.example.testapp.OrderProcessingTest - → Setting up order service for test
+    03:36:34.357 [Test worker] DEBUG com.example.testapp.OrderProcessingTest - Order service initialized with empty order queue
+    03:36:34.358 [Test worker] INFO  com.example.testapp.OrderProcessingTest - ▶ Testing simple order creation and processing
+    03:36:34.363 [Test worker] DEBUG com.example.testapp.OrderProcessingTest - Creating order for customer: CUST-12345
+    03:36:34.363 [Test worker] INFO  com.example.testapp.OrderProcessingTest - Order created: ORD-1000
+    03:36:34.363 [Test worker] DEBUG com.example.testapp.OrderProcessingTest - Added 2 items to order ORD-1000
+    03:36:34.366 [Test worker] INFO  com.example.testapp.OrderProcessingTest - Order total calculated: $109.97
+    03:36:34.367 [Test worker] INFO  com.example.testapp.OrderProcessingTest - ✓ Simple order test completed successfully
+    03:36:34.368 [Test worker] DEBUG com.example.testapp.OrderProcessingTest - Cleaning up order test data
+
+Order Processing Tests > ✓ Should create and process simple order PASSED
+
+Order Processing Tests STANDARD_OUT
+    03:36:34.373 [Test worker] INFO  com.example.testapp.OrderProcessingTest - ╔══════════════════════════════════════════════════════════╗
+    03:36:34.373 [Test worker] INFO  com.example.testapp.OrderProcessingTest - ║   Completed Order Processing Test Suite                ║
+    03:36:34.373 [Test worker] INFO  com.example.testapp.OrderProcessingTest - ╚══════════════════════════════════════════════════════════╝
+
+[Incubating] Problems report is available at: file:///Users/maherkarim/Dev/qap-junit-5-plugin/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1s
+11 actionable tasks: 11 executed

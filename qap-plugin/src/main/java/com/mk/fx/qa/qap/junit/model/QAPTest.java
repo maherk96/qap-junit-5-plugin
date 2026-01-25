@@ -20,6 +20,8 @@ public class QAPTest extends QAPBaseTestCase {
   private String testType; // TEST, PARAMETERIZED, etc.
   private String disabledReason; // Reason why test was disabled (only set when status is DISABLED)
   private QAPTestLifecycle lifecycle; // Complete lifecycle tracking including fixtures
+
+  @com.fasterxml.jackson.annotation.JsonIgnore // Hidden - use lifecycle phase logs instead
   private List<com.mk.fx.qa.qap.logging.core.QAPLogEntry>
       logEntries; // Captured log entries during test execution
 
@@ -66,7 +68,7 @@ public class QAPTest extends QAPBaseTestCase {
   }
 
   /** Returns only the test execution duration (excluding fixtures). */
-  @com.fasterxml.jackson.annotation.JsonProperty("testOnlyDurationNanos")
+  @com.fasterxml.jackson.annotation.JsonIgnore
   public Long getTestOnlyDurationNanos() {
     if (lifecycle != null
         && lifecycle.getTest() != null
@@ -74,5 +76,39 @@ public class QAPTest extends QAPBaseTestCase {
       return lifecycle.getTest().getDurationNanos();
     }
     return getDurationNanos();
+  }
+
+  /**
+   * Override to hide durationMillis from JSON - use lifecycle durations or totalDurationNanos
+   * instead.
+   */
+  @Override
+  @com.fasterxml.jackson.annotation.JsonIgnore
+  public long getDurationMillis() {
+    return super.getDurationMillis();
+  }
+
+  /**
+   * Override to hide base durationNanos - use lifecycle.test.durationNanos or totalDurationNanos
+   * instead.
+   */
+  @Override
+  @com.fasterxml.jackson.annotation.JsonIgnore
+  public long getDurationNanos() {
+    return super.getDurationNanos();
+  }
+
+  /** Override to hide hasFailure - can be inferred from failure != null. */
+  @Override
+  @com.fasterxml.jackson.annotation.JsonIgnore
+  public boolean hasFailure() {
+    return super.hasFailure();
+  }
+
+  /** Override to hide logs array - we use logEntries structured field instead. */
+  @Override
+  @com.fasterxml.jackson.annotation.JsonIgnore
+  public java.util.List<String> getLogs() {
+    return super.getLogs();
   }
 }
