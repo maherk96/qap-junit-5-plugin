@@ -59,7 +59,6 @@ class QAPJunitExtensionDisabledTest {
 
     // Disabled tests should NOT have failure - only disabledReason
     // This matches the expected behavior in t.json
-    assertFalse(t.hasFailure(), "Disabled tests should not have failures");
     assertNull(t.getFailure(), "Disabled tests should have null failure");
     assertNotNull(t.getDisabledReason(), "Disabled tests should have a disabledReason");
     assertTrue(

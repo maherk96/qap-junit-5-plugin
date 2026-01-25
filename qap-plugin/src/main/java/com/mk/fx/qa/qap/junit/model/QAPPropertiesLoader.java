@@ -13,7 +13,6 @@ public class QAPPropertiesLoader {
   private static final Logger log = LoggerFactory.getLogger(QAPPropertiesLoader.class);
 
   private final String appName;
-  private final String fixMessageLogging;
   private final String testEnvironment;
   private final String runEnvironment;
   private final String user;
@@ -29,7 +28,6 @@ public class QAPPropertiesLoader {
     Properties qapAttributes = loadQAPAttributes();
     this.qapProperties = qapAttributes; // Store for later access
     this.appName = qapAttributes.getProperty("qap.app.name");
-    this.fixMessageLogging = qapAttributes.getProperty("qap.report.fix.messaging");
     this.user =
         qapAttributes.getProperty(
             "qap.user", System.getProperty(com.mk.fx.qa.qap.junit.core.SystemProperties.USER_NAME));

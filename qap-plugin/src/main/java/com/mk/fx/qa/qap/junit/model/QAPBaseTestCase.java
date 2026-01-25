@@ -1,14 +1,11 @@
 package com.mk.fx.qa.qap.junit.model;
 
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
-import lombok.ToString;
 
 @Data
 public abstract class QAPBaseTestCase {
@@ -18,10 +15,6 @@ public abstract class QAPBaseTestCase {
   @JsonIgnore protected long startTimeNanos; // System.nanoTime() for precise duration measurement
   @JsonIgnore protected long endTimeNanos; // System.nanoTime() for precise duration measurement
   protected String status;
-
-  @ToString.Exclude @JsonIgnore protected byte[] logs;
-
-  @ToString.Exclude @JsonIgnore protected byte[] fix;
 
   @JsonIgnore protected QAPFailure failure;
 
@@ -81,21 +74,7 @@ public abstract class QAPBaseTestCase {
     this.tag.add(tag);
   }
 
-  public boolean hasTags() {
-    return isNotEmpty(tag);
-  }
-
-  public boolean hasLogs() {
-    return isNotEmpty(logs);
-  }
-
-  // Always serialize logs as an array for consistency
-  @JsonProperty("logs")
-  public java.util.List<String> getLogs() {
-    return java.util.Collections.emptyList();
-  }
-
-  @JsonProperty("durationMillis")
+  @JsonIgnore
   public long getDurationMillis() {
     return (endTime > 0L && startTime > 0L && endTime >= startTime) ? (endTime - startTime) : 0L;
   }
@@ -109,7 +88,7 @@ public abstract class QAPBaseTestCase {
    *
    * @return duration in nanoseconds, or 0 if timing data is unavailable
    */
-  @JsonProperty("durationNanos")
+  @JsonIgnore
   public long getDurationNanos() {
     if (endTimeNanos > 0L && startTimeNanos > 0L && endTimeNanos >= startTimeNanos) {
       return endTimeNanos - startTimeNanos;
@@ -120,23 +99,14 @@ public abstract class QAPBaseTestCase {
     return millis > 0L ? millis * 1_000_000L : 0L;
   }
 
-  public boolean hasFix() {
-    return isNotEmpty(fix);
-  }
-
+  @JsonIgnore
   public boolean hasException() {
     return failure != null;
   }
 
-  @JsonProperty("hasFailure")
+  @JsonIgnore
   public boolean hasFailure() {
     return failure != null;
-  }
-
-  // Serialize fix as array when absent to avoid nulls
-  @JsonProperty("fix")
-  public java.util.List<String> getFixArray() {
-    return java.util.Collections.emptyList();
   }
 
   @JsonProperty("failure")

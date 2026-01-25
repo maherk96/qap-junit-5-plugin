@@ -36,15 +36,6 @@ class QAPPropertiesLoaderTest {
     }
 
     @Test
-    @DisplayName("Should load fixMessageLogging property")
-    void testFixMessageLoggingProperty() {
-      QAPPropertiesLoader loader = new QAPPropertiesLoader();
-
-      String fixMessageLogging = loader.getFixMessageLogging();
-      // No assertion on value as it depends on test resources
-    }
-
-    @Test
     @DisplayName("Should use system property for user when qap.user not set")
     void testUserFallbackToSystemProperty() {
       String systemUser = System.getProperty("user.name");
@@ -258,7 +249,6 @@ class QAPPropertiesLoaderTest {
 
       // All getters should work without throwing
       assertDoesNotThrow(() -> loader.getAppName());
-      assertDoesNotThrow(() -> loader.getFixMessageLogging());
       assertDoesNotThrow(() -> loader.getTestEnvironment());
       assertDoesNotThrow(() -> loader.getRunEnvironment());
       assertDoesNotThrow(() -> loader.getUser());

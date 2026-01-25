@@ -77,38 +77,4 @@ public class QAPTest extends QAPBaseTestCase {
     }
     return getDurationNanos();
   }
-
-  /**
-   * Override to hide durationMillis from JSON - use lifecycle durations or totalDurationNanos
-   * instead.
-   */
-  @Override
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public long getDurationMillis() {
-    return super.getDurationMillis();
-  }
-
-  /**
-   * Override to hide base durationNanos - use lifecycle.test.durationNanos or totalDurationNanos
-   * instead.
-   */
-  @Override
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public long getDurationNanos() {
-    return super.getDurationNanos();
-  }
-
-  /** Override to hide hasFailure - can be inferred from failure != null. */
-  @Override
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public boolean hasFailure() {
-    return super.hasFailure();
-  }
-
-  /** Override to hide logs array - we use logEntries structured field instead. */
-  @Override
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public java.util.List<String> getLogs() {
-    return super.getLogs();
-  }
 }
