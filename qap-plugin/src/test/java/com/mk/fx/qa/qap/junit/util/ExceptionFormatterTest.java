@@ -377,11 +377,9 @@ class ExceptionFormatterTest {
 
       // Should NOT be pointing to JUnit/framework classes
       assertFalse(
-          location.getClazz().startsWith("org.junit."),
-          "Should skip JUnit framework classes");
+          location.getClazz().startsWith("org.junit."), "Should skip JUnit framework classes");
       assertFalse(
-          location.getClazz().startsWith("org.opentest4j."),
-          "Should skip OpenTest4J classes");
+          location.getClazz().startsWith("org.opentest4j."), "Should skip OpenTest4J classes");
     }
 
     @Test
@@ -421,7 +419,8 @@ class ExceptionFormatterTest {
       StackTraceElement[] frameworkStack =
           new StackTraceElement[] {
             new StackTraceElement("org.junit.Assert", "fail", "Assert.java", 100),
-            new StackTraceElement("org.opentest4j.AssertionUtils", "fail", "AssertionUtils.java", 50)
+            new StackTraceElement(
+                "org.opentest4j.AssertionUtils", "fail", "AssertionUtils.java", 50)
           };
       exception.setStackTrace(frameworkStack);
 
@@ -431,9 +430,7 @@ class ExceptionFormatterTest {
       QAPFailureLocation location = failure.getLocation();
       assertNotNull(location, "Should fallback to first frame");
       assertEquals(
-          "org.junit.Assert",
-          location.getClazz(),
-          "Should use first frame when all are framework");
+          "org.junit.Assert", location.getClazz(), "Should use first frame when all are framework");
     }
   }
 
@@ -652,7 +649,8 @@ class ExceptionFormatterTest {
 
       // Should be capped: 5 head + 1 separator + 5 tail = 11 lines
       assertTrue(
-          stackTrace.size() <= 15, "Stack trace should be capped to configured max: " + stackTrace.size());
+          stackTrace.size() <= 15,
+          "Stack trace should be capped to configured max: " + stackTrace.size());
 
       // Should contain omitted message
       boolean hasOmitted = stackTrace.stream().anyMatch(line -> line.contains("omitted"));
@@ -660,14 +658,12 @@ class ExceptionFormatterTest {
 
       // First lines should be from the top of the stack
       assertTrue(
-          stackTrace.get(0).contains("RuntimeException"),
-          "First line should be exception type");
+          stackTrace.get(0).contains("RuntimeException"), "First line should be exception type");
 
       // Last lines should be from the bottom of the stack
       String lastLine = stackTrace.get(stackTrace.size() - 1);
       assertTrue(
-          lastLine.contains("at ") || lastLine.isEmpty(),
-          "Last line should be a stack frame");
+          lastLine.contains("at ") || lastLine.isEmpty(), "Last line should be a stack frame");
     }
 
     @Test
@@ -764,17 +760,13 @@ class ExceptionFormatterTest {
 
       // Find separator line
       String separator =
-          stackTrace.stream()
-              .filter(line -> line.contains("omitted"))
-              .findFirst()
-              .orElse(null);
+          stackTrace.stream().filter(line -> line.contains("omitted")).findFirst().orElse(null);
 
       if (separator != null) {
         // Should contain a number
         assertTrue(separator.matches(".*\\d+.*"), "Separator should include omitted line count");
         assertTrue(
-            separator.contains("more lines omitted"),
-            "Separator should have descriptive text");
+            separator.contains("more lines omitted"), "Separator should have descriptive text");
       }
     }
 

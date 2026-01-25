@@ -23,8 +23,7 @@ class StackTraceConfigTest {
       assertEquals(50, config.getHeadLines(), "Default headLines should be 50");
       assertEquals(20, config.getTailLines(), "Default tailLines should be 20");
       assertFalse(
-          config.isKeepUntilFrameworkExit(),
-          "Default keepUntilFrameworkExit should be false");
+          config.isKeepUntilFrameworkExit(), "Default keepUntilFrameworkExit should be false");
     }
   }
 
