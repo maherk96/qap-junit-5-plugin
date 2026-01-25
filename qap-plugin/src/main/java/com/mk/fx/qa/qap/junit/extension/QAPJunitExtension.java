@@ -63,7 +63,7 @@ public class QAPJunitExtension
   public QAPJunitExtension() {
     ConcurrentHashMap<String, Throwable> sharedFailedInits = new ConcurrentHashMap<>();
     QAPRuntime rt = QAPRuntime.defaultRuntime();
-    IMethodInterceptor mi = new QAPJunitMethodInterceptor(sharedFailedInits);
+    QAPJunitMethodInterceptor mi = new QAPJunitMethodInterceptor(sharedFailedInits);
     ITestEventCreator tec = new QAPJunitTestEventsCreator();
     QAPLaunchIdGenerator gen = new QAPLaunchIdGenerator();
     this.runtime = Objects.requireNonNull(rt, "runtime");
@@ -120,8 +120,9 @@ public class QAPJunitExtension
     }
     StoreManager.putMethodStoreData(context, QAPUtils.METHOD_DESCRIPTION_KEY, qapTest);
 
-    // Start log capture for this test
-    startLogCapture(context);
+    // NOTE: We do NOT start log capture here anymore
+    // Log capture for the test execution will start in interceptTestMethod
+    // Log capture for beforeEach happens in the interceptor
   }
 
   @Override
@@ -129,8 +130,8 @@ public class QAPJunitExtension
     QAPTest qapTest =
         StoreManager.getMethodStoreData(context, QAPUtils.METHOD_DESCRIPTION_KEY, QAPTest.class);
 
-    // Stop log capture and attach logs to test
-    stopLogCaptureAndAttach(context, qapTest);
+    // Log capture is now handled in interceptors per-phase
+    // No need to stop/attach logs here
 
     StoreManager.addDescriptionToClassStore(context, qapTest);
   }
@@ -207,6 +208,15 @@ public class QAPJunitExtension
       ExtensionContext extensionContext)
       throws Throwable {
     methodInterceptor.interceptBeforeEachMethod(invocation, invocationContext, extensionContext);
+  }
+
+  @Override
+  public void interceptTestMethod(
+      Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      ExtensionContext extensionContext)
+      throws Throwable {
+    methodInterceptor.interceptTestMethod(invocation, invocationContext, extensionContext);
   }
 
   @Override
@@ -369,6 +379,9 @@ public class QAPJunitExtension
    */
   private void initializeLogCapture() {
     try {
+      // Initialize stack trace configuration from properties
+      initializeStackTraceConfig();
+
       // Create registry and discover available capturers
       logCapturerRegistry = new com.mk.fx.qa.qap.logging.core.QAPLogCapturerRegistry();
       logCapturerRegistry.discover();
@@ -383,6 +396,15 @@ public class QAPJunitExtension
             "✅ Log capture enabled: {} (priority: {})",
             logCapturer.getFrameworkName(),
             logCapturer.getPriority());
+
+        // Build config from properties
+        com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig config = buildLogCaptureConfig();
+
+        // Pass log capturer AND config to method interceptor for fixture log capture
+        if (methodInterceptor instanceof QAPJunitMethodInterceptor) {
+          ((QAPJunitMethodInterceptor) methodInterceptor).setLogCapturer(logCapturer);
+          ((QAPJunitMethodInterceptor) methodInterceptor).setLogCaptureConfig(config);
+        }
       } else {
         log.debug("No log capturer available - tests will run without log capture");
       }
@@ -390,6 +412,26 @@ public class QAPJunitExtension
       // Never fail tests due to logging issues
       log.warn("Failed to initialize log capture: {}", e.getMessage());
       logCapturer = null;
+    }
+  }
+
+  /**
+   * Initializes stack trace configuration from properties. Sets up the ExceptionFormatter with user
+   * preferences for stack trace capping.
+   */
+  private void initializeStackTraceConfig() {
+    try {
+      QAPPropertiesLoader propertiesLoader = runtime.getPropertiesLoader();
+      com.mk.fx.qa.qap.junit.model.StackTraceConfig stackTraceConfig =
+          com.mk.fx.qa.qap.junit.model.StackTraceConfig.fromProperties(propertiesLoader);
+      com.mk.fx.qa.qap.junit.util.ExceptionFormatter.setStackTraceConfig(stackTraceConfig);
+      log.debug(
+          "Stack trace config initialized: maxLines={}, headLines={}, tailLines={}",
+          stackTraceConfig.getMaxLines(),
+          stackTraceConfig.getHeadLines(),
+          stackTraceConfig.getTailLines());
+    } catch (Exception e) {
+      log.warn("Failed to initialize stack trace config, using defaults: {}", e.getMessage());
     }
   }
 
@@ -478,28 +520,18 @@ public class QAPJunitExtension
   }
 
   /**
-   * Stops log capture and attaches captured logs to the test. Called in afterEach before storing
-   * the test result.
+   * Stops log capture and attaches captured logs to the test root level only. The lifecycle.test
+   * logs are captured separately in interceptTestMethod.
+   *
+   * <p>NOTE: This method is no longer used for log capture since we now capture logs per-phase in
+   * the interceptors. Kept for potential future use or can be removed.
    *
    * @param context the test execution context
    * @param qapTest the test object to attach logs to
    */
+  @SuppressWarnings("unused")
   private void stopLogCaptureAndAttach(ExtensionContext context, QAPTest qapTest) {
-    if (logCapturer == null || qapTest == null) {
-      return;
-    }
-
-    try {
-      String testId = context.getUniqueId();
-      java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> logs =
-          logCapturer.stopCapture(testId);
-
-      if (logs != null && !logs.isEmpty()) {
-        qapTest.setLogEntries(logs);
-        log.debug("Captured {} log entries for test: {}", logs.size(), context.getDisplayName());
-      }
-    } catch (Exception e) {
-      log.warn("Failed to stop log capture for {}: {}", context.getDisplayName(), e.getMessage());
-    }
+    // No longer used - logs are captured per-phase in interceptors
+    // Kept for reference or can be removed in future cleanup
   }
 }

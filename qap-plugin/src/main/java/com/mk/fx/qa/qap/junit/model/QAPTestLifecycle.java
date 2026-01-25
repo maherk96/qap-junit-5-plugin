@@ -7,18 +7,19 @@ import java.util.List;
 import lombok.Data;
 
 /**
- * Represents the complete lifecycle execution for a test case, including all fixtures (beforeAll,
- * beforeEach, afterEach, afterAll) and test execution.
+ * Represents the test-case-level lifecycle execution, including per-test fixtures and test
+ * execution.
+ *
+ * <p>This does NOT include class-level fixtures (@BeforeAll/@AfterAll) - those are tracked at the
+ * test class level.
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class QAPTestLifecycle {
 
-  private List<QAPTestFixture> beforeAll = new ArrayList<>();
   private List<QAPTestFixture> beforeEach = new ArrayList<>();
   private TestExecution test;
   private List<QAPTestFixture> afterEach = new ArrayList<>();
-  private List<QAPTestFixture> afterAll = new ArrayList<>();
 
   @Data
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,6 +27,7 @@ public class QAPTestLifecycle {
     @JsonProperty("durationNanos")
     private Long durationNanos;
 
-    private String status;
+    private List<com.mk.fx.qa.qap.logging.core.QAPLogEntry>
+        logEntries; // Logs captured during test execution only (excludes fixtures)
   }
 }

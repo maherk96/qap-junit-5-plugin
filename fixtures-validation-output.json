@@ -1,0 +1,159 @@
+{
+  "header": {
+    "launchStartTime": 1769227525220,
+    "launchId": "TestLaunch-f24b153f4e07",
+    "applicationName": "TestApp-Demo",
+    "testEnvironment": "TEST",
+    "user": "test-user",
+    "gitBranch": null,
+    "launchEndTime": 1769227525253,
+    "osVersion": "Mac OS X 26.2",
+    "testRunnerVersion": "Junit 5.10.2",
+    "jdkVersion": "JDK 21.0.7",
+    "regression": false
+  },
+  "testClasses": [
+    {
+      "className": "PaymentProcessorTest",
+      "displayName": "Payment Processor Tests",
+      "testCases": [
+        {
+          "startTime": 1769227525238,
+          "endTime": 1769227525251,
+          "status": "PASSED",
+          "methodName": "testProcessCreditCardPayment",
+          "displayName": "Should process valid credit card payment",
+          "testCaseId": "PaymentProcessorTest#testProcessCreditCardPayment",
+          "methodDisplayName": "Should process valid credit card payment",
+          "parameters": [],
+          "parameterization": null,
+          "testType": "TEST",
+          "disabledReason": null,
+          "lifecycle": {
+            "beforeEach": [
+              {
+                "methodName": "setup",
+                "className": "PaymentProcessorTest",
+                "order": 1,
+                "status": "PASSED",
+                "durationNanos": 2075542,
+                "logEntries": [
+                  {
+                    "timestamp": 1769227525.241000000,
+                    "level": "INFO",
+                    "logger": "com.example.testapp.PaymentProcessorTest",
+                    "thread": "Test worker",
+                    "message": "Creating new payment processor instance",
+                    "mdc": {},
+                    "markers": []
+                  }
+                ]
+              }
+            ],
+            "test": {
+              "logEntries": [
+                {
+                  "timestamp": 1769227525.242000000,
+                  "level": "INFO",
+                  "logger": "com.example.testapp.PaymentProcessorTest",
+                  "thread": "Test worker",
+                  "message": "Testing credit card payment processing",
+                  "mdc": {},
+                  "markers": []
+                },
+                {
+                  "timestamp": 1769227525.248000000,
+                  "level": "INFO",
+                  "logger": "com.example.testapp.PaymentProcessorTest",
+                  "thread": "Test worker",
+                  "message": "Payment approved - Transaction ID: TXN-1000, Amount: $99.99",
+                  "mdc": {},
+                  "markers": []
+                }
+              ],
+              "durationNanos": 12323000
+            },
+            "afterEach": []
+          },
+          "failure": null,
+          "totalDurationNanos": 14398542,
+          "fix": [],
+          "tags": {
+            "class": [
+              "financial",
+              "payment"
+            ]
+          }
+        }
+      ],
+      "children": [],
+      "fixtures": [
+        {
+          "phase": "BEFORE_ALL",
+          "methodName": "setupClass",
+          "className": "com.example.testapp.PaymentProcessorTest",
+          "status": "PASSED",
+          "durationNanos": 6239458,
+          "logEntries": [
+            {
+              "timestamp": 1769227525.232000000,
+              "level": "INFO",
+              "logger": "com.example.testapp.PaymentProcessorTest",
+              "thread": "Test worker",
+              "message": "=== Starting Payment Processor Test Suite ===",
+              "mdc": {},
+              "markers": []
+            },
+            {
+              "timestamp": 1769227525.234000000,
+              "level": "INFO",
+              "logger": "com.example.testapp.PaymentProcessorTest",
+              "thread": "Test worker",
+              "message": "Initializing payment gateway connection",
+              "mdc": {},
+              "markers": []
+            }
+          ]
+        },
+        {
+          "phase": "AFTER_ALL",
+          "methodName": "teardownClass",
+          "className": "com.example.testapp.PaymentProcessorTest",
+          "status": "PASSED",
+          "durationNanos": 433959,
+          "logEntries": [
+            {
+              "timestamp": 1769227525.252000000,
+              "level": "INFO",
+              "logger": "com.example.testapp.PaymentProcessorTest",
+              "thread": "Test worker",
+              "message": "=== Payment Processor Test Suite Complete ===",
+              "mdc": {},
+              "markers": []
+            },
+            {
+              "timestamp": 1769227525.253000000,
+              "level": "INFO",
+              "logger": "com.example.testapp.PaymentProcessorTest",
+              "thread": "Test worker",
+              "message": "Closing payment gateway connection",
+              "mdc": {},
+              "markers": []
+            }
+          ]
+        }
+      ],
+      "classFqn": "com.example.testapp.PaymentProcessorTest",
+      "classSimpleName": "PaymentProcessorTest",
+      "parentChain": [
+        "Payment Processor Tests"
+      ],
+      "tags": {
+        "class": [
+          "financial",
+          "payment"
+        ]
+      }
+    }
+  ]
+}

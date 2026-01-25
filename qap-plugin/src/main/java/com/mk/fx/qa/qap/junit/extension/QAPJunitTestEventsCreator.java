@@ -158,7 +158,7 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
             .setTest(new com.mk.fx.qa.qap.junit.model.QAPTestLifecycle.TestExecution());
       }
       qapTest.getLifecycle().getTest().setDurationNanos(qapTest.getDurationNanos());
-      qapTest.getLifecycle().getTest().setStatus(status.name());
+      // Status is only at testCase level, not duplicated in lifecycle.test
     }
   }
 

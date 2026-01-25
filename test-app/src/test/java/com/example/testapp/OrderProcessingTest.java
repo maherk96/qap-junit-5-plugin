@@ -2,7 +2,6 @@ package com.example.testapp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.*;
@@ -181,7 +180,9 @@ class OrderProcessingTest {
     double totalPaid = orderService.getTotalPaid(order.getOrderId());
     assertEquals(100.00, totalPaid, 0.01);
 
-    logger.info("✓ Split payment processed successfully. Total paid: ${}", String.format("%.2f", totalPaid));
+    logger.info(
+        "✓ Split payment processed successfully. Total paid: ${}",
+        String.format("%.2f", totalPaid));
   }
 
   @Nested
@@ -423,8 +424,7 @@ class OrderProcessingTest {
 
     public double calculateTotal(String orderId) {
       Order order = getOrder(orderId);
-      double subtotal =
-          order.getItems().stream().mapToDouble(OrderItem::getTotal).sum();
+      double subtotal = order.getItems().stream().mapToDouble(OrderItem::getTotal).sum();
       return subtotal - order.getDiscount();
     }
 
@@ -433,8 +433,7 @@ class OrderProcessingTest {
         throw new IllegalArgumentException("Invalid discount code: " + code);
       }
       Order order = getOrder(orderId);
-      double subtotal =
-          order.getItems().stream().mapToDouble(OrderItem::getTotal).sum();
+      double subtotal = order.getItems().stream().mapToDouble(OrderItem::getTotal).sum();
       order.setDiscount(subtotal * 0.20);
       return true;
     }
@@ -456,7 +455,9 @@ class OrderProcessingTest {
     public double calculateShipping(String orderId) {
       Order order = getOrder(orderId);
       double totalWeight =
-          order.getItems().stream().mapToDouble(item -> item.getWeight() * item.getQuantity()).sum();
+          order.getItems().stream()
+              .mapToDouble(item -> item.getWeight() * item.getQuantity())
+              .sum();
       return Math.max(5.00, totalWeight * 2.0);
     }
 

@@ -355,6 +355,36 @@ class ExceptionFormatterTest {
     }
 
     @Test
+    @DisplayName("Should extract user-code location, not framework location")
+    void testUserCodeLocationExtraction() {
+      // Create exception from user test code
+      RuntimeException exception = createExceptionAtKnownLocation();
+      QAPFailure failure = ExceptionFormatter.toFailure(exception);
+
+      assertNotNull(failure);
+      QAPFailureLocation location = failure.getLocation();
+      assertNotNull(location, "Location should be extracted");
+
+      // Should point to user code (this test class), not JUnit internals
+      assertEquals(
+          "com.mk.fx.qa.qap.junit.util.ExceptionFormatterTest",
+          location.getClazz(),
+          "Should extract user-code class, not framework");
+      assertEquals(
+          "createExceptionAtKnownLocation",
+          location.getMethod(),
+          "Should extract user-code method");
+
+      // Should NOT be pointing to JUnit/framework classes
+      assertFalse(
+          location.getClazz().startsWith("org.junit."),
+          "Should skip JUnit framework classes");
+      assertFalse(
+          location.getClazz().startsWith("org.opentest4j."),
+          "Should skip OpenTest4J classes");
+    }
+
+    @Test
     @DisplayName("Should handle exception with empty stack trace")
     void testEmptyStackTrace() {
       RuntimeException exception = new RuntimeException("No stack trace");
@@ -381,6 +411,29 @@ class ExceptionFormatterTest {
       assertEquals("ExceptionFormatterTest.java", location.getFile());
       assertNotNull(location.getLine(), "Should have line number");
       assertTrue(location.getLine() > 0, "Line number should be positive");
+    }
+
+    @Test
+    @DisplayName("Should fallback to first frame if all frames are framework")
+    void testAllFrameworkFramesFallback() {
+      // Create exception with custom stack trace containing only framework frames
+      RuntimeException exception = new RuntimeException("Framework only");
+      StackTraceElement[] frameworkStack =
+          new StackTraceElement[] {
+            new StackTraceElement("org.junit.Assert", "fail", "Assert.java", 100),
+            new StackTraceElement("org.opentest4j.AssertionUtils", "fail", "AssertionUtils.java", 50)
+          };
+      exception.setStackTrace(frameworkStack);
+
+      QAPFailure failure = ExceptionFormatter.toFailure(exception);
+
+      assertNotNull(failure);
+      QAPFailureLocation location = failure.getLocation();
+      assertNotNull(location, "Should fallback to first frame");
+      assertEquals(
+          "org.junit.Assert",
+          location.getClazz(),
+          "Should use first frame when all are framework");
     }
   }
 
@@ -543,6 +596,211 @@ class ExceptionFormatterTest {
       assertNotNull(suppressedList);
       assertEquals(1, suppressedList.size());
       assertEquals("Cleanup also failed", suppressedList.get(0).getMessage());
+    }
+  }
+
+  @Nested
+  @DisplayName("Stack Trace Capping")
+  class StackTraceCapping {
+
+    @Test
+    @DisplayName("Should not cap stack trace when under limit")
+    void testNoCappingWhenUnderLimit() {
+      // Reset to high limit
+      com.mk.fx.qa.qap.junit.model.StackTraceConfig config =
+          com.mk.fx.qa.qap.junit.model.StackTraceConfig.builder()
+              .maxLines(1000)
+              .headLines(50)
+              .tailLines(20)
+              .keepUntilFrameworkExit(false)
+              .build();
+      ExceptionFormatter.setStackTraceConfig(config);
+
+      RuntimeException exception = new RuntimeException("Test error");
+      QAPFailure failure = ExceptionFormatter.toFailure(exception);
+
+      assertNotNull(failure);
+      List<String> stackTrace = failure.getStackTraceLines();
+      assertNotNull(stackTrace);
+      assertTrue(stackTrace.size() < 1000, "Stack trace should be under limit");
+
+      // Verify no "omitted" message
+      boolean hasOmitted = stackTrace.stream().anyMatch(line -> line.contains("omitted"));
+      assertFalse(hasOmitted, "Should not have 'omitted' message when under limit");
+    }
+
+    @Test
+    @DisplayName("Should cap stack trace using head+tail strategy")
+    void testHeadTailCapping() {
+      // Configure small limits
+      com.mk.fx.qa.qap.junit.model.StackTraceConfig config =
+          com.mk.fx.qa.qap.junit.model.StackTraceConfig.builder()
+              .maxLines(15)
+              .headLines(5)
+              .tailLines(5)
+              .keepUntilFrameworkExit(false)
+              .build();
+      ExceptionFormatter.setStackTraceConfig(config);
+
+      // Create exception with deep stack
+      RuntimeException exception = createDeepStackException();
+      QAPFailure failure = ExceptionFormatter.toFailure(exception);
+
+      assertNotNull(failure);
+      List<String> stackTrace = failure.getStackTraceLines();
+      assertNotNull(stackTrace);
+
+      // Should be capped: 5 head + 1 separator + 5 tail = 11 lines
+      assertTrue(
+          stackTrace.size() <= 15, "Stack trace should be capped to configured max: " + stackTrace.size());
+
+      // Should contain omitted message
+      boolean hasOmitted = stackTrace.stream().anyMatch(line -> line.contains("omitted"));
+      assertTrue(hasOmitted, "Should have '... N more lines omitted ...' separator");
+
+      // First lines should be from the top of the stack
+      assertTrue(
+          stackTrace.get(0).contains("RuntimeException"),
+          "First line should be exception type");
+
+      // Last lines should be from the bottom of the stack
+      String lastLine = stackTrace.get(stackTrace.size() - 1);
+      assertTrue(
+          lastLine.contains("at ") || lastLine.isEmpty(),
+          "Last line should be a stack frame");
+    }
+
+    @Test
+    @DisplayName("Should support unlimited stack trace with maxLines=-1")
+    void testUnlimitedStackTrace() {
+      com.mk.fx.qa.qap.junit.model.StackTraceConfig config =
+          com.mk.fx.qa.qap.junit.model.StackTraceConfig.builder()
+              .maxLines(-1) // Unlimited
+              .headLines(50)
+              .tailLines(20)
+              .keepUntilFrameworkExit(false)
+              .build();
+      ExceptionFormatter.setStackTraceConfig(config);
+
+      RuntimeException exception = createDeepStackException();
+      QAPFailure failure = ExceptionFormatter.toFailure(exception);
+
+      assertNotNull(failure);
+      List<String> stackTrace = failure.getStackTraceLines();
+      assertNotNull(stackTrace);
+
+      // Should NOT be capped
+      boolean hasOmitted = stackTrace.stream().anyMatch(line -> line.contains("omitted"));
+      assertFalse(hasOmitted, "Unlimited stack trace should not have 'omitted' message");
+    }
+
+    @Test
+    @DisplayName("Should cap using 'keep until framework exit' strategy")
+    void testKeepUntilFrameworkExitStrategy() {
+      com.mk.fx.qa.qap.junit.model.StackTraceConfig config =
+          com.mk.fx.qa.qap.junit.model.StackTraceConfig.builder()
+              .maxLines(100)
+              .headLines(50)
+              .tailLines(20)
+              .keepUntilFrameworkExit(true) // ← Use this strategy
+              .build();
+      ExceptionFormatter.setStackTraceConfig(config);
+
+      RuntimeException exception = createDeepStackException();
+      QAPFailure failure = ExceptionFormatter.toFailure(exception);
+
+      assertNotNull(failure);
+      List<String> stackTrace = failure.getStackTraceLines();
+      assertNotNull(stackTrace);
+
+      // Should contain at least some frames
+      assertTrue(stackTrace.size() > 0, "Should have at least some stack trace lines");
+
+      // When using keepUntilFrameworkExit, the trace should be reasonably sized
+      // (stops when hitting framework again after user code)
+      assertTrue(
+          stackTrace.size() <= 100,
+          "Stack trace should be capped with framework exit strategy: " + stackTrace.size());
+    }
+
+    @Test
+    @DisplayName("Should handle very short maxLines gracefully")
+    void testVeryShortMaxLines() {
+      com.mk.fx.qa.qap.junit.model.StackTraceConfig config =
+          com.mk.fx.qa.qap.junit.model.StackTraceConfig.builder()
+              .maxLines(5)
+              .headLines(2)
+              .tailLines(2)
+              .keepUntilFrameworkExit(false)
+              .build();
+      ExceptionFormatter.setStackTraceConfig(config);
+
+      RuntimeException exception = createDeepStackException();
+      QAPFailure failure = ExceptionFormatter.toFailure(exception);
+
+      assertNotNull(failure);
+      List<String> stackTrace = failure.getStackTraceLines();
+      assertNotNull(stackTrace);
+      assertTrue(stackTrace.size() <= 5, "Should respect very short maxLines");
+    }
+
+    @Test
+    @DisplayName("Should include separator with omitted line count")
+    void testSeparatorIncludesCount() {
+      com.mk.fx.qa.qap.junit.model.StackTraceConfig config =
+          com.mk.fx.qa.qap.junit.model.StackTraceConfig.builder()
+              .maxLines(20)
+              .headLines(8)
+              .tailLines(8)
+              .keepUntilFrameworkExit(false)
+              .build();
+      ExceptionFormatter.setStackTraceConfig(config);
+
+      RuntimeException exception = createDeepStackException();
+      QAPFailure failure = ExceptionFormatter.toFailure(exception);
+
+      assertNotNull(failure);
+      List<String> stackTrace = failure.getStackTraceLines();
+
+      // Find separator line
+      String separator =
+          stackTrace.stream()
+              .filter(line -> line.contains("omitted"))
+              .findFirst()
+              .orElse(null);
+
+      if (separator != null) {
+        // Should contain a number
+        assertTrue(separator.matches(".*\\d+.*"), "Separator should include omitted line count");
+        assertTrue(
+            separator.contains("more lines omitted"),
+            "Separator should have descriptive text");
+      }
+    }
+
+    // Helper to create exception with deep stack
+    private RuntimeException createDeepStackException() {
+      return level1();
+    }
+
+    private RuntimeException level1() {
+      return level2();
+    }
+
+    private RuntimeException level2() {
+      return level3();
+    }
+
+    private RuntimeException level3() {
+      return level4();
+    }
+
+    private RuntimeException level4() {
+      return level5();
+    }
+
+    private RuntimeException level5() {
+      return new RuntimeException("Deep stack exception");
     }
   }
 

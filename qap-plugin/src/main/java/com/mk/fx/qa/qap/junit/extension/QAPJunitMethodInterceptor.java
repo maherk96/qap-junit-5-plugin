@@ -43,8 +43,30 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
    */
   private final Map<String, Throwable> failedInits;
 
+  /** Optional log capturer for capturing logs during fixture execution. */
+  private volatile com.mk.fx.qa.qap.logging.core.QAPLogCapturer logCapturer;
+
+  /** Log capture configuration from qap.properties. */
+  private volatile com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig logCaptureConfig;
+
   public QAPJunitMethodInterceptor(Map<String, Throwable> failedInits) {
     this.failedInits = failedInits;
+  }
+
+  /**
+   * Sets the log capturer for capturing logs during fixtures. Called after initialization if
+   * logging is available.
+   */
+  public void setLogCapturer(com.mk.fx.qa.qap.logging.core.QAPLogCapturer logCapturer) {
+    this.logCapturer = logCapturer;
+  }
+
+  /**
+   * Sets the log capture configuration from qap.properties. This ensures fixtures use the same log
+   * level and filters as test execution.
+   */
+  public void setLogCaptureConfig(com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig config) {
+    this.logCaptureConfig = config;
   }
 
   @Override
@@ -108,6 +130,38 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     invocation.proceed();
   }
 
+  @Override
+  public void interceptTestMethod(
+      InvocationInterceptor.Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      ExtensionContext extensionContext)
+      throws Throwable {
+    // Start log capture for the actual test method execution
+    String testId = extensionContext.getUniqueId();
+    startFixtureLogCapture(testId);
+
+    try {
+      invocation.proceed();
+    } finally {
+      // Stop log capture and attach to test execution in lifecycle
+      java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> testLogs =
+          stopFixtureLogCapture(testId);
+
+      QAPTest qapTest =
+          StoreManager.getMethodStoreData(extensionContext, METHOD_DESCRIPTION_KEY, QAPTest.class);
+      if (qapTest != null && qapTest.getLifecycle() != null) {
+        // Ensure TestExecution object exists
+        if (qapTest.getLifecycle().getTest() == null) {
+          qapTest
+              .getLifecycle()
+              .setTest(new com.mk.fx.qa.qap.junit.model.QAPTestLifecycle.TestExecution());
+        }
+        // Attach test-only logs (not including beforeEach/afterEach)
+        qapTest.getLifecycle().getTest().setLogEntries(testLogs);
+      }
+    }
+  }
+
   /**
    * Extracts the parameterization provider name from method annotations. Checks for common JUnit 5
    * parameterization annotations.
@@ -162,6 +216,13 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     classStore.put(FIXTURE_START_TIME_KEY, startTime);
     classStore.put(FIXTURE_START_TIME_NANOS_KEY, startTimeNanos);
 
+    // Get the fixture method for metadata
+    Method fixtureMethod = (Method) invocationContext.getExecutable();
+
+    // Start log capture for this fixture
+    String fixtureId = extensionContext.getUniqueId() + ":beforeAll:" + fixtureMethod.getName();
+    startFixtureLogCapture(fixtureId);
+
     Throwable failure = null;
     try {
       invocation.proceed();
@@ -175,20 +236,22 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
       long durationMillis = endTime - startTime;
       long durationNanos = endTimeNanos - startTimeNanos;
 
+      // Stop log capture and get logs
+      java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> logs =
+          stopFixtureLogCapture(fixtureId);
+
       QAPFailure qapFailure = failure != null ? ExceptionFormatter.toFailure(failure) : null;
 
-      // Get the fixture method from the invocation context
-      Method fixtureMethod = (Method) invocationContext.getExecutable();
-
-      // beforeAll is class-level, so we record it at class level
-      // (it will be added to all tests in the class when they're created)
+      // Create class-level fixture with full metadata
       QAPFixture fixture =
           new QAPFixture(
               "BEFORE_ALL",
+              fixtureMethod.getName(),
+              fixtureMethod.getDeclaringClass().getName(), // Fully qualified
               failure != null ? "FAILED" : "PASSED",
-              durationMillis,
               durationNanos,
-              qapFailure);
+              qapFailure,
+              logs);
       addFixtureToClass(extensionContext, fixture, fixtureMethod);
     }
   }
@@ -204,6 +267,10 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     var methodStore = StoreManager.getMethodStore(extensionContext);
     methodStore.put(FIXTURE_START_TIME_KEY, startTime);
     methodStore.put(FIXTURE_START_TIME_NANOS_KEY, startTimeNanos);
+
+    // Start log capture for this fixture
+    String fixtureId = extensionContext.getUniqueId() + ":beforeEach:" + System.nanoTime();
+    startFixtureLogCapture(fixtureId);
 
     Throwable failure = null;
     try {
@@ -224,6 +291,10 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
       long durationMillis = endTime - startTime;
       long durationNanos = endTimeNanos - startTimeNanos;
 
+      // Stop log capture and get logs
+      java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> logs =
+          stopFixtureLogCapture(fixtureId);
+
       QAPFailure qapFailure = failure != null ? ExceptionFormatter.toFailure(failure) : null;
 
       // Get the fixture method from the invocation context
@@ -236,7 +307,8 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
           fixtureMethod,
           failure != null ? "FAILED" : "PASSED",
           durationNanos,
-          qapFailure);
+          qapFailure,
+          logs);
     }
   }
 
@@ -248,6 +320,10 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
       throws Throwable {
     long startTime = System.currentTimeMillis();
     long startTimeNanos = System.nanoTime();
+
+    // Start log capture for this fixture
+    String fixtureId = extensionContext.getUniqueId() + ":afterEach:" + System.nanoTime();
+    startFixtureLogCapture(fixtureId);
 
     Throwable failure = null;
     try {
@@ -261,6 +337,10 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
       long durationMillis = endTime - startTime;
       long durationNanos = endTimeNanos - startTimeNanos;
 
+      // Stop log capture and get logs
+      java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> logs =
+          stopFixtureLogCapture(fixtureId);
+
       QAPFailure qapFailure = failure != null ? ExceptionFormatter.toFailure(failure) : null;
 
       // Get the fixture method from the invocation context
@@ -273,7 +353,8 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
           fixtureMethod,
           failure != null ? "FAILED" : "PASSED",
           durationNanos,
-          qapFailure);
+          qapFailure,
+          logs);
     }
   }
 
@@ -289,6 +370,13 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     classStore.put(FIXTURE_START_TIME_KEY, startTime);
     classStore.put(FIXTURE_START_TIME_NANOS_KEY, startTimeNanos);
 
+    // Get the fixture method for metadata
+    Method fixtureMethod = (Method) invocationContext.getExecutable();
+
+    // Start log capture for this fixture
+    String fixtureId = extensionContext.getUniqueId() + ":afterAll:" + fixtureMethod.getName();
+    startFixtureLogCapture(fixtureId);
+
     Throwable failure = null;
     try {
       invocation.proceed();
@@ -301,19 +389,22 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
       long durationMillis = endTime - startTime;
       long durationNanos = endTimeNanos - startTimeNanos;
 
+      // Stop log capture and get logs
+      java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> logs =
+          stopFixtureLogCapture(fixtureId);
+
       QAPFailure qapFailure = failure != null ? ExceptionFormatter.toFailure(failure) : null;
 
-      // Get the fixture method from the invocation context
-      Method fixtureMethod = (Method) invocationContext.getExecutable();
-
-      // afterAll is class-level, so we record it at class level
+      // Create class-level fixture with full metadata
       QAPFixture fixture =
           new QAPFixture(
               "AFTER_ALL",
+              fixtureMethod.getName(),
+              fixtureMethod.getDeclaringClass().getName(), // Fully qualified
               failure != null ? "FAILED" : "PASSED",
-              durationMillis,
               durationNanos,
-              qapFailure);
+              qapFailure,
+              logs);
       addFixtureToClass(extensionContext, fixture, fixtureMethod);
 
       // Clean up failed init tracking for this context to prevent memory leak
@@ -324,6 +415,9 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
   /**
    * Adds a fixture to the current test case's lifecycle. This links fixtures directly to the test
    * that was running when they executed.
+   *
+   * <p>NOTE: This is only for @BeforeEach and @AfterEach fixtures. @BeforeAll and @AfterAll are
+   * class-level and handled by addFixtureToClass.
    */
   private void addFixtureToTest(
       ExtensionContext context,
@@ -331,15 +425,13 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
       Method fixtureMethod,
       String status,
       long durationNanos,
-      QAPFailure error) {
+      QAPFailure error,
+      java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> logs) {
     // Get the current test case from method store
     QAPTest qapTest =
         StoreManager.getMethodStoreData(context, METHOD_DESCRIPTION_KEY, QAPTest.class);
     if (qapTest == null) {
-      // No test case available (e.g., beforeAll/afterAll at class level)
-      // Fall back to class-level recording
-      QAPFixture fixture = new QAPFixture(phase, status, 0L, durationNanos, error);
-      addFixtureToClass(context, fixture, fixtureMethod);
+      // No test case available - shouldn't happen for beforeEach/afterEach
       return;
     }
 
@@ -350,7 +442,7 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
 
     // Create test fixture with method and class information
     String methodName = fixtureMethod.getName();
-    String className = fixtureMethod.getDeclaringClass().getSimpleName();
+    String className = fixtureMethod.getDeclaringClass().getName(); // ✅ Use FQN for consistency
 
     // Determine order based on current list size
     int order;
@@ -361,20 +453,26 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     } else if ("AFTER_EACH".equals(phase)) {
       targetList = qapTest.getLifecycle().getAfterEach();
       order = targetList.size() + 1;
-    } else if ("BEFORE_ALL".equals(phase)) {
-      targetList = qapTest.getLifecycle().getBeforeAll();
-      order = targetList.size() + 1;
-    } else if ("AFTER_ALL".equals(phase)) {
-      targetList = qapTest.getLifecycle().getAfterAll();
-      order = targetList.size() + 1;
     } else {
-      return; // Unknown phase
+      // Invalid phase for test-level fixtures
+      return;
     }
 
     com.mk.fx.qa.qap.junit.model.QAPTestFixture testFixture =
         new com.mk.fx.qa.qap.junit.model.QAPTestFixture(
-            methodName, className, order, status, durationNanos, error);
+            methodName, className, order, status, durationNanos, error, logs);
     targetList.add(testFixture);
+  }
+
+  /** Legacy method for backwards compatibility (without logs). */
+  private void addFixtureToTest(
+      ExtensionContext context,
+      String phase,
+      Method fixtureMethod,
+      String status,
+      long durationNanos,
+      QAPFailure error) {
+    addFixtureToTest(context, phase, fixtureMethod, status, durationNanos, error, null);
   }
 
   /**
@@ -418,5 +516,46 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     testClassNode.getFixtures().add(fixture);
     nodes.put(testClassKey, testClassNode);
     classStore.put(CLASS_NODES_KEY, nodes);
+  }
+
+  // ---- Log Capture Helpers -----------------------------------------------
+
+  /**
+   * Starts log capture for a fixture execution. Creates a unique capture ID to isolate fixture
+   * logs. Uses the same configuration as test execution (from qap.properties).
+   */
+  private void startFixtureLogCapture(String fixtureId) {
+    if (logCapturer == null) {
+      return; // No capturer available
+    }
+
+    try {
+      // Use configured log level from qap.properties, or default if not set
+      com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig config =
+          (logCaptureConfig != null)
+              ? logCaptureConfig
+              : com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig.defaultConfig();
+      logCapturer.startCapture(fixtureId, config);
+    } catch (Exception e) {
+      // Never fail tests due to logging issues - just skip capture
+    }
+  }
+
+  /**
+   * Stops log capture for a fixture and returns captured logs. Returns null if capture was not
+   * started or failed.
+   */
+  private java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> stopFixtureLogCapture(
+      String fixtureId) {
+    if (logCapturer == null) {
+      return null;
+    }
+
+    try {
+      return logCapturer.stopCapture(fixtureId);
+    } catch (Exception e) {
+      // Never fail tests due to logging issues
+      return null;
+    }
   }
 }

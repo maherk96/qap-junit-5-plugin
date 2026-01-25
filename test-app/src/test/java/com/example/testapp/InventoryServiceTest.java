@@ -83,7 +83,11 @@ class InventoryServiceTest {
 
     assertTrue(reserved);
     assertEquals(originalStock - reserveQty, inventoryService.getStock(sku));
-    logger.info("Reserved {} units of {}, remaining stock: {}", reserveQty, sku, originalStock - reserveQty);
+    logger.info(
+        "Reserved {} units of {}, remaining stock: {}",
+        reserveQty,
+        sku,
+        originalStock - reserveQty);
   }
 
   @Test
@@ -118,7 +122,9 @@ class InventoryServiceTest {
 
     assertFalse(lowStockItems.isEmpty());
     logger.warn("Found {} items with low stock", lowStockItems.size());
-    lowStockItems.forEach(sku -> logger.warn("Low stock alert: {} has {} units", sku, inventoryService.getStock(sku)));
+    lowStockItems.forEach(
+        sku ->
+            logger.warn("Low stock alert: {} has {} units", sku, inventoryService.getStock(sku)));
   }
 
   @Test
@@ -283,9 +289,7 @@ class InventoryServiceTest {
     }
 
     public double calculateTotalValue() {
-      return inventory.values().stream()
-          .mapToDouble(p -> p.getQuantity() * p.getPrice())
-          .sum();
+      return inventory.values().stream().mapToDouble(p -> p.getQuantity() * p.getPrice()).sum();
     }
 
     public int bulkUpdateStock(Map<String, Integer> updates) {
@@ -305,8 +309,10 @@ class InventoryServiceTest {
       StringBuilder report = new StringBuilder("INVENTORY REPORT\n");
       report.append("================\n");
       for (Product p : inventory.values()) {
-        report
-            .append(String.format("%s - %s: %d units @ $%.2f\n", p.getSku(), p.getName(), p.getQuantity(), p.getPrice()));
+        report.append(
+            String.format(
+                "%s - %s: %d units @ $%.2f\n",
+                p.getSku(), p.getName(), p.getQuantity(), p.getPrice()));
       }
       return report.toString();
     }

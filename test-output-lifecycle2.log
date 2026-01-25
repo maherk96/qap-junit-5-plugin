@@ -1,0 +1,53 @@
+> Task :qap-logging-core:compileJava
+> Task :qap-logging-core:processResources
+> Task :qap-logging-core:classes
+> Task :qap-logging-core:jar
+
+> Task :qap-logging-log4j2:compileJava
+warning: unknown enum constant Include.NON_NULL
+  reason: class file for com.fasterxml.jackson.annotation.JsonInclude$Include not found
+1 warning
+
+> Task :qap-logging-log4j2:processResources
+> Task :qap-logging-log4j2:classes
+> Task :qap-logging-log4j2:jar
+> Task :qap-plugin:compileJava
+> Task :qap-plugin:processResources NO-SOURCE
+> Task :qap-plugin:classes
+> Task :qap-plugin:jar
+> Task :test-app:compileJava NO-SOURCE
+> Task :test-app:processResources NO-SOURCE
+> Task :test-app:classes UP-TO-DATE
+> Task :test-app:compileTestJava
+> Task :test-app:processTestResources
+> Task :test-app:testClasses
+
+> Task :test-app:test
+
+Payment Processor Tests STANDARD_OUT
+    03:35:10.621 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - === Starting Payment Processor Test Suite ===
+    03:35:10.626 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - Initializing payment gateway connection
+
+Payment Processor Tests > Should process valid credit card payment STANDARD_OUT
+    03:35:10.633 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - Creating new payment processor instance
+    03:35:10.634 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - Testing credit card payment processing
+    03:35:10.638 [Test worker] DEBUG com.example.testapp.PaymentProcessorTest - Processing payment - Card: ****9012, Amount: $99.99
+    03:35:10.640 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - Payment approved - Transaction ID: TXN-1000, Amount: $99.99
+
+Payment Processor Tests > Should process valid credit card payment PASSED
+
+Payment Processor Tests STANDARD_OUT
+    03:35:10.643 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - === Payment Processor Test Suite Complete ===
+    03:35:10.644 [Test worker] INFO  com.example.testapp.PaymentProcessorTest - Closing payment gateway connection
+    {"header":{"launchStartTime":1769225710613,"launchId":"TestLaunch-fc065827c34b","applicationName":"TestApp-Demo","testEnvironment":"TEST","user":"test-user","gitBranch":null,"launchEndTime":1769225710644,"osVersion":"Mac OS X 26.2","testRunnerVersion":"Junit 5.10.2","jdkVersion":"JDK 21.0.7","regression":false},"testClasses":[{"className":"PaymentProcessorTest","displayName":"Payment Processor Tests","testCases":[{"startTime":1769225710631,"endTime":1769225710642,"status":"PASSED","methodName":"testProcessCreditCardPayment","displayName":"Should process valid credit card payment","testCaseId":"PaymentProcessorTest#testProcessCreditCardPayment","methodDisplayName":"Should process valid credit card payment","parameters":[],"parameterization":null,"testType":"TEST","disabledReason":null,"lifecycle":{"beforeAll":[],"beforeEach":[{"methodName":"setup","className":"PaymentProcessorTest","order":1,"status":"PASSED","durationNanos":1902625,"logEntries":[{"timestamp":1769225710.633000000,"level":"INFO","logger":"com.example.testapp.PaymentProcessorTest","thread":"Test worker","message":"Creating new payment processor instance","mdc":{},"markers":[]}]}],"test":{"status":"PASSED","durationNanos":11362792},"afterEach":[],"afterAll":[]},"logEntries":[{"timestamp":1769225710.633000000,"level":"INFO","logger":"com.example.testapp.PaymentProcessorTest","thread":"Test worker","message":"Creating new payment processor instance","mdc":{},"markers":[]},{"timestamp":1769225710.634000000,"level":"INFO","logger":"com.example.testapp.PaymentProcessorTest","thread":"Test worker","message":"Testing credit card payment processing","mdc":{},"markers":[]},{"timestamp":1769225710.638000000,"level":"DEBUG","logger":"com.example.testapp.PaymentProcessorTest","thread":"Test worker","message":"Processing payment - Card: ****9012, Amount: $99.99","mdc":{},"markers":[]},{"timestamp":1769225710.640000000,"level":"INFO","logger":"com.example.testapp.PaymentProcessorTest","thread":"Test worker","message":"Payment approved - Transaction ID: TXN-1000, Amount: $99.99","mdc":{},"markers":[]}],"logs":[],"failure":null,"totalDurationNanos":13265417,"testOnlyDurationNanos":11362792,"durationMillis":11,"hasFailure":false,"fix":[],"durationNanos":11362792,"tags":{"class":["financial","payment"]}}],"children":[],"fixtures":[{"phase":"BEFORE_ALL","status":"PASSED","durationMillis":8,"durationNanos":7960042},{"phase":"AFTER_ALL","status":"PASSED","durationMillis":1,"durationNanos":366958}],"classFqn":"com.example.testapp.PaymentProcessorTest","classSimpleName":"PaymentProcessorTest","parentChain":["Payment Processor Tests"],"tags":{"class":["financial","payment"]}}]}
+
+[Incubating] Problems report is available at: file:///Users/maherkarim/Dev/qap-junit-5-plugin/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1s
+11 actionable tasks: 11 executed
