@@ -2,6 +2,7 @@ package com.mk.fx.qa.qap.junit.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Properties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -107,25 +108,20 @@ class StackTraceConfigTest {
     @Test
     @DisplayName("Should create config from properties loader with all values set")
     void testFromPropertiesWithAllValues() {
-      // Create mock properties loader
+      // Create a properties file with custom values
+      Properties props = new Properties();
+      props.setProperty("qap.stacktrace.max.lines", "150");
+      props.setProperty("qap.stacktrace.head.lines", "40");
+      props.setProperty("qap.stacktrace.tail.lines", "15");
+      props.setProperty("qap.stacktrace.keep.until.framework.exit", "true");
+
+      // Save to a temp file and load via QAPPropertiesLoader
+      // For test purposes, we'll create a loader that uses these properties
       QAPPropertiesLoader mockLoader =
           new QAPPropertiesLoader() {
             @Override
-            public int getIntProperty(String key, int defaultValue) {
-              return switch (key) {
-                case "qap.stacktrace.max.lines" -> 150;
-                case "qap.stacktrace.head.lines" -> 40;
-                case "qap.stacktrace.tail.lines" -> 15;
-                default -> defaultValue;
-              };
-            }
-
-            @Override
-            public boolean getBooleanProperty(String key, boolean defaultValue) {
-              if ("qap.stacktrace.keep.until.framework.exit".equals(key)) {
-                return true;
-              }
-              return defaultValue;
+            public Properties loadQAPAttributes() {
+              return props;
             }
           };
 
@@ -169,14 +165,14 @@ class StackTraceConfigTest {
     @Test
     @DisplayName("Should handle partial property configuration")
     void testFromPropertiesWithPartialValues() {
+      Properties props = new Properties();
+      props.setProperty("qap.stacktrace.max.lines", "100"); // Only this is set
+
       QAPPropertiesLoader partialLoader =
           new QAPPropertiesLoader() {
             @Override
-            public int getIntProperty(String key, int defaultValue) {
-              if ("qap.stacktrace.max.lines".equals(key)) {
-                return 100; // Only this is set
-              }
-              return defaultValue; // Others use defaults
+            public Properties loadQAPAttributes() {
+              return props;
             }
           };
 
@@ -192,14 +188,14 @@ class StackTraceConfigTest {
     @Test
     @DisplayName("Should support unlimited via properties")
     void testUnlimitedViaProperties() {
+      Properties props = new Properties();
+      props.setProperty("qap.stacktrace.max.lines", "-1"); // Unlimited
+
       QAPPropertiesLoader unlimitedLoader =
           new QAPPropertiesLoader() {
             @Override
-            public int getIntProperty(String key, int defaultValue) {
-              if ("qap.stacktrace.max.lines".equals(key)) {
-                return -1; // Unlimited
-              }
-              return defaultValue;
+            public Properties loadQAPAttributes() {
+              return props;
             }
           };
 

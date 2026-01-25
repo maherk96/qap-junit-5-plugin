@@ -43,7 +43,7 @@ public class StackTraceConfig {
   }
 
   /**
-   * Creates configuration from properties loader.
+   * Creates configuration from properties loader using pre-loaded values.
    *
    * @param loader properties loader with qap.properties values
    * @return StackTraceConfig based on properties or defaults
@@ -54,11 +54,10 @@ public class StackTraceConfig {
     }
 
     return StackTraceConfig.builder()
-        .maxLines(loader.getIntProperty("qap.stacktrace.max.lines", 200))
-        .headLines(loader.getIntProperty("qap.stacktrace.head.lines", 50))
-        .tailLines(loader.getIntProperty("qap.stacktrace.tail.lines", 20))
-        .keepUntilFrameworkExit(
-            loader.getBooleanProperty("qap.stacktrace.keep.until.framework.exit", false))
+        .maxLines(loader.getStackTraceMaxLines())
+        .headLines(loader.getStackTraceHeadLines())
+        .tailLines(loader.getStackTraceTailLines())
+        .keepUntilFrameworkExit(loader.isStackTraceKeepUntilFrameworkExit())
         .build();
   }
 }
