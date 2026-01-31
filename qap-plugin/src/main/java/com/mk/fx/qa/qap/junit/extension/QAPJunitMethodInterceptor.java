@@ -16,6 +16,7 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
@@ -36,6 +37,13 @@ import org.junit.jupiter.params.provider.ValueSource;
  * execution safely.
  */
 public class QAPJunitMethodInterceptor implements IMethodInterceptor {
+
+  /**
+   * Pattern for detecting synthetic parameter names (arg0, arg1, etc.) generated when the
+   * -parameters compiler flag is not used.
+   */
+  private static final Pattern SYNTHETIC_PARAM_PATTERN = Pattern.compile("arg\\d+");
+
   /**
    * Thread-safe map tracking failed initialization methods across test execution. Keys are
    * extension context unique IDs, values are the exceptions thrown. Must be periodically cleaned to
@@ -43,10 +51,16 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
    */
   private final Map<String, Throwable> failedInits;
 
-  /** Optional log capturer for capturing logs during fixture execution. */
+  /**
+   * Optional log capturer for capturing logs during fixture execution. Volatile ensures visibility
+   * across threads. Null-safe with fallback to defaultConfig() if not set.
+   */
   private volatile com.mk.fx.qa.qap.logging.core.QAPLogCapturer logCapturer;
 
-  /** Log capture configuration from qap.properties. */
+  /**
+   * Log capture configuration from qap.properties. Volatile ensures visibility across threads.
+   * Null-safe with fallback to defaultConfig() if not set.
+   */
   private volatile com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig logCaptureConfig;
 
   public QAPJunitMethodInterceptor(Map<String, Throwable> failedInits) {
@@ -79,6 +93,12 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     var qapTest =
         StoreManager.getMethodStoreData(extensionContext, METHOD_DESCRIPTION_KEY, QAPTest.class);
 
+    // Defensive null check - proceed if qapTest is null (shouldn't happen, but safe)
+    if (qapTest == null) {
+      invocation.proceed();
+      return;
+    }
+
     Method method = extensionContext.getRequiredTestMethod();
     Parameter[] parameters = method.getParameters();
 
@@ -93,10 +113,8 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
       if (i < parameters.length) {
         Parameter param = parameters[i];
         paramName = param.getName();
-        // If parameter name is synthetic (arg0, arg1, etc.), it means debug info is not available
-        // Check if it's a synthetic name by checking if it matches the pattern arg\d+
-        if (paramName != null && paramName.matches("arg\\d+")) {
-          // Synthetic name - debug info not available, set to null
+        // Use compiled pattern to check if name is synthetic
+        if (paramName != null && SYNTHETIC_PARAM_PATTERN.matcher(paramName).matches()) {
           paramName = null;
         }
       }
@@ -127,7 +145,18 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     String id =
         nestedPath + "#" + extensionContext.getRequiredTestMethod().getName() + "[" + index + "]";
     qapTest.setTestCaseId(id);
-    invocation.proceed();
+
+    // Capture logs for parameterized test execution
+    String testId = extensionContext.getUniqueId();
+    startFixtureLogCapture(testId);
+
+    try {
+      invocation.proceed();
+    } finally {
+      java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> testLogs =
+          stopFixtureLogCapture(testId);
+      attachLogsToTest(extensionContext, testLogs);
+    }
   }
 
   @Override
@@ -136,30 +165,44 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
       ReflectiveInvocationContext<Method> invocationContext,
       ExtensionContext extensionContext)
       throws Throwable {
-    // Start log capture for the actual test method execution
+    // Capture logs for the actual test method execution
     String testId = extensionContext.getUniqueId();
     startFixtureLogCapture(testId);
 
     try {
       invocation.proceed();
     } finally {
-      // Stop log capture and attach to test execution in lifecycle
       java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> testLogs =
           stopFixtureLogCapture(testId);
-
-      QAPTest qapTest =
-          StoreManager.getMethodStoreData(extensionContext, METHOD_DESCRIPTION_KEY, QAPTest.class);
-      if (qapTest != null && qapTest.getLifecycle() != null) {
-        // Ensure TestExecution object exists
-        if (qapTest.getLifecycle().getTest() == null) {
-          qapTest
-              .getLifecycle()
-              .setTest(new com.mk.fx.qa.qap.junit.model.QAPTestLifecycle.TestExecution());
-        }
-        // Attach test-only logs (not including beforeEach/afterEach)
-        qapTest.getLifecycle().getTest().setLogEntries(testLogs);
-      }
+      attachLogsToTest(extensionContext, testLogs);
     }
+  }
+
+  /**
+   * Attaches captured logs to the test's lifecycle execution. Ensures the test execution object
+   * exists before attaching logs. Null-safe - handles missing test or lifecycle gracefully.
+   *
+   * @param context the extension context for the test
+   * @param logs the captured log entries (may be null)
+   */
+  private void attachLogsToTest(
+      ExtensionContext context, java.util.List<com.mk.fx.qa.qap.logging.core.QAPLogEntry> logs) {
+    QAPTest qapTest =
+        StoreManager.getMethodStoreData(context, METHOD_DESCRIPTION_KEY, QAPTest.class);
+
+    if (qapTest == null || qapTest.getLifecycle() == null) {
+      return; // Nothing to attach to
+    }
+
+    // Ensure TestExecution object exists
+    if (qapTest.getLifecycle().getTest() == null) {
+      qapTest
+          .getLifecycle()
+          .setTest(new com.mk.fx.qa.qap.junit.model.QAPTestLifecycle.TestExecution());
+    }
+
+    // Attach test-only logs (not including beforeEach/afterEach)
+    qapTest.getLifecycle().getTest().setLogEntries(logs);
   }
 
   /**
@@ -233,7 +276,6 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     } finally {
       long endTime = System.currentTimeMillis();
       long endTimeNanos = System.nanoTime();
-      long durationMillis = endTime - startTime;
       long durationNanos = endTimeNanos - startTimeNanos;
 
       // Stop log capture and get logs
@@ -247,7 +289,7 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
           new QAPFixture(
               "BEFORE_ALL",
               fixtureMethod.getName(),
-              fixtureMethod.getDeclaringClass().getName(), // Fully qualified
+              fixtureMethod.getDeclaringClass().getName(),
               failure != null ? "FAILED" : "PASSED",
               durationNanos,
               qapFailure,
@@ -288,7 +330,6 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     } finally {
       long endTime = System.currentTimeMillis();
       long endTimeNanos = System.nanoTime();
-      long durationMillis = endTime - startTime;
       long durationNanos = endTimeNanos - startTimeNanos;
 
       // Stop log capture and get logs
@@ -334,7 +375,6 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     } finally {
       long endTime = System.currentTimeMillis();
       long endTimeNanos = System.nanoTime();
-      long durationMillis = endTime - startTime;
       long durationNanos = endTimeNanos - startTimeNanos;
 
       // Stop log capture and get logs
@@ -386,7 +426,6 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     } finally {
       long endTime = System.currentTimeMillis();
       long endTimeNanos = System.nanoTime();
-      long durationMillis = endTime - startTime;
       long durationNanos = endTimeNanos - startTimeNanos;
 
       // Stop log capture and get logs
@@ -400,7 +439,7 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
           new QAPFixture(
               "AFTER_ALL",
               fixtureMethod.getName(),
-              fixtureMethod.getDeclaringClass().getName(), // Fully qualified
+              fixtureMethod.getDeclaringClass().getName(),
               failure != null ? "FAILED" : "PASSED",
               durationNanos,
               qapFailure,
@@ -464,7 +503,9 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
     targetList.add(testFixture);
   }
 
-  /** Legacy method for backwards compatibility (without logs). */
+  /**
+   * Convenience overload for fixtures without log capture. Delegates to full method with null logs.
+   */
   private void addFixtureToTest(
       ExtensionContext context,
       String phase,
@@ -476,16 +517,20 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
   }
 
   /**
-   * Legacy method for class-level fixtures (beforeAll/afterAll when no test is running). Kept for
-   * backward compatibility and class-level fixtures.
+   * Adds a class-level fixture (beforeAll/afterAll) to the test class metadata. Uses
+   * computeIfAbsent to safely handle concurrent access to the class nodes map.
    */
   private void addFixtureToClass(
       ExtensionContext context, QAPFixture fixture, Method fixtureMethod) {
     var classStore = StoreManager.getClassStore(context);
+
+    // Use getOrComputeIfAbsent to safely initialize the map (thread-safe)
     @SuppressWarnings("unchecked")
     Map<String, QAPTestClass> nodes =
-        classStore.getOrDefault(
-            CLASS_NODES_KEY, Map.class, new java.util.concurrent.ConcurrentHashMap<>());
+        (Map<String, QAPTestClass>)
+            classStore.getOrComputeIfAbsent(
+                CLASS_NODES_KEY,
+                k -> new java.util.concurrent.ConcurrentHashMap<String, QAPTestClass>());
 
     // Record fixture in the test class where the test is currently running
     Class<?> testClass = context.getRequiredTestClass();
@@ -512,10 +557,8 @@ public class QAPJunitMethodInterceptor implements IMethodInterceptor {
       testClassNode.setFixtures(new ArrayList<>());
     }
 
-    // Record fixture - each fixture execution is recorded in the test class
+    // Record fixture - map updates are reflected in store via reference
     testClassNode.getFixtures().add(fixture);
-    nodes.put(testClassKey, testClassNode);
-    classStore.put(CLASS_NODES_KEY, nodes);
   }
 
   // ---- Log Capture Helpers -----------------------------------------------

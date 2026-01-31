@@ -156,9 +156,9 @@ public class QAPPropertiesLoader {
     return qapProperties.getProperty(key, defaultValue);
   }
 
-  /**˚
-   * Gets a boolean property value with a default. Use this for accessing properties not pre-loaded
-   * in the constructor.
+  /**
+   * ˚ Gets a boolean property value with a default. Use this for accessing properties not
+   * pre-loaded in the constructor.
    *
    * @param key property key
    * @param defaultValue default value if not found
