@@ -458,12 +458,8 @@ public class QAPJunitExtension
   }
 
   /**
-   * Builds log capture configuration from qap.properties. Users can customize logging behavior by
-   * setting properties like: - qap.logging.enabled=true - qap.logging.min.level=DEBUG -
-   * qap.logging.max.entries=5000 - qap.logging.max.message.length=20000 -
-   * qap.logging.capture.stacktraces=true - qap.logging.include.mdc=true -
-   * qap.logging.include.markers=true -
-   * qap.logging.logger.patterns=com.myapp.*,org.springframework.*
+   * Builds log capture configuration from qap.properties. Uses pre-loaded property values for
+   * performance.
    *
    * @return configured QAPLogCaptureConfig
    */
@@ -473,11 +469,11 @@ public class QAPJunitExtension
     com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig.Builder builder =
         com.mk.fx.qa.qap.logging.core.QAPLogCaptureConfig.builder();
 
-    // Enabled (default: true)
-    builder.enabled(props.getBooleanProperty("qap.logging.enabled", true));
+    // Enabled
+    builder.enabled(props.isLoggingEnabled());
 
-    // Min level (default: DEBUG for comprehensive capture)
-    String minLevelStr = props.getProperty("qap.logging.min.level", "DEBUG");
+    // Min level - parse from string
+    String minLevelStr = props.getLoggingMinLevel();
     try {
       com.mk.fx.qa.qap.logging.core.QAPLogLevel minLevel =
           com.mk.fx.qa.qap.logging.core.QAPLogLevel.valueOf(minLevelStr.toUpperCase());
@@ -489,24 +485,24 @@ public class QAPJunitExtension
       builder.minLevel(com.mk.fx.qa.qap.logging.core.QAPLogLevel.DEBUG);
     }
 
-    // Max entries per test (default: 1000)
-    builder.maxEntriesPerTest(props.getIntProperty("qap.logging.max.entries", 1000));
+    // Max entries per test
+    builder.maxEntriesPerTest(props.getLoggingMaxEntries());
 
-    // Max message length (default: 10000)
-    builder.maxMessageLength(props.getIntProperty("qap.logging.max.message.length", 10000));
+    // Max message length
+    builder.maxMessageLength(props.getLoggingMaxMessageLength());
 
-    // Capture stack traces (default: true)
-    builder.captureStackTraces(props.getBooleanProperty("qap.logging.capture.stacktraces", true));
+    // Capture stack traces
+    builder.captureStackTraces(props.isLoggingCaptureStackTraces());
 
-    // Include MDC (default: true)
-    builder.includeMdc(props.getBooleanProperty("qap.logging.include.mdc", true));
+    // Include MDC
+    builder.includeMdc(props.isLoggingIncludeMdc());
 
-    // Include markers (default: true)
-    builder.includeMarkers(props.getBooleanProperty("qap.logging.include.markers", true));
+    // Include markers
+    builder.includeMarkers(props.isLoggingIncludeMarkers());
 
-    // Logger patterns (default: empty = capture all)
-    String patternsStr = props.getProperty("qap.logging.logger.patterns", "");
-    if (!patternsStr.trim().isEmpty()) {
+    // Logger patterns
+    String patternsStr = props.getLoggingLoggerPatterns();
+    if (patternsStr != null && !patternsStr.trim().isEmpty()) {
       String[] patterns = patternsStr.split(",");
       for (String pattern : patterns) {
         String trimmed = pattern.trim();
