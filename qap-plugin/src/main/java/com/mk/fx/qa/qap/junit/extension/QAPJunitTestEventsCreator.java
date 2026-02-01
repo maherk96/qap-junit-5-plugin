@@ -28,22 +28,29 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * <p><strong>Hierarchy Building:</strong>
  *
  * <p>The class constructs a tree structure representing nested test classes. Java nested classes
- * are identified by the $ separator in their fully qualified names (e.g., {@code
- * OuterClass$InnerClass}). The algorithm:
+ * are identified by the {@code $} separator in their fully qualified names (e.g., {@code
+ * OuterClass$InnerClass}). Both simple test classes and nested class hierarchies use the same
+ * hierarchical processing path. The algorithm:
  *
  * <ol>
  *   <li>Identifies the root test class (top-level class)
  *   <li>Filters tests to separate root class tests from nested class tests
- *   <li>Groups nested classes by their parent using the $ separator
+ *   <li>Groups nested classes by their parent using the {@code $} separator
  *   <li>Recursively attaches children to their parents
  *   <li>Limits recursion depth to 10 levels (defensive programming)
  * </ol>
  *
- * <p><strong>Legacy Support:</strong>
+ * <p><strong>Fallback Mode:</strong>
  *
- * <p>When hierarchical class nodes are not available in the extension context store (older test
- * runs or missing CLASS_NODES_KEY), the system falls back to a flat list format. This creates a
- * single root class containing all tests without nested relationships.
+ * <p>In rare edge cases where class metadata is missing from the extension context store (failed
+ * initialization, backward compatibility with older versions, or store corruption), the system
+ * falls back to creating a minimal launch with a flat test list. This ensures test execution
+ * completes even if metadata collection failed.
+ *
+ * <p><strong>Important:</strong> The fallback mode is NOT related to class nesting. Both simple
+ * classes and nested class hierarchies use the normal hierarchical path when metadata is available.
+ * The fallback is a safety mechanism for exceptional circumstances that should rarely occur in
+ * normal operation.
  *
  * <p><strong>Thread Safety:</strong>
  *
@@ -72,13 +79,14 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
    * the final launch structure. The method operates in two modes:
    *
    * <ul>
-   *   <li><strong>Hierarchical mode:</strong> When class nodes are available in the store, builds a
-   *       tree structure representing nested test classes with proper parent-child relationships
-   *   <li><strong>Legacy mode:</strong> When class nodes are unavailable, creates a flat list of
-   *       all tests under a single root class
+   *   <li><strong>Normal mode:</strong> When class nodes are available in the store, builds a tree
+   *       structure representing test classes with proper parent-child relationships (handles both
+   *       simple and nested classes)
+   *   <li><strong>Fallback mode:</strong> When class nodes are unavailable (rare edge case),
+   *       creates a minimal launch with a flat test list
    * </ul>
    *
-   * <p><strong>Hierarchical Mode Process:</strong>
+   * <p><strong>Normal Mode Process:</strong>
    *
    * <ol>
    *   <li>Initialize or retrieve the root test class
@@ -112,13 +120,11 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
 
     Map<String, QAPTestClass> nodes = retrieveClassNodes(context);
 
-    // Check if we should use legacy flat list path
-    if (shouldUseLegacyPath(nodes)) {
-      populateLegacyFlatList(context, launch);
+    if (shouldUseFallbackMode(nodes)) {
+      populateFallbackLaunch(context, launch);
       return;
     }
 
-    // Use hierarchical path - build nested class structure
     QAPTestClass rootClass = initializeRootClass(context, launch, nodes);
     populateRootClassData(rootClass, nodes);
     buildClassHierarchy(rootClass, nodes);
@@ -144,11 +150,11 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
    *
    * <p><strong>Failure Handling:</strong>
    *
-   * <p>When a test fails, the exception is formatted into a QAP Failure object containing:
+   * <p>When a test fails, the exception is formatted into a QAPFailure object containing:
    *
    * <ul>
    *   <li>Exception class name and message
-   *   <li>Full stack trace
+   *   <li>Full stack trace (formatted according to configured limits)
    *   <li>Cause chain (if present)
    * </ul>
    *
@@ -170,7 +176,6 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
     QAPTest qapTest =
         StoreManager.getMethodStoreData(context, QAPUtils.METHOD_DESCRIPTION_KEY, QAPTest.class);
     if (qapTest == null) {
-      // No test data to populate - this shouldn't happen in normal flow
       return;
     }
 
@@ -182,7 +187,6 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
       qapTest.setFailure(com.mk.fx.qa.qap.junit.util.ExceptionFormatter.toFailure(throwable));
     }
 
-    // Record test execution duration in lifecycle
     if (qapTest.getLifecycle() != null) {
       if (qapTest.getLifecycle().getTest() == null) {
         qapTest
@@ -196,7 +200,8 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
   /**
    * Starts a new QAP test launch and initializes the root class with metadata.
    *
-   * <p>This method is called at the beginning of test execution (typically in beforeAll). It:
+   * <p>This method is called at the beginning of test execution (typically in {@code beforeAll}).
+   * It:
    *
    * <ul>
    *   <li>Creates launch header with timestamp and launch ID
@@ -235,29 +240,25 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
 
     Class<?> testClass = context.getRequiredTestClass();
 
-    // Collect class-level tags
     Set<String> classTags = new HashSet<>();
     for (org.junit.jupiter.api.Tag tag :
         testClass.getAnnotationsByType(org.junit.jupiter.api.Tag.class)) {
       classTags.add(tag.value());
     }
 
-    // Create root test class node
     QAPTestClass rootClass =
         new QAPTestClass(testClass.getSimpleName(), context.getDisplayName(), classTags);
 
-    // Create launch with header
     QAPJunitLaunch qapLaunch =
         new QAPJunitLaunch(
             new QAPHeader(
                 Instant.now().toEpochMilli(), System.getProperty(SYSTEM_PROPERTY_LAUNCH_ID)),
             new ArrayList<>(List.of(rootClass)));
 
-    // Populate root class metadata
     rootClass.setClassKey(testClass.getName());
     rootClass.setClassFqn(testClass.getName());
     rootClass.setClassSimpleName(testClass.getSimpleName());
-    rootClass.setClassChain(new ArrayList<>()); // Empty chain for root class
+    rootClass.setClassChain(new ArrayList<>());
     rootClass.setInheritedClassTags(Collections.emptySet());
     rootClass.setFixtures(new ArrayList<>());
 
@@ -265,12 +266,11 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
     return qapLaunch;
   }
 
-  // ========================================================================
-  // Private Helper Methods - Store Access
-  // ========================================================================
-
   /**
    * Retrieves the class nodes map from the extension context store with type safety.
+   *
+   * <p>Validates the retrieved object is actually a Map before casting to prevent runtime
+   * ClassCastException.
    *
    * @param context the extension context
    * @return map of class key to QAPTestClass, or null if not found or wrong type
@@ -285,19 +285,21 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
       }
       return null;
     } catch (ClassCastException e) {
-      // Wrong type in store - log and return null
       return null;
     }
   }
 
   /**
-   * Retrieves the legacy test list from the extension context store with type safety.
+   * Retrieves the fallback test list from the extension context store with type safety.
+   *
+   * <p>Used only in fallback mode when hierarchical class structure is unavailable. Validates the
+   * retrieved object is actually a List before casting.
    *
    * @param context the extension context
    * @return list of QAPTest objects, or null if not found or wrong type
    */
   @SuppressWarnings("unchecked")
-  private List<QAPTest> retrieveLegacyTestList(ExtensionContext context) {
+  private List<QAPTest> retrieveFallbackTestList(ExtensionContext context) {
     try {
       Object data =
           StoreManager.getClassStoreData(
@@ -307,39 +309,44 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
       }
       return null;
     } catch (ClassCastException e) {
-      // Wrong type in store - log and return null
       return null;
     }
   }
 
-  // ========================================================================
-  // Private Helper Methods - Legacy Path
-  // ========================================================================
-
   /**
-   * Determines if the legacy flat list path should be used.
+   * Determines if fallback mode should be used due to missing class metadata.
    *
-   * <p>Legacy path is used when hierarchical class nodes are not available in the store. This
-   * happens in older test runs or when CLASS_NODES_KEY was not populated.
+   * <p>In normal operation, CLASS_NODES_KEY is always populated by {@code beforeAll} in
+   * QAPJunitExtension. Fallback mode handles rare edge cases:
+   *
+   * <ul>
+   *   <li>Extension initialization failed or was skipped
+   *   <li>Backward compatibility with older data format that didn't populate CLASS_NODES_KEY
+   *   <li>Extension context store corruption
+   * </ul>
+   *
+   * <p><strong>Note:</strong> This is NOT related to nested vs. non-nested classes. Both simple and
+   * nested class structures use the normal hierarchical path when metadata is available.
    *
    * @param nodes the class nodes map from store
-   * @return true if legacy path should be used
+   * @return true if fallback mode should be used (rare edge case)
    */
-  private boolean shouldUseLegacyPath(Map<String, QAPTestClass> nodes) {
+  private boolean shouldUseFallbackMode(Map<String, QAPTestClass> nodes) {
     return nodes == null || nodes.isEmpty();
   }
 
   /**
-   * Populates the launch with a flat list of tests (legacy format).
+   * Fallback handler for missing class metadata (rare edge case).
    *
-   * <p>Used when hierarchical class structure is not available. Creates a single root class node
-   * and attaches all tests to it without nested class relationships.
+   * <p>Creates minimal launch structure when CLASS_NODES_KEY wasn't populated. This is a safety net
+   * to ensure test execution completes even if metadata collection failed. In normal operation, the
+   * hierarchical path is always used.
    *
    * @param context the extension context
    * @param launch the launch to populate
    */
-  private void populateLegacyFlatList(ExtensionContext context, QAPJunitLaunch launch) {
-    List<QAPTest> events = retrieveLegacyTestList(context);
+  private void populateFallbackLaunch(ExtensionContext context, QAPJunitLaunch launch) {
+    List<QAPTest> events = retrieveFallbackTestList(context);
 
     QAPTestClass rootClass =
         launch.getTestClasses().isEmpty() ? null : launch.getTestClasses().get(0);
@@ -355,15 +362,11 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
     rootClass.setTestCases(events != null ? events : new ArrayList<>());
   }
 
-  // ========================================================================
-  // Private Helper Methods - Hierarchical Path
-  // ========================================================================
-
   /**
    * Initializes or retrieves the root class for the launch.
    *
    * <p>The root class represents the top-level test class. This method ensures one exists in the
-   * launch and sets its classKey for hierarchy building.
+   * launch and sets its classKey temporarily for hierarchy building (removed later).
    *
    * @param context the extension context
    * @param launch the launch being populated
@@ -375,7 +378,6 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
     QAPTestClass rootClass =
         launch.getTestClasses().isEmpty() ? null : launch.getTestClasses().get(0);
 
-    // Determine root key - use existing classKey or compute from context
     String rootKey = (rootClass != null) ? rootClass.getClassKey() : null;
     if (rootKey == null) {
       rootKey = context.getRequiredTestClass().getName();
@@ -384,14 +386,11 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
       }
     }
 
-    // Create root class if doesn't exist
     if (rootClass == null) {
       QAPTestClass rootNode = nodes.get(rootKey);
       if (rootNode != null) {
-        // Use existing node from store
         rootClass = rootNode;
       } else {
-        // Create new root class
         rootClass =
             new QAPTestClass(
                 context.getRequiredTestClass().getSimpleName(),
@@ -401,8 +400,6 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
       launch.getTestClasses().add(rootClass);
     }
 
-    // Temporarily set classKey for hierarchy building
-    // (Will be nulled later as root shouldn't have classKey in final JSON)
     if (rootClass.getClassKey() == null) {
       rootClass.setClassKey(rootKey);
     }
@@ -414,7 +411,8 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
    * Populates the root class with its metadata and filtered tests.
    *
    * <p>Copies metadata from the store node to the root class. Filters tests to only include those
-   * belonging to the root class (not nested classes).
+   * belonging directly to the root class (tests from nested classes are attached to their
+   * respective nested class nodes).
    *
    * @param rootClass the root class to populate
    * @param nodes all class nodes from store
@@ -424,16 +422,12 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
     QAPTestClass rootNode = nodes.get(rootKey);
 
     if (rootNode != null) {
-      // Filter tests - only include tests from root class (not nested classes)
       List<QAPTest> rootTests = filterRootClassTests(rootNode.getTestCases());
       rootClass.setTestCases(rootTests);
-
-      // Copy metadata from store node
       rootClass.setClassChain(rootNode.getClassChain());
       rootClass.setInheritedClassTags(rootNode.getInheritedClassTags());
       rootClass.setFixtures(rootNode.getFixtures());
     } else {
-      // No data for root - initialize with empty collections
       rootClass.setTestCases(new ArrayList<>());
     }
   }
@@ -441,8 +435,8 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
   /**
    * Builds the nested class hierarchy by attaching children recursively.
    *
-   * <p>Creates parent-child relationships based on class key patterns (using $ separator). After
-   * building hierarchy, removes the classKey from root (not needed in final JSON).
+   * <p>Creates parent-child relationships based on class key patterns (using {@code $} separator).
+   * After building hierarchy, removes the classKey from root (not needed in final JSON).
    *
    * @param rootClass the root class to build hierarchy from
    * @param nodes all class nodes from store
@@ -450,30 +444,21 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
   private void buildClassHierarchy(QAPTestClass rootClass, Map<String, QAPTestClass> nodes) {
     String rootKey = rootClass.getClassKey();
 
-    // Create map of all non-root nodes
     Map<String, QAPTestClass> nestedClasses = new HashMap<>(nodes);
     nestedClasses.remove(rootKey);
 
-    // Build children map - groups nested classes by their parent key
     Map<String, List<QAPTestClass>> childrenMap = buildChildrenMap(nestedClasses);
 
-    // Recursively attach children to their parents
     attachChildrenRecursively(rootClass, childrenMap, 0);
 
-    // Remove classKey from root - it's temporary for hierarchy building
-    // Final JSON should not have classKey on root class
     rootClass.setClassKey(null);
   }
-
-  // ========================================================================
-  // Private Helper Methods - Hierarchy Building
-  // ========================================================================
 
   /**
    * Filters tests to only include those from the root class (not nested classes).
    *
-   * <p>Tests from nested classes have test case IDs containing the $ separator and should be
-   * attached to their respective nested class nodes, not the root.
+   * <p>Tests from nested classes have test case IDs containing the {@code $} separator and should
+   * be attached to their respective nested class nodes, not the root.
    *
    * @param tests all tests from root node
    * @return filtered list of root class tests only
@@ -490,8 +475,9 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
   /**
    * Builds a map of parent class key to list of child classes.
    *
-   * <p>Uses the $ separator in class keys to determine parent-child relationships. Orphans (classes
-   * without valid parent keys) are ignored.
+   * <p>Uses the {@code $} separator in class keys to determine parent-child relationships. Classes
+   * without valid parent keys (orphans) are ignored - these shouldn't exist in normal execution but
+   * could occur if store data is corrupted.
    *
    * @param nestedClasses all nested class nodes (excluding root)
    * @return map of parent key to list of children
@@ -505,7 +491,6 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
       String parentClassKey = getParentClassKey(classKey);
 
       if (parentClassKey == null) {
-        // Orphan - no valid parent, skip
         continue;
       }
 
@@ -519,7 +504,8 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
    * Recursively attaches child classes to their parent nodes.
    *
    * <p>Traverses the class hierarchy tree and sets the children list for each node. Includes depth
-   * limit to prevent infinite recursion in case of corrupted data.
+   * limit to prevent stack overflow in case of corrupted data (circular references shouldn't occur
+   * with normal JUnit test classes but defensive programming prevents crashes).
    *
    * @param node the current node to process
    * @param childrenMap map of parent keys to children lists
@@ -527,10 +513,8 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
    */
   private void attachChildrenRecursively(
       QAPTestClass node, Map<String, List<QAPTestClass>> childrenMap, int depth) {
-    // Safety limit to prevent stack overflow if data is corrupted
     final int MAX_DEPTH = 10;
     if (depth >= MAX_DEPTH) {
-      // Max nesting reached - this shouldn't happen with normal test classes
       return;
     }
 
@@ -540,21 +524,16 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
     if (children != null && !children.isEmpty()) {
       node.setChildren(children);
 
-      // Recursively attach grandchildren
       for (QAPTestClass child : children) {
         attachChildrenRecursively(child, childrenMap, depth + 1);
       }
     }
   }
 
-  // ========================================================================
-  // Private Helper Methods - Utility
-  // ========================================================================
-
   /**
    * Extracts the parent class key from a nested class key by removing the last nested segment.
    *
-   * <p>Example: "com.example.Outer$Inner" → "com.example.Outer"
+   * <p>Example: {@code "com.example.Outer$Inner" → "com.example.Outer"}
    *
    * @param classKey the full class key
    * @return parent class key, or null if this is not a nested class
@@ -573,7 +552,7 @@ public class QAPJunitTestEventsCreator implements ITestEventCreator {
   /**
    * Determines if a test belongs to the root class (not a nested class).
    *
-   * <p>Tests from nested classes have test case IDs containing the $ separator.
+   * <p>Tests from nested classes have test case IDs containing the {@code $} separator.
    *
    * @param test the test to check
    * @return true if this is a root class test, false if from nested class

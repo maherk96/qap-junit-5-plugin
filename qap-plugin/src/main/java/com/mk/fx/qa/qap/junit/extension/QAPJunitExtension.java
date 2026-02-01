@@ -616,7 +616,6 @@ public class QAPJunitExtension
       node.setClassChain(chain);
       node.setFixtures(new java.util.ArrayList<>());
       nodes.put(key, node);
-      // Map is already in store via getOrComputeIfAbsent - no need to put again
     } else {
       // Refresh display name only if changed (rare for static @DisplayName)
       String currentDisplayName = getOrResolveDisplayName(context);
