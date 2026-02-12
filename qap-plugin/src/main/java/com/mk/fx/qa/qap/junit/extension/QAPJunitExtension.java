@@ -10,6 +10,7 @@ import com.mk.fx.qa.qap.junit.model.QAPPropertiesLoader;
 import com.mk.fx.qa.qap.junit.model.QAPTest;
 import com.mk.fx.qa.qap.junit.runtime.QAPRuntime;
 import com.mk.fx.qa.qap.junit.store.StoreManager;
+import com.mk.fx.qa.qap.junit.util.CoverageItemExtractor;
 import com.mk.fx.qa.qap.junit.util.TagExtractor;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -539,6 +540,7 @@ public class QAPJunitExtension
     qapTest.setTag(TagExtractor.methodTags(context));
     qapTest.setClassTags(TagExtractor.classTags(context));
     qapTest.setInheritedClassTags(TagExtractor.inheritedClassTags(context));
+    qapTest.setCoverageItems(CoverageItemExtractor.methodCoverageItems(context));
     qapTest.setTestType("TEST");
 
     registerClassNode(context);
