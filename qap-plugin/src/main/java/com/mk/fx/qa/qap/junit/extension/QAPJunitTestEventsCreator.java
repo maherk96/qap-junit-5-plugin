@@ -9,6 +9,7 @@ import com.mk.fx.qa.qap.junit.model.QAPJunitLaunch;
 import com.mk.fx.qa.qap.junit.model.QAPTest;
 import com.mk.fx.qa.qap.junit.model.QAPTestClass;
 import com.mk.fx.qa.qap.junit.store.StoreManager;
+import com.mk.fx.qa.qap.junit.util.CoverageItemExtractor;
 import java.time.Instant;
 import java.util.*;
 import org.junit.jupiter.api.extension.ExtensionContext;

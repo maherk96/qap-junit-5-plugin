@@ -63,6 +63,12 @@ public class QAPTest {
   protected Set<String> inheritedClassTags = new HashSet<>();
 
   // ========================================================================
+  // Coverage Items
+  // ========================================================================
+
+  protected List<String> coverageItems;
+
+  // ========================================================================
   // Test-Specific Fields
   // ========================================================================
 
@@ -140,6 +146,19 @@ public class QAPTest {
 
   public void addTag(String tag) {
     this.tag.add(tag);
+  }
+
+  // ========================================================================
+  // Coverage Item Methods
+  // ========================================================================
+
+  @JsonProperty("coverageItems")
+  public List<String> getCoverageItems() {
+    return coverageItems != null ? Collections.unmodifiableList(coverageItems) : null;
+  }
+
+  public void setCoverageItems(List<String> items) {
+    this.coverageItems = items;
   }
 
   // ========================================================================
